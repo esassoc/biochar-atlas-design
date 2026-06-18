@@ -1,0 +1,109 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import Section from '@esa/docs/Section.astro';
+import { withBase } from '../../../lib/base';
+
+// Samples render at fixed desktop px; components consume the hub's fluid
+// clamp() --type-size-* tokens, which track these at desktop widths.
+const scale = [
+  { name: 'Size 600', px: 30, lh: 38, weight: 600, use: 'Page title', sample: 'Biochar Suitability Tool' },
+  { name: 'Size 500', px: 24, lh: 32, weight: 600, use: 'Section heading', sample: 'Soil context' },
+  { name: 'Size 400', px: 20, lh: 28, weight: 600, use: 'Card title', sample: 'Douglas-fir slash, 550°C' },
+  { name: 'Size 300', px: 18, lh: 27, weight: 400, use: 'Lead paragraph', sample: 'Evaluate whether a specific biochar suits a specific field.' },
+  { name: 'Size 250', px: 16, lh: 24, weight: 400, use: 'Body — base reading size', sample: 'SSURGO soil properties auto-derive when you pick a field; select goals to compare biochars from the catalog.' },
+  { name: 'Size 200', px: 14, lh: 20, weight: 400, use: 'Meta, timestamps, captions — the floor', sample: 'Auto-derived from SSURGO · OR039 · Jun 11, 2026' },
+];
+
+const weights = [
+  { name: 'Regular', value: 400, dm: 350, token: 'font-weight-regular' },
+  { name: 'Medium', value: 500, dm: 450, token: 'font-weight-medium' },
+  { name: 'Semibold', value: 600, dm: 550, token: 'font-weight-semibold' },
+  { name: 'Bold', value: 700, dm: 650, token: 'font-weight-bold' },
+];
+---
+<DocsLayout title="Typography — Biochar Atlas" activeHref="/design-system/foundations/typography">
+  <nav class="crumbs"><a href={withBase('/design-system')}>Biochar Atlas</a> <span>/</span> <span>Foundations</span> <span>/</span> <span>Typography</span></nav>
+  <h1>Typography</h1>
+  <p class="lede">
+    Public Sans for everything; Roboto Mono for data values. Public Sans is the U.S. Web Design
+    System typeface — a deliberately USDA-adjacent choice that reads as quiet credibility to the
+    NRCS conservationists who are this tool's primary users.
+  </p>
+
+  <Section id="families" title="Type families">
+    <div class="fam">
+      <div class="fam__sample">The quick brown fox jumps over the lazy dog</div>
+      <div class="fam__meta"><code>--font-sans</code> · Public Sans · the only UI face — headings differ by size and weight, not family</div>
+    </div>
+    <div class="fam">
+      <div class="fam__sample fam__sample--mono">pH 6.2 · CEC 18.5 · 78 / 100</div>
+      <div class="fam__meta"><code>--font-mono</code> · Roboto Mono · data values — soil properties, suitability scores, coordinates</div>
+    </div>
+  </Section>
+
+  <Section id="scale" title="Type scale">
+    <p>
+      Sizes shown at their desktop px / line-height; components read the matching fluid
+      <code>--type-size-*</code> token. Body text never drops below 16px; meta text never
+      below 14px.
+    </p>
+    <div class="scale">
+      {scale.map((t) => (
+        <div class="row">
+          <div class="row__meta">
+            <span class="row__name">{t.name}</span>
+            <span class="row__dims">{t.px} / {t.lh} · {t.weight}</span>
+            <span class="row__use">{t.use}</span>
+          </div>
+          <div class="row__sample" style={`font-size: ${t.px}px; line-height: ${t.lh}px; font-weight: ${t.weight};`}>{t.sample}</div>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <Section id="weights" title="Weights">
+    <p>
+      Public Sans ships standard weights, so the theme re-points the hub's weight tokens:
+      <strong>400 / 500 / 600 / 700</strong> replace DM Sans's variable-font
+      <strong>350 / 450 / 550 / 650</strong>. Components that read
+      <code>--font-weight-*</code> get the right optical weight on either face; never
+      hard-code a DM Sans weight number in this spoke.
+    </p>
+    <div class="weights">
+      {weights.map((w) => (
+        <div class="wt">
+          <div class="wt__sample" style={`font-weight: ${w.value};`}>{w.name}</div>
+          <code>--{w.token}</code>
+          <span class="wt__val">{w.value} <span class="wt__dm">(DM Sans: {w.dm})</span></span>
+        </div>
+      ))}
+    </div>
+  </Section>
+</DocsLayout>
+
+<style>
+  .fam { padding: var(--spacing-400, 1rem) 0; border-bottom: 1px solid var(--color-border-light, #ebe8e1); }
+  .fam:last-child { border-bottom: 0; }
+  .fam__sample { font-size: 28px; color: var(--color-text-primary, #33312a); }
+  .fam__sample--mono { font-family: var(--font-mono, monospace); font-size: 22px; }
+  .fam__meta { margin-top: var(--spacing-200, 0.5rem); font-size: 14px; color: var(--color-text-muted, #807c73); }
+  .fam__meta code { font-family: var(--font-mono, monospace); }
+
+  .scale { display: flex; flex-direction: column; }
+  .row { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: var(--spacing-500, 1.5rem); align-items: baseline; padding: var(--spacing-400, 1rem) 0; border-bottom: 1px solid var(--color-border-light, #ebe8e1); }
+  .row:last-child { border-bottom: 0; }
+  .row__meta { display: flex; flex-direction: column; gap: 1px; }
+  .row__name { font-size: 14px; font-weight: 500; color: var(--color-text-primary, #33312a); }
+  .row__dims { font-family: var(--font-mono, monospace); font-size: 14px; color: var(--color-text-muted, #807c73); }
+  .row__use { font-size: 14px; color: var(--color-text-muted, #807c73); }
+  .row__sample { color: var(--color-text-primary, #33312a); min-width: 0; }
+
+  .weights { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--spacing-400, 1rem); }
+  .wt { display: flex; flex-direction: column; gap: 2px; padding: var(--spacing-400, 1rem); border: 1px solid var(--color-border, #ddd9d0); border-radius: 10px; }
+  .wt__sample { font-size: 22px; color: var(--color-text-primary, #33312a); }
+  .wt code { font-family: var(--font-mono, monospace); font-size: 14px; color: var(--color-text-secondary, #54514a); margin-top: var(--spacing-200, 0.5rem); }
+  .wt__val { font-size: 14px; color: var(--color-text-muted, #807c73); }
+  .wt__dm { color: var(--color-text-muted, #807c73); }
+
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; gap: var(--spacing-200, 0.5rem); } }
+</style>

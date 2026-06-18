@@ -1,0 +1,57 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+import AlertBox from '@esa/ecology/esa-alert-box.astro';
+
+const props = [
+  { name: 'variant', type: "'info' | 'success' | 'warning' | 'danger'", default: "'info'", description: 'Tone — drives the background, border, and auto-mapped icon.' },
+  { name: 'title', type: 'string', description: 'Optional bold heading above the message.' },
+  { name: 'dismissable', type: 'boolean', default: 'false', description: 'Shows a close button that hides the alert and emits a dismissed event.' },
+];
+
+const events = [
+  { name: 'dismissed', type: 'CustomEvent', description: 'Bubbles when the close button is clicked (dismissable only).' },
+];
+---
+<ComponentDoc
+  name="Alert Box"
+  category="Display"
+  slug="esa-alert-box"
+  type=".astro"
+  summary="The inherited Ecology alert, wearing the Biochar Atlas skin. An inline status message with a variant-mapped icon, optional title, and optional dismiss control; tones resolve from the spoke's semantic tokens — warning is the score amber."
+>
+  <Section id="preview" title="Preview">
+    <Preview align="start" code={`<AlertBox variant="info" title="Estimates only">\n  Scores are screening-level guidance, not a prescription.\n</AlertBox>`}>
+      <div style="width: 100%;">
+        <AlertBox variant="info" title="Estimates only">Scores are screening-level guidance, not a prescription.</AlertBox>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="variants" title="Variants">
+    <Preview align="start" code={`<AlertBox variant="info" title="Heads up">Soil properties were auto-derived from SSURGO.</AlertBox>\n<AlertBox variant="success" title="Saved">Your assessment was saved successfully.</AlertBox>\n<AlertBox variant="warning" title="Check this">Manual soil-test values override the SSURGO defaults.</AlertBox>\n<AlertBox variant="danger" title="Error">Something went wrong while scoring.</AlertBox>`}>
+      <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+        <AlertBox variant="info" title="Heads up">Soil properties were auto-derived from SSURGO.</AlertBox>
+        <AlertBox variant="success" title="Saved">Your assessment was saved successfully.</AlertBox>
+        <AlertBox variant="warning" title="Check this">Manual soil-test values override the SSURGO defaults.</AlertBox>
+        <AlertBox variant="danger" title="Error">Something went wrong while scoring.</AlertBox>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="states" title="States">
+    <p>The title is optional — omit it for a compact single-line alert. With <code>dismissable</code>, a close button appears and a <code>dismissed</code> event bubbles on click.</p>
+    <Preview align="start" code={`<AlertBox variant="info">A compact, single-line alert with just a message.</AlertBox>\n<AlertBox variant="warning" title="Dismiss me" dismissable={true}>Click the × to hide this alert.</AlertBox>`}>
+      <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+        <AlertBox variant="info">A compact, single-line alert with just a message.</AlertBox>
+        <AlertBox variant="warning" title="Dismiss me" dismissable={true}>Click the × to hide this alert.</AlertBox>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} events={events} />
+  </Section>
+</ComponentDoc>

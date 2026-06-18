@@ -1,0 +1,70 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+import EsaEmptyState from '@esa/ecology/esa-empty-state.astro';
+import EsaButton from '@esa/ecology/esa-button.astro';
+
+const props = [
+  { name: 'title', type: 'string', description: 'Required. The headline of the empty state.' },
+  { name: 'description', type: 'string', description: 'Optional supporting copy under the title.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Scales the icon, text, and padding together.' },
+];
+---
+<ComponentDoc
+  name="Empty State"
+  category="Display"
+  slug="esa-empty-state"
+  type=".astro"
+  summary="The inherited Ecology empty state, wearing the Biochar Atlas skin. A centered icon + title + description + actions block for nothing-here moments — no field selected, no biochars matched, no saved assessments."
+>
+  <Section id="basic" title="Basic">
+    <p>Pass an inline SVG via the named <code>icon</code> slot; the default slot holds the call to action.</p>
+    <Preview align="start" code={`<EsaEmptyState\n  title="No field selected"\n  description="Pick a field on the map or enter coordinates to derive its soil context."\n>\n  <svg slot="icon" …map-pin… />\n  <EsaButton color="primary">Find a field</EsaButton>\n</EsaEmptyState>`}>
+      <div class="host">
+        <EsaEmptyState
+          title="No field selected"
+          description="Pick a field on the map or enter coordinates to derive its soil context."
+        >
+          <svg slot="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+          <EsaButton color="primary">Find a field</EsaButton>
+        </EsaEmptyState>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="no-icon" title="Without icon or action">
+    <p>Both the icon slot and the actions are optional — title alone reads as a quiet placeholder row.</p>
+    <Preview align="start" code={`<EsaEmptyState title="No biochars match these filters" description="Loosen a filter or clear them all." />`}>
+      <div class="host">
+        <EsaEmptyState title="No biochars match these filters" description="Loosen a filter or clear them all." />
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="sizes" title="Sizes">
+    <p>Four sizes scale icon, type, and padding together — <code>sm</code> fits inside a card body; <code>lg</code> can carry a full page.</p>
+    <Preview align="start" code={`<EsaEmptyState title="No saved assessments" size="sm" />\n<EsaEmptyState title="No saved assessments" size="lg" />`}>
+      <div class="host host--split">
+        <EsaEmptyState title="No saved assessments" description="Completed assessments appear here." size="sm" />
+        <EsaEmptyState title="No saved assessments" description="Completed assessments appear here." size="lg" />
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} />
+    <p class="slots">
+      <strong>Slots:</strong> <code>icon</code> (an inline SVG, sized by the component) ·
+      default (action buttons under the description).
+    </p>
+  </Section>
+</ComponentDoc>
+
+<style>
+  .host { width: 100%; border: 1px dashed var(--color-border, #ddd9d0); border-radius: var(--radius-300, 8px); }
+  .host--split { display: grid; grid-template-columns: 1fr 1fr; align-items: center; }
+  .slots { font-size: 15px; color: var(--color-text-secondary, #54514a); }
+  @media (max-width: 640px) { .host--split { grid-template-columns: 1fr; } }
+</style>

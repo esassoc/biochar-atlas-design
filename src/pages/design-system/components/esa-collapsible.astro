@@ -1,0 +1,76 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+import EsaCollapsible from '@esa/ecology/esa-collapsible.astro';
+
+const props = [
+  { name: 'title', type: 'string', description: 'Summary label (required).' },
+  { name: 'icon', type: 'string', description: 'Optional leading Lucide icon name (kebab-case).' },
+  { name: 'iconPaths', type: 'string', description: 'Inner SVG markup for an icon outside esa-icon’s built-in registry (passed through to esa-icon).' },
+  { name: 'open', type: 'boolean', default: 'false', description: 'Render expanded on load.' },
+  { name: 'flush', type: 'boolean', default: 'false', description: 'No card chrome (border/radius/background, flush horizontal padding) — for stacked sidebar sections separated by the host’s own dividers.' },
+];
+---
+<ComponentDoc
+  name="Collapsible"
+  category="Display"
+  slug="esa-collapsible"
+  type=".astro"
+  summary="A single disclosure section — an icon + title summary over a slotted body — built on native <code>&lt;details&gt;</code> for free accessibility, keyboard support, and open/close state with no JS. It is a single disclosure, not a single-open accordion group: stack several and each opens independently."
+>
+  <Section id="basic" title="Basic">
+    <p>A required <code>title</code>, an optional leading <code>icon</code>, and slotted body content. Compose a stack for a sidebar of detail groups; <code>open</code> controls the initial state per section.</p>
+    <Preview align="start" code={`<EsaCollapsible title="Soil properties" icon="database" open>\n  pH, texture, drainage class, and available water capacity.\n</EsaCollapsible>\n<EsaCollapsible title="Limitations" icon="info">\n  Scope notes and screening-level disclaimers.\n</EsaCollapsible>`}>
+      <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px;">
+        <EsaCollapsible title="Soil properties" icon="database" open>
+          <p style="margin: 0; color: var(--color-text-secondary);">pH, texture, drainage class, and available water capacity.</p>
+        </EsaCollapsible>
+        <EsaCollapsible title="Limitations" icon="info">
+          <p style="margin: 0; color: var(--color-text-secondary);">Scope notes and screening-level disclaimers.</p>
+        </EsaCollapsible>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="no-icon" title="Without an icon">
+    <p>The icon is optional — omit it for a plain title summary. The caret still leads the open/close affordance from the right.</p>
+    <Preview align="start" code={`<EsaCollapsible title="Methodology">\n  How the 0–100 score is derived.\n</EsaCollapsible>`}>
+      <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px;">
+        <EsaCollapsible title="Methodology">
+          <p style="margin: 0; color: var(--color-text-secondary);">How the 0–100 score is derived.</p>
+        </EsaCollapsible>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="flush" title="Flush">
+    <p>With <code>flush</code>, the card chrome drops away — for stacked drawer or sidebar sections where the host supplies its own dividers.</p>
+    <Preview align="start" code={`<EsaCollapsible title="Tracking" icon="history" flush open>\n  Ruleset version and dataset refresh dates.\n</EsaCollapsible>`}>
+      <div class="flush-host">
+        <EsaCollapsible title="Tracking" icon="history" flush open>
+          <p style="margin: 0; color: var(--color-text-secondary);">Ruleset version and dataset refresh dates.</p>
+        </EsaCollapsible>
+        <EsaCollapsible title="Details" icon="file-text" flush>
+          <p style="margin: 0; color: var(--color-text-secondary);">Read-only assessment metadata.</p>
+        </EsaCollapsible>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} />
+  </Section>
+</ComponentDoc>
+
+<style>
+  .flush-host {
+    width: 100%; max-width: 420px;
+    border: 1px solid var(--color-border, #ddd9d0);
+    border-radius: var(--radius-300, 8px);
+    background: var(--color-surface, #fff);
+    padding: 0 var(--spacing-400, 1rem);
+  }
+  .flush-host > :global(* + *) { border-top: 1px solid var(--color-border-light, #ebe8e1); }
+</style>

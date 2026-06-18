@@ -1,0 +1,150 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import Section from '@esa/docs/Section.astro';
+import ColorScale from '@esa/docs/ColorScale.astro';
+import { withBase } from '../../../lib/base';
+
+// Spoke ramps — verbatim from theme-biochar.css. These are --bca-* spoke-local
+// tokens (no hub equivalent); the semantic chain below is re-pointed onto them.
+const green = [
+  { step: '50', value: '#f0f5ec', token: 'bca-green-50' },
+  { step: '100', value: '#e2ecda', token: 'bca-green-100' },
+  { step: '200', value: '#c8dabe', token: 'bca-green-200' },
+  { step: '300', value: '#a3c096', token: 'bca-green-300' },
+  { step: '500', value: '#4e7d52', token: 'bca-green-500' },
+  { step: '700', value: '#2d5839', token: 'bca-green-700' },
+  { step: '800', value: '#234a31', token: 'bca-green-800' },
+  { step: '900', value: '#1b3b27', token: 'bca-green-900' },
+  { step: '950', value: '#122a1b', token: 'bca-green-950' },
+];
+const amber = [
+  { step: '100', value: '#f7ead2', token: 'bca-amber-100' },
+  { step: '300', value: '#e9c477', token: 'bca-amber-300' },
+  { step: '500', value: '#d99a2b', token: 'bca-amber-500' },
+  { step: '700', value: '#b3791a', token: 'bca-amber-700' },
+  { step: 'track', value: '#efe9da', token: 'bca-score-track' },
+];
+const parchment = [
+  { step: '50', value: '#f6f4ea', token: 'bca-parchment-50' },
+  { step: '100', value: '#ece9d8', token: 'bca-parchment-100' },
+  { step: '200', value: '#dfdcc4', token: 'bca-parchment-200' },
+  { step: 'sage', value: '#dde2cc', token: 'bca-sage' },
+  { step: 'water', value: '#b8cfd8', token: 'bca-water' },
+];
+
+// Semantic roles — these ARE wired under [data-theme="biochar"], so the
+// swatches render live via var() and reflect exactly what ships.
+const roles = [
+  { token: 'color-primary', value: '#234a31', note: 'Forest green (green/800) — the "Evaluate suitability" CTA. Buttons, links, focus rings chain off this.' },
+  { token: 'color-primary-subtle', value: '#f0f5ec', note: 'Tinted fills for selected/hover states (green/50).' },
+  { token: 'color-primary-border', value: '#c8dabe', note: 'Borders on primary-tinted surfaces (green/200).' },
+  { token: 'color-secondary', value: '#4e7d52', note: 'Lighter forest green (green/500) for secondary emphasis.' },
+  { token: 'color-success', value: '#2e7d4f', note: 'Positive feedback — suitable, saved, complete.' },
+  { token: 'color-warning', value: '#c77f1f', note: 'Caution — the score amber doubles as warning.' },
+  { token: 'color-info', value: '#3a7ca5', note: 'Informational feedback; also the user-provided provenance blue.' },
+  { token: 'color-text-primary', value: '#33312a', note: 'Body text — warm field-notebook gray with a slight olive cast.' },
+  { token: 'color-text-secondary', value: '#54514a', note: 'Supporting text.' },
+  { token: 'color-text-muted', value: '#807c73', note: 'Meta text — timestamps, captions.' },
+  { token: 'color-border', value: '#ddd9d0', note: 'Hairline dividers, warm to match the neutrals.' },
+  { token: 'color-background', value: '#faf9f6', note: 'Page background — warm paper, not white.' },
+  { token: 'color-surface-sunken', value: '#f3f1ea', note: 'Sunken panels, stat tiles, control wells.' },
+];
+
+// Cartography + provenance accents — single-purpose spoke tokens.
+const accents = [
+  { token: 'bca-field-stroke', value: '#234a31', note: 'Selected field outline on the map.' },
+  { token: 'bca-recommended-bg', value: '#e2ecda', note: 'Background tint behind the recommended biochar.' },
+  { token: 'bca-recommended-text', value: '#1b3b27', note: 'Text on the recommended tint.' },
+  { token: 'bca-provenance-ssurgo', value: '#6a665e', note: '"Auto-derived from SSURGO" provenance badge.' },
+  { token: 'bca-provenance-user', value: '#3a7ca5', note: '"User-provided soil test" provenance badge.' },
+];
+---
+<DocsLayout title="Color — Biochar Atlas" activeHref="/design-system/foundations/color">
+  <nav class="crumbs"><a href={withBase('/design-system')}>Biochar Atlas</a> <span>/</span> <span>Foundations</span> <span>/</span> <span>Color</span></nav>
+  <h1>Color</h1>
+  <p class="lede">
+    Forest green replaces Ecology's teal; score amber and parchment cartography carry the
+    Suitability Tool's map-and-meter language. Spoke ramps (<code>--bca-*</code>) feed the
+    semantic roles components actually read.
+  </p>
+
+  <Section id="ramps" title="Spoke ramps">
+    <p>
+      Raw material, prefixed <code>--bca-*</code> because they have no hub equivalent. The
+      forest-green ramp feeds the primary chain; the amber ramp drives the 0–100 suitability
+      meters; parchment is the map terrain palette (tiles are muted toward it with CSS filters).
+    </p>
+    <ColorScale name="Forest green — primary" steps={green} />
+    <ColorScale name="Score amber — suitability meters" steps={amber} />
+    <ColorScale name="Parchment — cartography" steps={parchment} />
+  </Section>
+
+  <Section id="roles" title="Semantic roles">
+    <p>
+      What components reference. The Biochar theme re-points these off the ramps above — each
+      swatch below renders live from its token, so it reflects exactly what ships.
+    </p>
+    <div class="roles">
+      {roles.map((r) => (
+        <div class="role">
+          <span class="role__sw" style={`background: var(--${r.token});`}></span>
+          <div class="role__body">
+            <code>--{r.token}</code>
+            <span class="role__val">{r.value}</span>
+            <span class="role__note">{r.note}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <Section id="accents" title="Cartography &amp; provenance accents">
+    <p>
+      Single-purpose spoke tokens for the map layer and data-provenance signals. Provenance
+      matters here: NRCS users need to see at a glance whether a soil value came from SSURGO
+      or from their own lab test.
+    </p>
+    <div class="roles">
+      {accents.map((r) => (
+        <div class="role">
+          <span class="role__sw" style={`background: var(--${r.token}, ${r.value});`}></span>
+          <div class="role__body">
+            <code>--{r.token}</code>
+            <span class="role__val">{r.value}</span>
+            <span class="role__note">{r.note}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <Section id="theming" title="Theming">
+    <p>
+      One <code>[data-theme="biochar"]</code> block in <code>theme-biochar.css</code> overrides the
+      semantic layer; primitives never move. Because the hub chains <code>--color-text-link</code>
+      and the focus-ring tokens off <code>--color-primary</code>, re-pointing primary alone re-skins
+      links and focus states too.
+    </p>
+    <p class="note">
+      <strong>Neutral chain —</strong> the full neutral chain (<code>--color-text-primary</code>,
+      <code>-secondary</code>, <code>-tertiary</code>, <code>-muted</code>, the borders, and
+      <code>--color-background</code>) is re-pointed to warm field-notebook grays with a slight
+      olive cast, so the whole app reads as paper in the field rather than the hub's cooler
+      neutrals. <code>--color-warning</code> is deliberately the score amber — caution and
+      mid-range suitability share one hue.
+    </p>
+  </Section>
+</DocsLayout>
+
+<style>
+  .roles { display: flex; flex-direction: column; gap: var(--spacing-200, 0.5rem); }
+  .role { display: flex; gap: var(--spacing-400, 1rem); align-items: center; padding: var(--spacing-300, 0.75rem) 0; border-bottom: 1px solid var(--color-border-light, #ebe8e1); }
+  .role:last-child { border-bottom: 0; }
+  .role__sw { width: 40px; height: 40px; border-radius: 8px; flex: none; border: 1px solid color-mix(in srgb, var(--color-text-primary, #000) 10%, transparent); }
+  .role__body { display: grid; gap: 1px; }
+  .role__body code { font-family: var(--font-mono, monospace); font-size: 14px; color: var(--color-text-primary, #33312a); }
+  .role__val { font-family: var(--font-mono, monospace); font-size: 14px; color: var(--color-text-muted, #807c73); text-transform: uppercase; }
+  .role__note { font-size: 14px; color: var(--color-text-secondary, #54514a); }
+
+  .note { padding: var(--spacing-300, 0.75rem) var(--spacing-400, 1rem); background: var(--color-surface-sunken, #f3f1ea); border-radius: 8px; font-size: 15px; line-height: 1.55; }
+</style>

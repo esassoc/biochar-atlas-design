@@ -1,0 +1,125 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+
+const props = [
+  { name: 'options', type: '{ value, label, tone? }[]', default: '[]', description: 'The chips. Set as a property; the attribute form also accepts a JSON string. tone picks the active-state palette per chip.' },
+  { name: 'value', type: 'string', default: "''", description: "Selected chip's value in single-select mode (reflected attribute); bound to the form value." },
+  { name: 'values', type: 'string[]', default: '[]', description: 'Selected values in multiple mode. Form value is the comma-joined list.' },
+  { name: 'multiple', type: 'boolean', default: 'false', description: 'Chips toggle independently (checkbox-group pattern) instead of exactly-one (radiogroup).' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Chip padding and text size (shared form scale).' },
+  { name: 'name', type: 'string', default: "''", description: 'Form field name for the form-associated value.' },
+  { name: 'label', type: 'string', default: "''", description: 'Accessible name for the group (set as aria-label on the host).' },
+];
+
+const events = [
+  { name: 'change', type: 'CustomEvent<{ value } | { values }>', description: 'Fired on selection change. Composed and bubbling; detail carries value (single) or values (multiple).' },
+];
+---
+<ComponentDoc
+  name="Chip Group"
+  category="Filters &amp; Controls"
+  slug="esa-chip-group"
+  type="wc"
+  summary="The inherited Ecology chip group, wearing the Biochar Atlas skin. A horizontal row of pill toggles — single-select radiogroup by default, independent checkbox set with <code>multiple</code>. In the Atlas it carries the application-goals step: pick goals, get scored against them."
+>
+  <Section id="single" title="Single select">
+    <p>
+      Exactly one chip is active (the WAI-ARIA radiogroup pattern). Arrow keys move the
+      selection with wrap-around; <code>Home</code>/<code>End</code> jump to the ends.
+    </p>
+    <Preview align="start" code={`<esa-chip-group label="Primary goal" name="goal" value="water"></esa-chip-group>\n\n<script>\n  el.options = [\n    { value: 'water', label: 'Water retention' },\n    { value: 'som', label: 'Soil organic matter' },\n    { value: 'carbon', label: 'Carbon sequestration' },\n    { value: 'ph', label: 'pH adjustment' },\n  ];\n</script>`}>
+      <esa-chip-group label="Primary goal" name="goal" value="water" data-demo="goals"></esa-chip-group>
+    </Preview>
+  </Section>
+
+  <Section id="multiple" title="Multi select">
+    <p>
+      With <code>multiple</code>, chips toggle independently and the selection lives in the
+      <code>values</code> array — the shape of the Atlas's &ldquo;select application goals&rdquo;
+      step. Arrows move focus without selecting; Enter or Space toggles the focused chip.
+    </p>
+    <Preview align="start" code={`<esa-chip-group label="Application goals" name="goals" multiple></esa-chip-group>\n\n<script>\n  el.options = [/* goals */];\n  el.values = ['water', 'som', 'carbon'];\n</script>`}>
+      <esa-chip-group label="Application goals" name="goals" multiple data-demo="goals-multi"></esa-chip-group>
+    </Preview>
+  </Section>
+
+  <Section id="tones" title="Tones">
+    <p>
+      Each option can name an active-state palette: <code>neutral</code> (default),
+      <code>neutral-strong</code>, <code>brand</code>, or <code>amber</code>. The tones map to
+      Ecology semantic tokens — under the Biochar theme, <code>brand</code> reads the primary
+      chain (<code>--color-primary-subtle</code> tint, <code>--color-primary</code> text), so it
+      renders forest green here, and <code>amber</code> follows the warning chain, i.e. the
+      score amber.
+    </p>
+    <Preview align="start" code={`el.options = [\n  { value: 'neutral', label: 'Neutral' },\n  { value: 'neutral-strong', label: 'Neutral strong', tone: 'neutral-strong' },\n  { value: 'brand', label: 'Brand', tone: 'brand' },\n  { value: 'amber', label: 'Amber', tone: 'amber' },\n];\nel.values = ['neutral', 'neutral-strong', 'brand', 'amber'];`}>
+      <esa-chip-group label="Tones" multiple data-demo="tones"></esa-chip-group>
+    </Preview>
+  </Section>
+
+  <Section id="sizes" title="Sizes">
+    <Preview align="start" code={`<esa-chip-group size="xs"></esa-chip-group>\n<esa-chip-group size="sm"></esa-chip-group>\n<esa-chip-group size="md"></esa-chip-group>\n<esa-chip-group size="lg"></esa-chip-group>`}>
+      <div class="col">
+        <esa-chip-group label="Extra small" size="xs" value="water" data-demo="goals"></esa-chip-group>
+        <esa-chip-group label="Small" size="sm" value="water" data-demo="goals"></esa-chip-group>
+        <esa-chip-group label="Medium" size="md" value="water" data-demo="goals"></esa-chip-group>
+        <esa-chip-group label="Large" size="lg" value="water" data-demo="goals"></esa-chip-group>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} events={events} />
+  </Section>
+
+  <Section id="accessibility" title="Accessibility">
+    <ul class="a11y">
+      <li>Single mode renders <code>role="radiogroup"</code> with <code>role="radio"</code> chips; <code>multiple</code> switches to <code>role="group"</code> with <code>role="checkbox"</code> chips. <code>aria-checked</code> reflects selection.</li>
+      <li>Roving tabindex: one chip is tab-reachable; Arrow keys move through the group with wrap-around, <code>Home</code>/<code>End</code> jump to the ends.</li>
+      <li>In single mode arrows move the selection; in multiple mode they move focus only and Enter/Space toggles — the WAI-ARIA checkbox-group pattern.</li>
+      <li>The <code>label</code> prop becomes the group's accessible name via ElementInternals.</li>
+      <li>Form-associated: the host form sees the selected value, or the comma-joined list when <code>multiple</code>.</li>
+    </ul>
+  </Section>
+</ComponentDoc>
+
+<style>
+  .col { display: flex; flex-direction: column; gap: var(--spacing-300, 0.75rem); align-items: flex-start; }
+  .a11y { font-size: 15px; line-height: 1.6; color: var(--color-text-secondary, #54514a); }
+</style>
+
+<script>
+  import '@esa/ecology/esa-chip-group';
+
+  const goals = [
+    { value: 'water', label: 'Water retention' },
+    { value: 'som', label: 'Soil organic matter' },
+    { value: 'carbon', label: 'Carbon sequestration' },
+    { value: 'ph', label: 'pH adjustment' },
+  ];
+  const tones = [
+    { value: 'neutral', label: 'Neutral' },
+    { value: 'neutral-strong', label: 'Neutral strong', tone: 'neutral-strong' },
+    { value: 'brand', label: 'Brand', tone: 'brand' },
+    { value: 'amber', label: 'Amber', tone: 'amber' },
+  ];
+
+  customElements.whenDefined('esa-chip-group').then(() => {
+    document.querySelectorAll('esa-chip-group[data-demo="goals"]').forEach((el) => {
+      (el as any).options = goals;
+    });
+    const multi = document.querySelector('esa-chip-group[data-demo="goals-multi"]');
+    if (multi) {
+      (multi as any).options = goals;
+      (multi as any).values = ['water', 'som', 'carbon'];
+    }
+    const toneEl = document.querySelector('esa-chip-group[data-demo="tones"]');
+    if (toneEl) {
+      (toneEl as any).options = tones;
+      (toneEl as any).values = tones.map((t) => t.value);
+    }
+  });
+</script>

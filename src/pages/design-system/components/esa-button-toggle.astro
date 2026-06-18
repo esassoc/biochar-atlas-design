@@ -1,0 +1,92 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+
+const props = [
+  { name: 'options', type: '{ value: string, label: string }[]', default: '[]', description: 'The segments. Set as a property (it is an array, not an attribute).' },
+  { name: 'value', type: 'string', default: "''", description: "Selected option's value. Single-select; bound to the form value." },
+  { name: 'label', type: 'string', default: "''", description: 'Optional visible label above the group; becomes the radiogroup name.' },
+  { name: 'hint', type: 'string', default: "''", description: 'Optional helper text below the group.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Control size (shared form scale).' },
+  { name: 'required', type: 'boolean', default: 'false', description: 'Marks the field required (adds an asterisk and aria-required).' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every segment.' },
+];
+
+const events = [
+  { name: 'change', type: 'CustomEvent<{ value: string }>', description: 'Fired when the selection changes. Composed and bubbling; detail.value is the newly selected value.' },
+];
+---
+<ComponentDoc
+  name="Button Toggle"
+  category="Filters &amp; Controls"
+  slug="esa-button-toggle"
+  type="wc"
+  summary="The inherited Ecology segmented single-select — one-of-N choices rendered as a row of connected buttons. Form-associated and following the WAI-ARIA radiogroup pattern; the selected segment fills with forest green from <code>--color-primary</code>. In the Atlas it switches the map / form entry paths."
+>
+  <Section id="preview" title="Preview">
+    <Preview code={`<esa-button-toggle label="Entry path"></esa-button-toggle>\n\n<script>\n  el.options = [\n    { value: 'map', label: 'Map' },\n    { value: 'form', label: 'Form' },\n    { value: 'compare', label: 'Compare' },\n  ];\n  el.value = 'map';\n</script>`}>
+      <esa-button-toggle label="Entry path" data-demo="preview"></esa-button-toggle>
+    </Preview>
+  </Section>
+
+  <Section id="sizes" title="Sizes">
+    <p>Four sizes share the form scale. Default is <code>md</code>.</p>
+    <Preview align="start" code={`<esa-button-toggle size="xs"></esa-button-toggle>\n<esa-button-toggle size="sm"></esa-button-toggle>\n<esa-button-toggle size="md"></esa-button-toggle>\n<esa-button-toggle size="lg"></esa-button-toggle>`}>
+      <div class="col">
+        <esa-button-toggle size="xs" data-demo="plain"></esa-button-toggle>
+        <esa-button-toggle size="sm" data-demo="plain"></esa-button-toggle>
+        <esa-button-toggle size="md" data-demo="plain"></esa-button-toggle>
+        <esa-button-toggle size="lg" data-demo="plain"></esa-button-toggle>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="states" title="States">
+    <Preview align="start" code={`<esa-button-toggle label="Default"></esa-button-toggle>\n<esa-button-toggle label="With hint" hint="Pick an entry path"></esa-button-toggle>\n<esa-button-toggle label="Disabled" disabled></esa-button-toggle>`}>
+      <div class="col">
+        <esa-button-toggle label="Default" data-demo="plain"></esa-button-toggle>
+        <esa-button-toggle label="With hint" hint="Pick an entry path" data-demo="plain"></esa-button-toggle>
+        <esa-button-toggle label="Disabled" disabled data-demo="plain"></esa-button-toggle>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} events={events} />
+  </Section>
+
+  <Section id="accessibility" title="Accessibility">
+    <ul class="a11y">
+      <li>Renders <code>role="radiogroup"</code> wrapping <code>role="radio"</code> buttons with <code>aria-checked</code> reflecting selection.</li>
+      <li>Roving tabindex: only the selected (or first) segment is tab-reachable; Arrow keys move selection through the group, wrapping at the ends.</li>
+      <li><code>Home</code> and <code>End</code> jump to the first and last segments; Enter and Space select the focused segment.</li>
+      <li>The <code>label</code> becomes the group's accessible name; <code>hint</code> is wired with <code>aria-describedby</code>.</li>
+      <li>Best for small fixed option sets — past about six options, prefer a select.</li>
+    </ul>
+  </Section>
+</ComponentDoc>
+
+<style>
+  .col { display: flex; flex-direction: column; gap: var(--spacing-300, 0.75rem); align-items: flex-start; }
+  .a11y { font-size: 15px; line-height: 1.6; color: var(--color-text-secondary, #54514a); }
+</style>
+
+<script>
+  import '@esa/ecology/esa-button-toggle';
+
+  const paths = [
+    { value: 'map', label: 'Map' },
+    { value: 'form', label: 'Form' },
+    { value: 'compare', label: 'Compare' },
+  ];
+
+  customElements.whenDefined('esa-button-toggle').then(() => {
+    document.querySelectorAll('esa-button-toggle[data-demo]').forEach((el) => {
+      (el as any).options = paths;
+    });
+    const preview = document.querySelector('esa-button-toggle[data-demo="preview"]');
+    if (preview) (preview as any).value = 'map';
+  });
+</script>

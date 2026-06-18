@@ -1,0 +1,107 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+
+const props = [
+  { name: 'name', type: 'string', default: "''", description: 'Filter key reported in esa-filter-change events.' },
+  { name: 'label', type: 'string', default: "''", description: 'Trigger text. Single-select shows "Label: Value" when set; multi-select keeps the bare label plus a count badge.' },
+  { name: 'options', type: '{ label, value, disabled?, color? }[]', default: '[]', description: 'Options. Set as a property. An optional color (any CSS color, incl. var() refs) renders a leading dot.' },
+  { name: 'multiple', type: 'boolean', default: 'false', description: 'Checkbox-style multi-select with a count badge on the trigger.' },
+  { name: 'placeholder', type: 'string', default: "''", description: 'Placeholder for the in-panel search input (falls back to "Search...").' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger size (reflected attribute).' },
+];
+
+const events = [
+  { name: 'selection-change', type: 'CustomEvent<{ value: string | string[] | undefined }>', description: 'Fired on every selection change for direct listeners. Composed and bubbles.' },
+  { name: 'esa-filter-change', type: 'CustomEvent<{ name, filters }>', description: 'Companion event for a parent filter container — carries the filter name and the active { name, label, value, displayValue } entries.' },
+];
+---
+<ComponentDoc
+  name="Filter Dropdown"
+  category="Filters &amp; Controls"
+  slug="esa-filter-dropdown"
+  type="wc"
+  summary="The inherited Ecology filter control, wearing the Biochar Atlas skin. A trigger button opening a searchable option panel — single or multi-select with checkbox rows, keyboard navigation, and a Clear all footer. The active trigger tints with forest green from <code>--color-primary</code>."
+>
+  <Section id="single" title="Single select">
+    <p>Click to open the panel; pick one option and it closes, echoing the choice on the trigger as &ldquo;Label: Value&rdquo;.</p>
+    <Preview align="start" code={`<esa-filter-dropdown name="feedstock" label="Feedstock" placeholder="Search feedstocks"></esa-filter-dropdown>`}>
+      <div class="room">
+        <esa-filter-dropdown name="feedstock" label="Feedstock" placeholder="Search feedstocks" data-demo="feedstock"></esa-filter-dropdown>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="multiple" title="Multi select">
+    <p>With <code>multiple</code>, options toggle independently, the panel stays open, and a count badge sits on the trigger.</p>
+    <Preview align="start" code={`<esa-filter-dropdown name="goals" label="Goals" multiple></esa-filter-dropdown>`}>
+      <div class="room">
+        <esa-filter-dropdown name="goals" label="Goals" multiple data-demo="goals"></esa-filter-dropdown>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="color-dots" title="Color dots">
+    <p>An option's optional <code>color</code> — any CSS color, including <code>var()</code> refs resolved against the host page — renders a leading dot. Here the Atlas provenance tokens color the source filter.</p>
+    <Preview align="start" code={`el.options = [\n  { label: 'Auto-derived (SSURGO)', value: 'ssurgo', color: 'var(--bca-provenance-ssurgo)' },\n  { label: 'User-provided soil test', value: 'user', color: 'var(--bca-provenance-user)' },\n];`}>
+      <div class="room">
+        <esa-filter-dropdown name="provenance" label="Soil data source" data-demo="provenance"></esa-filter-dropdown>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="sizes" title="Sizes">
+    <Preview align="start" code={`<esa-filter-dropdown size="xs"></esa-filter-dropdown>\n<esa-filter-dropdown size="sm"></esa-filter-dropdown>\n<esa-filter-dropdown size="md"></esa-filter-dropdown>\n<esa-filter-dropdown size="lg"></esa-filter-dropdown>`}>
+      <div class="room room--row">
+        <esa-filter-dropdown label="Feedstock" size="xs" data-demo="feedstock"></esa-filter-dropdown>
+        <esa-filter-dropdown label="Feedstock" size="sm" data-demo="feedstock"></esa-filter-dropdown>
+        <esa-filter-dropdown label="Feedstock" size="md" data-demo="feedstock"></esa-filter-dropdown>
+        <esa-filter-dropdown label="Feedstock" size="lg" data-demo="feedstock"></esa-filter-dropdown>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} events={events} />
+  </Section>
+</ComponentDoc>
+
+<style>
+  /* Leave headroom below the trigger so the absolute-positioned panel isn't
+     clipped by the preview figure's overflow. */
+  .room { width: 100%; min-height: 300px; display: flex; align-items: flex-start; }
+  .room--row { gap: var(--spacing-300, 0.75rem); flex-wrap: wrap; }
+</style>
+
+<script>
+  import '@esa/ecology/esa-filter-dropdown';
+
+  const feedstocks = [
+    { label: 'Douglas-fir slash, 550°C', value: 'doug-fir-550' },
+    { label: 'Mixed hardwood, 650°C', value: 'hardwood-650' },
+    { label: 'Softwood bark, 500°C', value: 'softwood-500' },
+    { label: 'Wheat straw, 450°C', value: 'wheat-450' },
+    { label: 'Walnut shell, 600°C', value: 'walnut-600', disabled: true },
+  ];
+  const goals = [
+    { label: 'Water retention', value: 'water' },
+    { label: 'Soil organic matter', value: 'som' },
+    { label: 'Carbon sequestration', value: 'carbon' },
+    { label: 'pH adjustment', value: 'ph' },
+    { label: 'Nutrient retention', value: 'nutrients' },
+  ];
+  const provenance = [
+    { label: 'Auto-derived (SSURGO)', value: 'ssurgo', color: 'var(--bca-provenance-ssurgo)' },
+    { label: 'User-provided soil test', value: 'user', color: 'var(--bca-provenance-user)' },
+  ];
+  const SETS: Record<string, unknown[]> = { feedstock: feedstocks, goals, provenance };
+
+  customElements.whenDefined('esa-filter-dropdown').then(() => {
+    document.querySelectorAll('esa-filter-dropdown[data-demo]').forEach((el) => {
+      const key = el.getAttribute('data-demo') ?? '';
+      (el as any).options = SETS[key] ?? [];
+    });
+  });
+</script>

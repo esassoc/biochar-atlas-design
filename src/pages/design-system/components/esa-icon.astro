@@ -1,0 +1,88 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+import EsaIcon from '@esa/ecology/esa-icon.astro';
+
+// A representative slice of the built-in Lucide registry — the names the
+// Atlas screens actually reach for.
+const common = [
+  'search', 'filter', 'check', 'x', 'chevron-down', 'chevron-right',
+  'info', 'triangle-alert', 'circle-check', 'download', 'file-text',
+  'calendar', 'user', 'trees', 'database', 'trending-up', 'history', 'settings',
+];
+
+const props = [
+  { name: 'name', type: 'string', description: 'Required. Lucide icon name (kebab-case), e.g. "chevron-down". Resolved against the built-in registry.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Icon size: 14 / 16 / 20 / 24 / 28px. The shared scale plus xl, so icons line up with buttons and inputs on a row.' },
+  { name: 'label', type: 'string', description: 'Accessible label. When omitted the icon is aria-hidden (decorative).' },
+  { name: 'paths', type: 'string', description: 'Inner SVG markup (the path/circle children, no svg wrapper) for a glyph outside the registry — the fallback when name is unknown.' },
+];
+---
+<ComponentDoc
+  name="Icon"
+  category="Core"
+  slug="esa-icon"
+  type=".astro"
+  summary="The inherited Ecology icon — inline Lucide SVGs from a built-in registry, no icon dependency. Stroke-based 24×24 outlines that take <code>currentColor</code>, so they pick up whatever text color surrounds them."
+>
+  <Section id="registry" title="Common icons">
+    <p>A slice of the built-in registry. Icons inherit <code>currentColor</code> from their parent — no color prop needed.</p>
+    <Preview align="start" code={`<EsaIcon name="search" />\n<EsaIcon name="filter" />\n<EsaIcon name="check" />`}>
+      <div class="icon-grid">
+        {common.map((n) => (
+          <div class="icon-cell">
+            <EsaIcon name={n} size="lg" />
+            <code>{n}</code>
+          </div>
+        ))}
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="sizes" title="Sizes">
+    <p>Five steps — the shared <code>xs&ndash;lg</code> scale plus <code>xl</code>. Built to sit on a row with same-size buttons and inputs.</p>
+    <Preview code={`<EsaIcon name="trees" size="xs" />\n<EsaIcon name="trees" size="sm" />\n<EsaIcon name="trees" size="md" />\n<EsaIcon name="trees" size="lg" />\n<EsaIcon name="trees" size="xl" />`}>
+      <EsaIcon name="trees" size="xs" />
+      <EsaIcon name="trees" size="sm" />
+      <EsaIcon name="trees" size="md" />
+      <EsaIcon name="trees" size="lg" />
+      <EsaIcon name="trees" size="xl" />
+    </Preview>
+  </Section>
+
+  <Section id="custom" title="Custom glyphs &amp; accessibility">
+    <p>
+      For a glyph outside the registry, pass the inner SVG markup via <code>paths</code> —
+      no fork needed. Add <code>label</code> when the icon carries meaning on its own;
+      without it the icon is treated as decorative and hidden from assistive tech.
+    </p>
+    <Preview code={`<EsaIcon name="biochar-leaf" paths='<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>' label="Biochar Atlas" size="xl" />`}>
+      <span class="leaf">
+        <EsaIcon
+          name="biochar-leaf"
+          paths='<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>'
+          label="Biochar Atlas"
+          size="xl"
+        />
+      </span>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} />
+  </Section>
+</ComponentDoc>
+
+<style>
+  .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: var(--spacing-300, 0.75rem); width: 100%; }
+  .icon-cell {
+    display: flex; flex-direction: column; align-items: center; gap: var(--spacing-200, 0.5rem);
+    padding: var(--spacing-300, 0.75rem) var(--spacing-200, 0.5rem);
+    border: 1px solid var(--color-border-light, #ebe8e1); border-radius: 8px;
+    color: var(--color-text-secondary, #54514a);
+  }
+  .icon-cell code { font-family: var(--font-mono, monospace); font-size: 14px; color: var(--color-text-muted, #807c73); }
+  .leaf { color: var(--color-primary, #234a31); }
+</style>

@@ -1,0 +1,247 @@
+---
+// bca-assessment-report — the field-ready, print-styled report a user takes into
+// a field visit, producer meeting, or NRCS planning file. Renders a
+// representative completed assessment (the default Willamette scenario) from the
+// same deterministic engines as the tool: interpretSite() for Field readiness +
+// compareBiochars() for the 78/64 recommendation. Screen view = a centered
+// "paper"; Print/Save-as-PDF strips the chrome via @media print.
+//
+// bcn-lego-checked: a print document is a bespoke artifact with no esa- equivalent
+// (esa-card/table/etc. model interactive app chrome, not a paginated report). The
+// only control is a no-print "Print" button wired to window.print().
+import { withBase } from '../../lib/base';
+import { fields } from '../../data/fields';
+import { soilUnits, hsgFor } from '../../data/soil-units';
+import { biocharCatalog } from '../../data/biochar-catalog';
+import { goals } from '../../data/goals';
+import { DEFAULT_GOAL_IDS, CURRENT_RULESET, compareBiochars } from '../../data/scoring';
+import { interpretSite } from '../../data/interpretation';
+
+// Representative completed assessment = the default scenario (deterministic).
+const field = fields[0];
+const soil = soilUnits.find((s) => s.mukey === field.soilMukey) ?? soilUnits[0];
+const site = interpretSite(soil);
+const comparison = compareBiochars(soil, [biocharCatalog[0], biocharCatalog[1]], [...DEFAULT_GOAL_IDS]);
+const top = comparison[0];
+const goalLabel = (id: string): string => goals.find((g) => g.id === id)?.label ?? id;
+const [lat, lng] = field.centroid;
+const coords = `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lng).toFixed(4)}° ${lng >= 0 ? 'E' : 'W'}`;
+
+// Fixed demo date (kept literal so the artifact reproduces identically).
+const REPORT_DATE = 'June 16, 2026';
+const ASSESSMENT_NAME = 'Lane Co. spring biochar assessment';
+---
+
+<article class="bca-report">
+  <div class="bca-report__bar no-print">
+    <a href={withBase('/prototypes/suitability-tool')}>← Back to the tool</a>
+    <button id="print-report" class="bca-report__print" type="button">Print / Save as PDF</button>
+  </div>
+
+  <div class="bca-report__paper">
+    <header class="bca-report__head">
+      <div>
+        <h1 class="bca-report__title">Biochar Suitability Assessment</h1>
+        <p class="bca-report__name">{ASSESSMENT_NAME}</p>
+      </div>
+      <div class="bca-report__brand">
+        <span class="bca-report__gov">USDA NRCS supported</span>
+      </div>
+    </header>
+
+    <dl class="bca-report__meta">
+      <div><dt>Field</dt><dd>{field.name} · {field.locality} · {field.acres} ac</dd></div>
+      <div><dt>Location</dt><dd class="mono">{coords}</dd></div>
+      <div><dt>Soil</dt><dd>{soil.name.split(',')[0]} — clay {soil.clayPct}% · OM {soil.omPct}% · pH {soil.ph} · CEC {soil.cecCmolKg} · HSG {hsgFor(soil)}</dd></div>
+      <div><dt>Source</dt><dd class="mono">SSURGO · {soil.surveyArea} · MUKEY {soil.mukey}</dd></div>
+      <div><dt>Date</dt><dd>{REPORT_DATE}</dd></div>
+    </dl>
+
+    <section class="bca-report__section">
+      <h2 class="bca-report__h2">1 · Field readiness</h2>
+      <p class={`bca-report__verdict bca-report__verdict--${site.verdict}`}>
+        {site.verdictLabel} · {site.responseScore}/100 response potential
+      </p>
+      <p class="bca-report__body">{site.narrative}</p>
+      {site.flags.length > 0 && (
+        <ul class="bca-report__limits">
+          {site.flags.map((f) => <li>{f}</li>)}
+        </ul>
+      )}
+    </section>
+
+    <section class="bca-report__section">
+      <h2 class="bca-report__h2">2 · Biochar suitability for selected goals</h2>
+      <p class="bca-report__goals">Goals: {[...DEFAULT_GOAL_IDS].map(goalLabel).join(' · ')}</p>
+      <table class="bca-report__table">
+        <thead>
+          <tr><th>Biochar</th><th>Feedstock · HTT</th><th class="bca-report__num">Score</th></tr>
+        </thead>
+        <tbody>
+          {comparison.map((c) => (
+            <tr class:list={[{ 'is-rec': c.recommended }]}>
+              <td>
+                {c.biochar.name}
+                {c.recommended && <span class="bca-report__rec">Best fit</span>}
+              </td>
+              <td>{c.biochar.feedstockClass} · {c.biochar.htt}°C</td>
+              <td class="bca-report__num mono">{c.result.total}/100</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="bca-report__body">{top.result.narrative}</p>
+      <h3 class="bca-report__h3">Why {top.biochar.name} scores as it does</h3>
+      <ul class="bca-report__why">
+        {top.result.perGoal.map((g) => (
+          <li><strong>{goalLabel(g.goalId)} — {g.score}/100.</strong> {g.rationale}</li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="bca-report__section">
+      <h2 class="bca-report__h2">3 · Limitations &amp; disclaimers</h2>
+      <ul class="bca-report__disclaimer">
+        <li><strong>Not a recommendation.</strong> This is advisory decision support to inform a conversation with an NRCS conservationist — not a prescription to apply biochar.</li>
+        <li>Site constraints flagged above (e.g. ponding, flooding, karst) are conditions biochar cannot change; address them independently.</li>
+        <li>Soil values are SSURGO-derived for the mapped field. A site-specific lab soil test or biochar analytical report should override these defaults where available.</li>
+        <li><strong>Prototype.</strong> All biochar and soil figures are mock; scoring is a deterministic stand-in for the USDA ARS algorithms.</li>
+      </ul>
+    </section>
+
+    <footer class="bca-report__foot">
+      <span class="mono">Ruleset {CURRENT_RULESET.label}</span>
+      <span>Methodology &amp; resources at the Biochar Atlas</span>
+      <span>Generated {REPORT_DATE} · science by USDA ARS</span>
+    </footer>
+  </div>
+</article>
+
+<script>
+  document.getElementById('print-report')?.addEventListener('click', () => window.print());
+</script>
+
+<style>
+  .bca-report { min-height: 100vh; background: var(--bca-parchment-100, #ece9d8); padding: var(--spacing-500, 1.5rem) 0 var(--spacing-700, 3rem); }
+
+  .bca-report__bar {
+    max-width: 8.5in;
+    margin: 0 auto var(--spacing-400, 1rem);
+    padding: 0 var(--spacing-400, 1rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .bca-report__bar a { font-size: 0.9375rem; font-weight: var(--font-weight-medium, 500); color: var(--color-primary, #234a31); }
+  .bca-report__bar a:hover { text-decoration: underline; }
+  .bca-report__print {
+    font-size: 0.9375rem;
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--color-text-inverse, #fff);
+    background: var(--color-primary, #234a31);
+    border-radius: var(--radius-200, 0.375rem);
+    padding: var(--spacing-250, 0.625rem) var(--spacing-400, 1rem);
+  }
+
+  /* the "paper" */
+  .bca-report__paper {
+    max-width: 8.5in;
+    margin: 0 auto;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #ddd9d0);
+    box-shadow: 0 12px 40px rgba(18, 42, 27, 0.12);
+    padding: var(--spacing-700, 3rem) var(--spacing-700, 3rem) var(--spacing-600, 2rem);
+  }
+
+  .bca-report__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-400, 1rem);
+    padding-bottom: var(--spacing-400, 1rem);
+    border-bottom: 2px solid var(--color-primary, #234a31);
+  }
+  .bca-report__title { margin: 0; font-size: 1.75rem; font-weight: var(--font-weight-bold, 700); color: var(--color-text-primary, #33312a); letter-spacing: -0.01em; }
+  .bca-report__name { margin: var(--spacing-100, 0.25rem) 0 0; font-size: 1.0625rem; color: var(--color-text-secondary, #54514a); }
+  .bca-report__brand { text-align: right; display: flex; flex-direction: column; gap: var(--spacing-150, 0.375rem); flex-shrink: 0; }
+  .bca-report__gov {
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--bca-green-900, #1b3b27);
+    background: var(--bca-green-100, #e2ecda);
+    border: 1px solid var(--bca-green-200, #c8dabe);
+    border-radius: var(--radius-100, 4px);
+    padding: 2px 8px;
+  }
+
+  .bca-report__meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-200, 0.5rem) var(--spacing-500, 1.5rem);
+    margin: var(--spacing-400, 1rem) 0 var(--spacing-500, 1.5rem);
+  }
+  .bca-report__meta > div { display: flex; gap: var(--spacing-250, 0.625rem); }
+  .bca-report__meta dt { flex-shrink: 0; width: 4.5rem; font-size: 0.875rem; color: var(--color-text-muted, #807c73); }
+  .bca-report__meta dd { margin: 0; font-size: 0.9375rem; color: var(--color-text-primary, #33312a); }
+
+  .bca-report__section { margin-bottom: var(--spacing-500, 1.5rem); break-inside: avoid; }
+  .bca-report__h2 { margin: 0 0 var(--spacing-300, 0.75rem); font-size: 1.1875rem; font-weight: var(--font-weight-bold, 700); color: var(--color-text-primary, #33312a); }
+  .bca-report__h3 { margin: var(--spacing-400, 1rem) 0 var(--spacing-200, 0.5rem); font-size: 1rem; font-weight: var(--font-weight-semibold, 600); color: var(--color-text-primary, #33312a); }
+  .bca-report__body { margin: 0 0 var(--spacing-300, 0.75rem); font-size: 1rem; line-height: 1.6; color: var(--color-text-secondary, #54514a); }
+  .bca-report__goals { margin: 0 0 var(--spacing-300, 0.75rem); font-size: 0.9375rem; color: var(--color-text-tertiary, #6a665e); }
+
+  .bca-report__verdict {
+    display: inline-block;
+    font-size: 1.0625rem;
+    font-weight: var(--font-weight-bold, 700);
+    border-radius: var(--radius-200, 0.375rem);
+    padding: var(--spacing-200, 0.5rem) var(--spacing-400, 1rem);
+    margin: 0 0 var(--spacing-300, 0.75rem);
+  }
+  .bca-report__verdict--well { background: var(--bca-green-100, #e2ecda); color: var(--bca-green-900, #1b3b27); }
+  .bca-report__verdict--moderate { background: var(--bca-amber-100, #f7ead2); color: var(--color-warning-strong, #7c5310); }
+  .bca-report__verdict--poor { background: var(--color-danger-subtle, #fbeae8); color: var(--color-danger-strong, #a32318); }
+
+  .bca-report__limits, .bca-report__why, .bca-report__disclaimer { margin: 0; padding-left: 1.1rem; }
+  .bca-report__limits li, .bca-report__disclaimer li { font-size: 0.9375rem; line-height: 1.5; color: var(--color-text-secondary, #54514a); margin-bottom: var(--spacing-150, 0.375rem); }
+  .bca-report__why li { font-size: 0.9375rem; line-height: 1.55; color: var(--color-text-secondary, #54514a); margin-bottom: var(--spacing-200, 0.5rem); }
+  .bca-report__why strong, .bca-report__disclaimer strong { color: var(--color-text-primary, #33312a); }
+
+  .bca-report__table { width: 100%; border-collapse: collapse; margin: 0 0 var(--spacing-300, 0.75rem); }
+  .bca-report__table th, .bca-report__table td { text-align: left; padding: var(--spacing-250, 0.625rem) var(--spacing-300, 0.75rem); border-bottom: 1px solid var(--color-border-light, #ebe8e1); font-size: 0.9375rem; }
+  .bca-report__table th { font-size: 0.8125rem; font-weight: var(--font-weight-semibold, 600); color: var(--color-text-muted, #807c73); border-bottom-color: var(--color-border, #ddd9d0); }
+  .bca-report__table .is-rec { background: var(--bca-green-50, #f0f5ec); }
+  .bca-report__num { text-align: right; }
+  .bca-report__rec {
+    display: inline-block;
+    margin-left: var(--spacing-200, 0.5rem);
+    font-size: 0.6875rem;
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--bca-green-900, #1b3b27);
+    background: var(--bca-green-100, #e2ecda);
+    border: 1px solid var(--bca-green-200, #c8dabe);
+    border-radius: var(--radius-100, 4px);
+    padding: 1px 7px;
+  }
+
+  .bca-report__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-200, 0.5rem) var(--spacing-400, 1rem);
+    justify-content: space-between;
+    margin-top: var(--spacing-500, 1.5rem);
+    padding-top: var(--spacing-300, 0.75rem);
+    border-top: 1px solid var(--color-border-light, #ebe8e1);
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #807c73);
+  }
+
+  .mono { font-family: var(--font-mono, 'Roboto Mono', monospace); }
+
+  @media print {
+    .bca-report { background: #fff; padding: 0; }
+    .no-print { display: none !important; }
+    .bca-report__paper { max-width: none; margin: 0; border: 0; box-shadow: none; padding: 0; }
+    .bca-report__section { break-inside: avoid; }
+  }
+</style>

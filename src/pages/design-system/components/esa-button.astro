@@ -1,0 +1,70 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+import EsaButton from '@esa/ecology/esa-button.astro';
+
+const colors = ['primary', 'secondary', 'danger', 'success', 'warning', 'info'] as const;
+
+const props = [
+  { name: 'color', type: "'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'info' | 'ai' | 'ghost'", default: "'primary'", description: 'Semantic color role. Biochar forest green comes from --color-primary.' },
+  { name: 'appearance', type: "'fill' | 'outline' | 'dashed'", default: "'fill'", description: 'Solid, outlined, or dashed-outline.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Control size (shared form scale).' },
+  { name: 'icon', type: 'string', description: 'Lucide icon name, shown left of the label.' },
+  { name: 'iconOnly', type: 'boolean', default: 'false', description: 'Icon-only mode (no text).' },
+  { name: 'active', type: 'boolean', default: 'false', description: 'Pressed/active state.' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: 'Non-interactive state.' },
+  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner and blocks input.' },
+  { name: 'type', type: "'button' | 'submit' | 'reset'", default: "'button'", description: 'Native button type.' },
+];
+---
+<ComponentDoc
+  name="Button"
+  category="Core"
+  slug="esa-button"
+  type=".astro"
+  summary="The inherited Ecology button, wearing the Biochar Atlas skin. Primary picks up the forest green because the theme re-points <code>--color-primary</code> — this is the &ldquo;Evaluate suitability&rdquo; green; the rest of the palette is inherited."
+>
+  <Section id="colors" title="Colors">
+    <Preview code={`<EsaButton color="primary">Evaluate suitability</EsaButton>`}>
+      {colors.map((c) => <EsaButton color={c}>Evaluate</EsaButton>)}
+    </Preview>
+  </Section>
+
+  <Section id="outline" title="Outline">
+    <Preview code={`<EsaButton color="primary" appearance="outline">Evaluate</EsaButton>`}>
+      {colors.map((c) => <EsaButton color={c} appearance="outline">Evaluate</EsaButton>)}
+    </Preview>
+  </Section>
+
+  <Section id="sizes" title="Sizes">
+    <Preview code={`<EsaButton size="xs">Evaluate</EsaButton>`}>
+      <EsaButton color="primary" size="xs">Evaluate</EsaButton>
+      <EsaButton color="primary" size="sm">Evaluate</EsaButton>
+      <EsaButton color="primary" size="md">Evaluate</EsaButton>
+      <EsaButton color="primary" size="lg">Evaluate</EsaButton>
+    </Preview>
+  </Section>
+
+  <Section id="icons" title="With icons">
+    <p>Pass a Lucide icon name via <code>icon</code>; add <code>iconOnly</code> to drop the label.</p>
+    <Preview code={`<EsaButton icon="download">Download report</EsaButton>\n<EsaButton icon="plus" iconOnly aria-label="Add biochar" />`}>
+      <EsaButton color="primary" icon="download">Download report</EsaButton>
+      <EsaButton color="secondary" icon="search">Find a field</EsaButton>
+      <EsaButton color="primary" icon="plus" iconOnly aria-label="Add biochar" />
+    </Preview>
+  </Section>
+
+  <Section id="states" title="States">
+    <Preview code={`<EsaButton color="ghost">Cancel</EsaButton>\n<EsaButton disabled>Disabled</EsaButton>\n<EsaButton loading>Scoring</EsaButton>`}>
+      <EsaButton color="ghost">Cancel</EsaButton>
+      <EsaButton color="primary" disabled>Disabled</EsaButton>
+      <EsaButton color="primary" loading>Scoring</EsaButton>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} />
+  </Section>
+</ComponentDoc>

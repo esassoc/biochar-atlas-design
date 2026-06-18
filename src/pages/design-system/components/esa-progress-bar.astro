@@ -1,0 +1,71 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+import EsaProgressBar from '@esa/ecology/esa-progress-bar.astro';
+
+const props = [
+  { name: 'value', type: 'number', default: '0', description: 'Fill percentage, clamped to 0–100. Ignored when indeterminate.' },
+  { name: 'mode', type: "'determinate' | 'indeterminate'", default: "'determinate'", description: 'Known progress vs. a looping activity sweep.' },
+  { name: 'variant', type: "'primary' | 'success' | 'warning' | 'danger'", default: "'primary'", description: 'Fill color intent.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Track height (2 / 4 / 8 / 12px).' },
+  { name: 'label', type: 'string', description: 'Optional label above the track; also the accessible name.' },
+  { name: 'showValue', type: 'boolean', default: 'false', description: 'Shows the percentage beside the label (determinate only).' },
+];
+---
+<ComponentDoc
+  name="Progress Bar"
+  category="Display"
+  slug="esa-progress-bar"
+  type=".astro"
+  summary="The inherited Ecology progress bar, wearing the Biochar Atlas skin. The Atlas's signature use is the 0–100 suitability meter; the default fill picks up forest green from <code>--color-primary</code>."
+>
+  <Section id="basic" title="Basic">
+    <p>A determinate bar with a label and visible value — the shape of the Atlas's suitability score readout. (78 is the calibration anchor: Douglas-fir slash at 550°C on the default scenario.)</p>
+    <Preview align="start" code={`<EsaProgressBar label="Suitability score" value={78} showValue />`}>
+      <div class="stack">
+        <EsaProgressBar label="Suitability score" value={78} showValue />
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="variants" title="Variants">
+    <Preview align="start" code={`<EsaProgressBar variant="primary" value={78} />\n<EsaProgressBar variant="success" value={90} />\n<EsaProgressBar variant="warning" value={48} />\n<EsaProgressBar variant="danger" value={22} />`}>
+      <div class="stack">
+        <EsaProgressBar label="Primary" variant="primary" value={78} showValue />
+        <EsaProgressBar label="Success" variant="success" value={90} showValue />
+        <EsaProgressBar label="Warning" variant="warning" value={48} showValue />
+        <EsaProgressBar label="Danger" variant="danger" value={22} showValue />
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="sizes" title="Sizes">
+    <Preview align="start" code={`<EsaProgressBar size="xs" value={64} />\n<EsaProgressBar size="sm" value={64} />\n<EsaProgressBar size="md" value={64} />\n<EsaProgressBar size="lg" value={64} />`}>
+      <div class="stack">
+        <EsaProgressBar size="xs" value={64} />
+        <EsaProgressBar size="sm" value={64} />
+        <EsaProgressBar size="md" value={64} />
+        <EsaProgressBar size="lg" value={64} />
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="indeterminate" title="Indeterminate">
+    <p>When progress is unknown — fetching SSURGO data, running the scorer — the fill sweeps the track on a loop.</p>
+    <Preview align="start" code={`<EsaProgressBar label="Deriving soil context" mode="indeterminate" />`}>
+      <div class="stack">
+        <EsaProgressBar label="Deriving soil context" mode="indeterminate" />
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} />
+  </Section>
+</ComponentDoc>
+
+<style>
+  .stack { display: flex; flex-direction: column; gap: var(--spacing-400, 1rem); width: 100%; max-width: 420px; }
+</style>

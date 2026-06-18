@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BcaAssessmentReport from '../../components/bca/bca-assessment-report.astro';
+---
+
+<!-- manifest:
+  layout: BaseLayout                                # page spine — bare document shell (no app chrome)
+  sections:
+    - assessment report -> bca-assessment-report    # field-ready, print-styled report
+-->
+
+<BaseLayout title="Assessment Report — Biochar Suitability Tool">
+  <BcaAssessmentReport />
+</BaseLayout>

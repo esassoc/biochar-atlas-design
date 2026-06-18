@@ -1,0 +1,131 @@
+/*
+ * Biochar Atlas theme — a spoke of the Ecology hub (../ecology).
+ *
+ * Follows the hub's theming contract: a [data-theme] block overrides the
+ * SEMANTIC layer only. tokens.css (from @esa/tokens) defines the primitives +
+ * default teal semantics on :root; this re-skins to the Biochar Atlas brand
+ * WITHOUT touching primitives.
+ *
+ * Brand sources: olive/forest greens (forest-green CTA, parchment map terrain,
+ * amber score bars), and a deliberately USDA-adjacent type choice — Public Sans
+ * is the U.S. Web Design System typeface, a quiet credibility signal for NRCS
+ * users.
+ */
+
+[data-theme="biochar"] {
+  /* ===== PRIMARY — forest green replaces ecology teal ===== */
+  --color-primary:         #234a31;   /* bca-green-800 — the "Evaluate suitability" green */
+  --color-primary-hover:   #1b3b27;
+  --color-primary-active:  #142e1e;
+  --color-primary-subtle:  #f0f5ec;   /* bca-green-50 */
+  --color-primary-border:  #c8dabe;   /* bca-green-200 */
+  --color-secondary:       #4e7d52;   /* bca-green-500 */
+  --color-secondary-hover: #2d5839;
+
+  /* ===== FEEDBACK ===== */
+  --color-success: #2e7d4f;
+  --color-warning: #c77f1f;           /* score amber doubles as warning */
+  --color-info:    #3a7ca5;
+  /* Dark readable text to sit ON the matching -subtle/tinted status surface
+     (status-pill text). The hub's -strong shades are tuned to ITS hues; these
+     re-point them to the biochar amber/green ramps so text pairs with the warm
+     biochar tints rather than the hub's redder defaults. */
+  --color-warning-strong: #7c5310;    /* dark biochar amber — on bca-amber-100 */
+  --color-success-strong: var(--bca-green-900, #1b3b27);
+
+  /* ===== NEUTRAL CHAIN — warm field-notebook grays (slight olive cast) ===== */
+  --color-text-primary:   #33312a;    /* bca-gray-900 */
+  --color-text-secondary: #54514a;    /* bca-gray-700 */
+  --color-text-tertiary:  #6a665e;    /* bca-gray-600 */
+  --color-text-muted:     #807c73;    /* bca-gray-500 */
+  --color-border:         #ddd9d0;    /* bca-gray-200 */
+  --color-border-light:   #ebe8e1;    /* bca-gray-100 */
+  --color-border-strong:  #c2beb4;    /* bca-gray-300 */
+  --color-background:     #faf9f6;    /* bca-gray-50 — warm paper */
+  --color-surface-sunken: #f3f1ea;
+
+  /* ===== OVERLAY (re-pointed to forest green) ===== */
+  --color-active-overlay: color-mix(in srgb, var(--color-primary) 8%, transparent);
+
+  /* ===== TYPE — Public Sans (USWDS) replaces DM Sans ===== */
+  --font-sans: 'Public Sans', system-ui, sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, monospace;
+  /* Public Sans weights: 400/500/600/700 (not 350/450/550/650 like DM Sans) */
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* ===== BIOCHAR SPOKE TOKENS (no hub equivalent) ===== */
+  /* Forest-green ramp — raw material feeding the semantic chain above */
+  --bca-green-50:  #f0f5ec;
+  --bca-green-100: #e2ecda;
+  --bca-green-200: #c8dabe;
+  --bca-green-300: #a3c096;
+  --bca-green-500: #4e7d52;
+  --bca-green-700: #2d5839;
+  --bca-green-800: #234a31;
+  --bca-green-900: #1b3b27;
+  --bca-green-950: #122a1b;
+
+  /* Score amber ramp — suitability meters, 0–100 bars */
+  --bca-amber-100: #f7ead2;
+  --bca-amber-300: #e9c477;
+  --bca-amber-500: #d99a2b;
+  --bca-amber-700: #b3791a;
+  --bca-score-track: #efe9da;
+
+  /* Parchment terrain — map surfaces and cartographic accents */
+  --bca-parchment-50:  #f6f4ea;
+  --bca-parchment-100: #ece9d8;
+  --bca-parchment-200: #dfdcc4;
+  --bca-sage:          #dde2cc;
+  --bca-water:         #b8cfd8;
+  --bca-field-fill:    color-mix(in srgb, #4e7d52 28%, transparent);
+  --bca-field-stroke:  #234a31;
+  /* Surrounding-parcel patchwork: a single shared hairline stroke + the
+     representative legend-swatch fill (the per-parcel fills are an 8-tone
+     array in the map island's JS, where Leaflet's canvas API can't read
+     CSS vars). Source of truth for both the legend chip and the JS stroke. */
+  --bca-parcel-fill:   #dee3cd;
+  --bca-parcel-stroke: #b3ac92;
+
+  /* Provenance + status accents */
+  --bca-recommended-bg:   #e2ecda;
+  --bca-recommended-text: #1b3b27;
+  --bca-provenance-ssurgo: #6a665e;   /* "Auto-derived from SSURGO" */
+  --bca-provenance-user:   #3a7ca5;   /* "User-provided soil test" */
+
+  /* ===== META LAYER — the dark "behind the curtain" chrome =====
+     A deliberately distinct sub-palette for the supplemental experience
+     (assumptions mode + the "how we'd build this" screen). It sits OVER the
+     parchment-light product, so it borrows the @esa/handoff inspector's
+     GitHub-dark family rather than the warm field-notebook neutrals above —
+     the contrast IS the message: you've stepped off the product and behind it.
+     Fixed dark values (not theme-reactive): the meta layer is always dark. */
+  --bca-meta-surface:        #0d1117;   /* deep slate base */
+  --bca-meta-surface-raised: #161b22;   /* raised rows / nested cards */
+  --bca-meta-surface-2:      #1c232c;   /* hover / second elevation */
+  --bca-meta-glass:          color-mix(in srgb, #0d1117 82%, transparent); /* glassy panels (+ backdrop-blur) */
+  --bca-meta-border:         #30363d;
+  --bca-meta-border-faint:   #21262d;
+  --bca-meta-text:           #e6edf3;   /* near-white body */
+  --bca-meta-text-secondary: #adbac7;
+  --bca-meta-text-muted:     #7d8590;
+  --bca-meta-accent:         #4493f8;   /* inspection blue — pins, links, focus */
+  --bca-meta-accent-soft:    color-mix(in srgb, #4493f8 16%, transparent);
+  --bca-meta-claude:         #d97757;   /* Anthropic terracotta — "the disciplined process" */
+  --bca-meta-claude-soft:    color-mix(in srgb, #d97757 14%, transparent);
+
+  /* Confidence + uncertainty status hues (on dark) */
+  --bca-meta-confident:    #7ee787;     /* green  — pattern-confident / confident */
+  --bca-meta-limited:      #e3b341;     /* amber  — biochar-unvalidated / limited */
+  --bca-meta-insufficient: #7d8590;     /* gray   — insufficient data */
+  --bca-meta-constraint:   #f85149;     /* red    — hard constraint */
+  --bca-meta-confident-soft:    color-mix(in srgb, #7ee787 14%, transparent);
+  --bca-meta-limited-soft:      color-mix(in srgb, #e3b341 16%, transparent);
+  --bca-meta-insufficient-soft: color-mix(in srgb, #7d8590 16%, transparent);
+  --bca-meta-constraint-soft:   color-mix(in srgb, #f85149 15%, transparent);
+
+  --bca-meta-shadow: 0 16px 50px -12px rgba(0, 0, 0, 0.6);
+}

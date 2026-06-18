@@ -1,0 +1,50 @@
+---
+// Biochar Atlas base layout — wires the hub tokens + the Biochar theme, loads
+// Public Sans / Roboto Mono, and sets data-theme="biochar" so every inherited
+// esa-* component re-skins.
+import '@esa/tokens/tokens.css';
+import '@esa/tokens/component-tokens.css';
+import '../styles/theme-biochar.css';
+import { withBase } from '../lib/base';
+// Runtime handoff inspector (hub package) — self-gating: dormant unless the
+// current route has a bundle at public/handoff/<slug>/.
+import HandoffInspector from '@esa/handoff/HandoffInspector.astro';
+
+interface Props {
+  title?: string;
+}
+const { title = 'Biochar Atlas' } = Astro.props;
+---
+<!doctype html>
+<html lang="en" data-theme="biochar">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: var(--font-sans, system-ui, sans-serif);
+        font-weight: var(--font-weight-regular, 400);
+        color: var(--color-text-primary, #33312a);
+        background: var(--color-surface, #fff);
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: var(--color-text-link, #234a31); text-decoration: none; }
+      img { display: block; max-width: 100%; }
+      button { font-family: inherit; cursor: pointer; background: none; border: 0; }
+    </style>
+  </head>
+  <body>
+    <slot />
+    <HandoffInspector />
+  </body>
+</html>

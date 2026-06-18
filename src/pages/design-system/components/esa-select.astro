@@ -1,0 +1,76 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+
+const props = [
+  { name: 'label', type: 'string', default: "''", description: 'Field label above the control.' },
+  { name: 'options', type: '{ label, value, disabled? }[]', default: '[]', description: 'Selectable options. Set as a property (not an attribute).' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Control size (reflected attribute).' },
+  { name: 'placeholder', type: 'string', default: "'Select...'", description: 'Placeholder shown when nothing is selected.' },
+  { name: 'help-text', type: 'string', default: "''", description: 'Helper text shown below the control.' },
+  { name: 'error-text', type: 'string', default: "''", description: 'Error message; replaces help text and turns the field red when present.' },
+  { name: 'required', type: 'boolean', default: 'false', description: 'Marks the field required (renders a * after the label).' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables interaction (reflected attribute).' },
+  { name: 'multiple', type: 'boolean', default: 'false', description: 'Allow multiple selections.' },
+  { name: 'chip-mode', type: 'boolean', default: 'false', description: 'Render multi-selections as removable chips inside the control.' },
+  { name: 'searchable', type: 'boolean', default: 'true', description: 'Type-to-filter the option list. When false the input is read-only.' },
+];
+
+const events = [
+  { name: 'change', type: 'CustomEvent<{ value: string | string[] }>', description: 'Fired on selection change. Composed and bubbles. Form value is the string (single) or comma-joined values (multiple).' },
+];
+---
+<ComponentDoc
+  name="Select"
+  category="Forms"
+  slug="esa-select"
+  type="wc"
+  summary="The inherited Ecology searchable select, wearing the Biochar Atlas skin. Single/multi-select with type-to-filter and removable chips; the active option and focus state pick up forest green from <code>--color-primary</code>."
+>
+  <Section id="preview" title="Preview">
+    <Preview code={`<esa-select label="Feedstock" placeholder="Choose a feedstock" help-text="Type to filter"></esa-select>`}>
+      <esa-select label="Feedstock" placeholder="Choose a feedstock" help-text="Type to filter"></esa-select>
+    </Preview>
+  </Section>
+
+  <Section id="sizes" title="Sizes">
+    <Preview code={`<esa-select label="Extra small" size="xs"></esa-select>\n<esa-select label="Small" size="sm"></esa-select>\n<esa-select label="Medium" size="md"></esa-select>\n<esa-select label="Large" size="lg"></esa-select>`}>
+      <esa-select label="Extra small" size="xs"></esa-select>
+      <esa-select label="Small" size="sm"></esa-select>
+      <esa-select label="Medium" size="md"></esa-select>
+      <esa-select label="Large" size="lg"></esa-select>
+    </Preview>
+  </Section>
+
+  <Section id="states" title="States">
+    <Preview code={`<esa-select label="Application goals" multiple chip-mode placeholder="Add goals"></esa-select>\n<esa-select label="Required" required></esa-select>\n<esa-select label="Error" error-text="Please make a selection"></esa-select>\n<esa-select label="Disabled" disabled></esa-select>`}>
+      <esa-select label="Application goals" multiple chip-mode placeholder="Add goals"></esa-select>
+      <esa-select label="Required" required></esa-select>
+      <esa-select label="Error" error-text="Please make a selection"></esa-select>
+      <esa-select label="Disabled" disabled></esa-select>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} events={events} />
+  </Section>
+</ComponentDoc>
+
+<script>
+  import '@esa/ecology/esa-select';
+  const opts = [
+    { label: 'Douglas-fir slash, 550°C', value: 'doug-fir-550' },
+    { label: 'Mixed hardwood, 650°C', value: 'hardwood-650' },
+    { label: 'Softwood bark, 500°C', value: 'softwood-500' },
+    { label: 'Walnut shell, 600°C', value: 'walnut-600', disabled: true },
+    { label: 'Wheat straw, 450°C', value: 'wheat-450' },
+    { label: 'Hazelnut shell, 550°C', value: 'hazelnut-550' },
+  ];
+  customElements.whenDefined('esa-select').then(() => {
+    document.querySelectorAll('esa-select').forEach((el) => {
+      (el as any).options = opts;
+    });
+  });
+</script>

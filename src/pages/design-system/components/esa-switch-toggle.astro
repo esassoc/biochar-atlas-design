@@ -1,0 +1,73 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+
+const props = [
+  { name: 'label', type: 'string', default: "''", description: 'Text rendered beside the track.' },
+  { name: 'checked', type: 'boolean', default: 'false', description: 'On/off state of the switch.' },
+  { name: 'label-position', type: "'before' | 'after'", default: "'after'", description: 'Whether the label sits before or after the track.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Track and thumb size.' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables interaction.' },
+];
+
+const events = [
+  { name: 'change', type: 'CustomEvent<{ checked: boolean }>', description: 'Fired when toggled. Composed and bubbling; detail.checked is the new state.' },
+];
+---
+<ComponentDoc
+  name="Switch Toggle"
+  category="Forms"
+  slug="esa-switch-toggle"
+  type="wc"
+  summary="The inherited Ecology switch, wearing the Biochar Atlas skin. An on/off control for instant settings; the track fills with forest green when checked because the theme re-points <code>--color-primary</code>."
+>
+  <Section id="preview" title="Preview">
+    <Preview code={`<esa-switch-toggle label="Show soil survey overlay" checked></esa-switch-toggle>`}>
+      <esa-switch-toggle label="Show soil survey overlay" checked></esa-switch-toggle>
+    </Preview>
+  </Section>
+
+  <Section id="sizes" title="Sizes">
+    <Preview code={`<esa-switch-toggle label="Extra small" size="xs" checked></esa-switch-toggle>\n<esa-switch-toggle label="Small" size="sm" checked></esa-switch-toggle>\n<esa-switch-toggle label="Medium" size="md" checked></esa-switch-toggle>\n<esa-switch-toggle label="Large" size="lg" checked></esa-switch-toggle>`}>
+      <esa-switch-toggle label="Extra small" size="xs" checked></esa-switch-toggle>
+      <esa-switch-toggle label="Small" size="sm" checked></esa-switch-toggle>
+      <esa-switch-toggle label="Medium" size="md" checked></esa-switch-toggle>
+      <esa-switch-toggle label="Large" size="lg" checked></esa-switch-toggle>
+    </Preview>
+  </Section>
+
+  <Section id="label-position" title="Label position">
+    <p>Place the label <code>after</code> the track (default) or <code>before</code> it.</p>
+    <Preview align="start" code={`<esa-switch-toggle label="Label after" checked></esa-switch-toggle>\n<esa-switch-toggle label="Label before" label-position="before" checked></esa-switch-toggle>`}>
+      <div class="col">
+        <esa-switch-toggle label="Label after" checked></esa-switch-toggle>
+        <esa-switch-toggle label="Label before" label-position="before" checked></esa-switch-toggle>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="states" title="States">
+    <Preview align="start" code={`<esa-switch-toggle label="Off"></esa-switch-toggle>\n<esa-switch-toggle label="On" checked></esa-switch-toggle>\n<esa-switch-toggle label="Disabled" disabled></esa-switch-toggle>\n<esa-switch-toggle label="Disabled + on" disabled checked></esa-switch-toggle>`}>
+      <div class="col">
+        <esa-switch-toggle label="Off"></esa-switch-toggle>
+        <esa-switch-toggle label="On" checked></esa-switch-toggle>
+        <esa-switch-toggle label="Disabled" disabled></esa-switch-toggle>
+        <esa-switch-toggle label="Disabled + on" disabled checked></esa-switch-toggle>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} events={events} />
+  </Section>
+</ComponentDoc>
+
+<style>
+  .col { display: flex; flex-direction: column; gap: var(--spacing-300, 0.75rem); align-items: flex-start; }
+</style>
+
+<script>
+  import '@esa/ecology/esa-switch-toggle';
+</script>

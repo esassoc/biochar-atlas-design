@@ -1,0 +1,25 @@
+{
+  "name": "@biochar/design",
+  "version": "0.0.1",
+  "description": "Biochar Atlas \u2014 an Astro spoke of the ESA Ecology hub (../ecology). Prototyping surface for the Biochar Suitability Tool.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "astro build && gh-pages -d dist --dotfiles"
+  },
+  "dependencies": {
+    "@esa/docs": "file:../ecology/packages/docs",
+    "@esa/ecology": "file:../ecology/packages/ecology",
+    "@esa/tokens": "file:../ecology/packages/tokens",
+    "@types/leaflet": "^1.9.21",
+    "astro": "^5.0.0",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "@esa/handoff": "file:../ecology/packages/handoff",
+    "gh-pages": "^6.3.0"
+  }
+}

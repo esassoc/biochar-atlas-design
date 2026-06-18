@@ -1,0 +1,91 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+import EsaCard from '@esa/ecology/esa-card.astro';
+import EsaButton from '@esa/ecology/esa-button.astro';
+
+const props = [
+  { name: 'title', type: 'string', description: 'Card heading. A header row renders when a title, header slot, or actions slot is present.' },
+  { name: 'subtitle', type: 'string', description: 'Supporting line under the title.' },
+  { name: 'icon', type: 'string', description: 'Any truthy value renders the built-in info glyph before the title (the glyph is fixed, not name-resolved).' },
+  { name: 'variant', type: "'default' | 'outlined' | 'elevated' | 'filled'", default: "'default'", description: 'Surface treatment — border, shadow, or sunken fill.' },
+  { name: 'headerVariant', type: "'default' | 'primary' | 'muted'", default: "'default'", description: 'Header chrome: transparent, forest-green fill, or sunken tint.' },
+  { name: 'padding', type: "'none' | 'compact' | 'default' | 'spacious'", default: "'default'", description: 'Body padding scale.' },
+];
+---
+<ComponentDoc
+  name="Card"
+  category="Display"
+  slug="esa-card"
+  type=".astro"
+  summary="The inherited Ecology card, wearing the Biochar Atlas skin. Header (icon + title + subtitle + actions), body, and optional footer; the primary header variant fills with forest green from <code>--color-primary</code>."
+>
+  <Section id="variants" title="Variants">
+    <Preview align="start" code={`<EsaCard title="Default">…</EsaCard>\n<EsaCard title="Elevated" variant="elevated">…</EsaCard>\n<EsaCard title="Filled" variant="filled">…</EsaCard>`}>
+      <div class="grid">
+        <EsaCard title="Default">Border on the surface color.</EsaCard>
+        <EsaCard title="Elevated" variant="elevated">Soft shadow, no border.</EsaCard>
+        <EsaCard title="Filled" variant="filled">Sunken background, no border.</EsaCard>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="header" title="Header">
+    <p>
+      A <code>title</code> (with optional <code>subtitle</code>) renders the header row; the
+      <code>actions</code> slot puts controls on its right. <code>headerVariant="primary"</code>
+      fills the header with the brand green.
+    </p>
+    <Preview align="start" code={`<EsaCard title="Soil context" subtitle="Auto-derived from SSURGO" headerVariant="muted">\n  Willamette silt loam, 0–3% slopes.\n  <EsaButton slot="actions" color="ghost" size="sm">Edit</EsaButton>\n</EsaCard>`}>
+      <div class="stack">
+        <EsaCard title="Soil context" subtitle="Auto-derived from SSURGO" headerVariant="muted">
+          Willamette silt loam, 0–3% slopes. pH 6.2, moderate available water capacity.
+          <EsaButton slot="actions" color="ghost" size="sm">Edit</EsaButton>
+        </EsaCard>
+        <EsaCard title="Suitability summary" subtitle="Ruleset v0.3" headerVariant="primary">
+          Douglas-fir slash at 550°C scores 78 of 100 for the selected goals.
+        </EsaCard>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="padding" title="Padding">
+    <Preview align="start" code={`<EsaCard padding="compact">…</EsaCard>\n<EsaCard padding="spacious">…</EsaCard>`}>
+      <div class="grid">
+        <EsaCard title="Compact" padding="compact">Dense body padding.</EsaCard>
+        <EsaCard title="Default">Standard body padding.</EsaCard>
+        <EsaCard title="Spacious" padding="spacious">Generous body padding.</EsaCard>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="footer" title="Footer slot">
+    <p>The named <code>footer</code> slot renders a sunken strip under the body — meta, totals, or secondary actions.</p>
+    <Preview align="start" code={`<EsaCard title="Assessment">\n  Scores, rationale, and limitations.\n  <span slot="footer">Generated Jun 11, 2026 · OR039</span>\n</EsaCard>`}>
+      <div class="stack">
+        <EsaCard title="Assessment">
+          Scores, rationale, and limitations for the selected field.
+          <span slot="footer" class="foot-meta">Generated Jun 11, 2026 · OR039</span>
+        </EsaCard>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} />
+    <p class="slots">
+      <strong>Slots:</strong> default (body) · <code>header</code> (replaces the built-in
+      title row) · <code>actions</code> (right side of the header) · <code>footer</code>
+      (sunken strip below the body).
+    </p>
+  </Section>
+</ComponentDoc>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--spacing-300, 0.75rem); width: 100%; }
+  .stack { display: flex; flex-direction: column; gap: var(--spacing-300, 0.75rem); width: 100%; }
+  .foot-meta { font-size: 14px; color: var(--color-text-muted, #807c73); }
+  .slots { font-size: 15px; color: var(--color-text-secondary, #54514a); }
+</style>

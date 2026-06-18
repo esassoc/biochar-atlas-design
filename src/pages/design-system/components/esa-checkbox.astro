@@ -1,0 +1,71 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+
+const props = [
+  { name: 'label', type: 'string', default: "''", description: 'Text rendered beside the box.' },
+  { name: 'checked', type: 'boolean', default: 'false', description: 'Whether the box is checked.' },
+  { name: 'indeterminate', type: 'boolean', default: 'false', description: 'Renders the mixed/partial state with a dash.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Box and label size.' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables interaction.' },
+];
+
+const events = [
+  { name: 'change', type: 'CustomEvent<{ checked: boolean }>', description: 'Fired when toggled. Composed and bubbling; detail.checked is the new state.' },
+];
+---
+<ComponentDoc
+  name="Checkbox"
+  category="Forms"
+  slug="esa-checkbox"
+  type="wc"
+  summary="The inherited Ecology checkbox, wearing the Biochar Atlas skin. The checked and indeterminate states fill with forest green because the theme re-points <code>--color-primary</code>; form-associated with an inlined check icon."
+>
+  <Section id="preview" title="Preview">
+    <Preview code={`<esa-checkbox label="Include compost co-application" checked></esa-checkbox>`}>
+      <esa-checkbox label="Include compost co-application" checked></esa-checkbox>
+    </Preview>
+  </Section>
+
+  <Section id="states" title="States">
+    <Preview align="start" code={`<esa-checkbox label="Unchecked"></esa-checkbox>\n<esa-checkbox label="Checked" checked></esa-checkbox>\n<esa-checkbox label="Indeterminate" indeterminate></esa-checkbox>\n<esa-checkbox label="Disabled" disabled></esa-checkbox>\n<esa-checkbox label="Disabled + checked" disabled checked></esa-checkbox>`}>
+      <div class="col">
+        <esa-checkbox label="Unchecked"></esa-checkbox>
+        <esa-checkbox label="Checked" checked></esa-checkbox>
+        <esa-checkbox label="Indeterminate" indeterminate></esa-checkbox>
+        <esa-checkbox label="Disabled" disabled></esa-checkbox>
+        <esa-checkbox label="Disabled + checked" disabled checked></esa-checkbox>
+      </div>
+    </Preview>
+  </Section>
+
+  <Section id="sizes" title="Sizes">
+    <Preview code={`<esa-checkbox label="Extra small" size="xs" checked></esa-checkbox>\n<esa-checkbox label="Small" size="sm" checked></esa-checkbox>\n<esa-checkbox label="Medium" size="md" checked></esa-checkbox>\n<esa-checkbox label="Large" size="lg" checked></esa-checkbox>`}>
+      <esa-checkbox label="Extra small" size="xs" checked></esa-checkbox>
+      <esa-checkbox label="Small" size="sm" checked></esa-checkbox>
+      <esa-checkbox label="Medium" size="md" checked></esa-checkbox>
+      <esa-checkbox label="Large" size="lg" checked></esa-checkbox>
+    </Preview>
+  </Section>
+
+  <Section id="no-label" title="No label">
+    <p>Omit <code>label</code> for a bare box — supply an <code>aria-label</code> for an accessible name.</p>
+    <Preview code={`<esa-checkbox checked aria-label="Select row"></esa-checkbox>`}>
+      <esa-checkbox checked aria-label="Select row"></esa-checkbox>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <Api props={props} events={events} />
+  </Section>
+</ComponentDoc>
+
+<style>
+  .col { display: flex; flex-direction: column; gap: var(--spacing-300, 0.75rem); align-items: flex-start; }
+</style>
+
+<script>
+  import '@esa/ecology/esa-checkbox';
+</script>

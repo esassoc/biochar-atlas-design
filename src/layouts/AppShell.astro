@@ -1,0 +1,939 @@
+---
+// AppShell — the Biochar Atlas frame, ported from beacon-design's AppShell
+// (itself a verbatim port of Beacon's Angular "modern-layout"):
+//   .modern-layout (topbar + body[sidenav + content]) · BEM classes, sidebar
+//   collapse, nav-section expand/collapse, dropdown open/close — all kept.
+//
+// Biochar changes vs Beacon:
+//   - Tokens: every --bcn-* swapped for semantic (--color-*) or spoke (--bca-*)
+//     tokens from theme-biochar.css, always with literal fallbacks.
+//   - Sidebar header: inline leaf mark + "Biochar Atlas" wordmark. Beacon's
+//     project-switcher is dropped.
+//   - Nav: data-driven NavSections. The four planned Atlas modules are TOP-LEVEL
+//     sections (collapsed by default) whose not-yet-built sub-pages render as
+//     disabled links — the nav previews the planned roadmap. Sections can carry
+//     a tag pill (e.g. 'Phase 2') on their header.
+//   - Topbar: deliberately quiet — sidebar toggle on the left, a simple user
+//     menu (Profile / Sign out) on the right. No page heading, no badges.
+import BaseLayout from './BaseLayout.astro';
+import EsaIcon from '@esa/ecology/esa-icon.astro';
+import { withBase } from '../lib/base';
+
+interface NavItem {
+  id: string;
+  label: string;
+  /** Real route (already withBase'd). Defaults to the `#id` stub when absent. */
+  href?: string;
+  /** Lucide glyph key — esa-icon registry name or LUCIDE entry below. */
+  icon?: string;
+  /** Inline Lucide path markup override for glyphs not in either lookup. */
+  iconPaths?: string;
+  active?: boolean;
+  /** Ghosted roadmap item — muted, not-allowed cursor, no navigation. */
+  disabled?: boolean;
+  /** Small pill at the row's right edge. */
+  tag?: string;
+}
+interface NavSection {
+  id: string;
+  title: string;
+  icon: string;
+  /** Inline Lucide path markup for glyphs not in esa-icon's registry. */
+  iconPaths?: string;
+  items?: NavItem[];
+  /** Single-link section (no sublist). */
+  link?: boolean;
+  expanded?: boolean;
+  active?: boolean;
+  dividerAfter?: boolean;
+  /** Small pill on the section header (e.g. 'Phase 2'). */
+  tag?: string;
+}
+interface Props {
+  title?: string;
+  navSections?: NavSection[];
+  /** NavItem id to highlight (overrides the static default, Suitability Tool). */
+  activeNavId?: string;
+  /** Section ids to render expanded (overrides the per-section `expanded` defaults when provided). */
+  expandedSections?: string[];
+}
+
+// ── Lucide glyphs not in esa-icon's built-in registry (inner SVG markup only) ──
+const LUCIDE = {
+  // section icons
+  'map-pinned':
+    '<path d="M18 8c0 3.613-3.869 7.429-5.393 8.795a1 1 0 0 1-1.214 0C9.87 15.429 6 11.613 6 8a6 6 0 0 1 12 0"/><circle cx="12" cy="8" r="2"/><path d="M8.714 14h-3.71a1 1 0 0 0-.948.683l-2.004 6A1 1 0 0 0 3 22h18a1 1 0 0 0 .948-1.316l-2-6a1 1 0 0 0-.949-.684h-3.712"/>',
+  // Suitability items
+  'map-pin':
+    '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  'columns-2': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/>',
+  bookmark: '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
+  calculator:
+    '<rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>',
+  // Atlas-module sections (database lives in esa-icon's registry)
+  store:
+    '<path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/>',
+  'book-open':
+    '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  'clipboard-check':
+    '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
+  // About section
+  info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  'file-text':
+    '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  'folder-open':
+    '<path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2"/>',
+  // Admin items
+  archive:
+    '<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
+  'refresh-cw':
+    '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+  'git-branch':
+    '<line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+  // user menu
+  user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  'log-out':
+    '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+};
+
+const {
+  title = 'Biochar Suitability Tool',
+  activeNavId,
+  expandedSections,
+  // Default nav: the live Suitability section, then the four planned Atlas
+  // modules as top-level sections (collapsed, not-yet-built sub-pages disabled),
+  // then About and Admin. The roadmap is deliberately visible but ghosted.
+  navSections = [
+    {
+      id: 'suitability',
+      title: 'Suitability',
+      icon: 'map-pinned',
+      iconPaths: LUCIDE['map-pinned'],
+      expanded: true,
+      dividerAfter: true,
+      items: [
+        {
+          id: 'suitability-tool',
+          label: 'Suitability Tool',
+          icon: 'map-pin',
+          href: withBase('/prototypes/suitability-tool'),
+          active: true,
+        },
+        { id: 'scenario-comparison', label: 'Scenario Comparison', icon: 'columns-2', disabled: true },
+        { id: 'saved-assessments', label: 'Saved Assessments', icon: 'bookmark', disabled: true },
+        { id: 'cps-336-calculator', label: 'CPS 336 Calculator', icon: 'calculator', disabled: true },
+      ],
+    },
+    {
+      id: 'sourcing',
+      title: 'Sourcing',
+      icon: 'store',
+      iconPaths: LUCIDE['store'],
+      tag: 'Phase 2',
+      expanded: false,
+      items: [
+        { id: 'find-suppliers', label: 'Find Suppliers', disabled: true },
+        { id: 'compare-materials', label: 'Compare Materials', disabled: true },
+        { id: 'supplier-directory', label: 'Supplier Directory', disabled: true },
+      ],
+    },
+    {
+      id: 'learning-center',
+      title: 'Learning Center',
+      icon: 'book-open',
+      iconPaths: LUCIDE['book-open'],
+      tag: 'Phase 2',
+      expanded: false,
+      items: [
+        { id: 'biochar-basics', label: 'Biochar Basics', disabled: true },
+        { id: 'fact-sheets-videos', label: 'Fact Sheets & Videos', disabled: true },
+        { id: 'training-ceus', label: 'Training & CEUs', disabled: true },
+      ],
+    },
+    {
+      id: 'nrcs-implementation',
+      title: 'NRCS Implementation',
+      icon: 'clipboard-check',
+      iconPaths: LUCIDE['clipboard-check'],
+      tag: 'Phase 2',
+      expanded: false,
+      items: [
+        { id: 'practice-planning', label: 'Practice Planning (CPS 336)', disabled: true },
+        { id: 'cost-payment-estimator', label: 'Cost & Payment Estimator', disabled: true },
+        { id: 'monitoring-risk', label: 'Monitoring & Risk Guidance', disabled: true },
+      ],
+    },
+    {
+      id: 'deployment-database',
+      title: 'Deployment Database',
+      icon: 'database',
+      tag: 'Phase 2',
+      expanded: false,
+      dividerAfter: true,
+      items: [
+        { id: 'field-trials', label: 'Field Trials', disabled: true },
+        { id: 'outcomes-explorer', label: 'Outcomes Explorer', disabled: true },
+        { id: 'submit-trial-data', label: 'Submit Trial Data', disabled: true },
+      ],
+    },
+    {
+      id: 'about',
+      title: 'About',
+      icon: 'info',
+      iconPaths: LUCIDE['info'],
+      expanded: false,
+      items: [
+        { id: 'methodology', label: 'Methodology', icon: 'file-text', href: '#' },
+        { id: 'resources', label: 'Resources', icon: 'folder-open', href: '#' },
+      ],
+    },
+    {
+      id: 'admin',
+      title: 'Admin',
+      icon: 'settings',
+      expanded: false,
+      items: [
+        { id: 'admin-catalog', label: 'Biochar Catalog', icon: 'archive', href: withBase('/prototypes/admin-catalog') },
+        { id: 'datasets-refresh', label: 'Datasets & Refresh', icon: 'refresh-cw', href: '#' },
+        { id: 'algorithm-versions', label: 'Algorithm Versions', icon: 'git-branch', href: '#' },
+      ],
+    },
+  ],
+} = Astro.props as Props;
+
+// Per-page section expansion — when provided, a section is expanded iff its id is listed.
+if (expandedSections) {
+  for (const section of navSections) {
+    section.expanded = expandedSections.includes(section.id);
+  }
+}
+
+// Per-page nav highlight — activeNavId beats the static default (Suitability Tool).
+// Disabled (roadmap) items never highlight.
+if (activeNavId) {
+  for (const section of navSections) {
+    let hit = false;
+    for (const item of section.items ?? []) {
+      item.active = !item.disabled && item.id === activeNavId;
+      if (item.active) hit = true;
+    }
+    section.active = hit;
+  }
+}
+---
+
+<BaseLayout title={title}>
+  <div class="modern-layout">
+    <!-- ═══ TOPBAR ═══ -->
+    <header class="topbar">
+      <!-- Left: sidebar toggle -->
+      <div class="topbar__left">
+        <button
+          type="button"
+          class="sidebar-toggle sidebar-toggle--collapsed"
+          id="sidebar-toggle"
+          aria-label="Expand sidebar"
+          aria-expanded="false"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="sidebar-toggle__icon"
+          >
+            <rect width="18" height="18" x="3" y="3" rx="2" />
+            <path d="M9 3v18" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Center: spacer (1fr) -->
+      <div class="topbar__center"></div>
+
+      <!-- Right: user menu -->
+      <div class="topbar__right">
+        <div class="user-menu" id="user-menu">
+          <button
+            type="button"
+            class="user-trigger"
+            id="user-trigger"
+            aria-haspopup="menu"
+            aria-expanded="false"
+          >
+            <span class="user-trigger__avatar">DW</span>
+            <span class="user-trigger__name">Dana Whitfield</span>
+            <EsaIcon name="chevron-down" size="xs" />
+          </button>
+
+          <div class="user-panel" id="user-panel" hidden>
+            <a href="#" class="user-panel__item">
+              <EsaIcon name="user" size="sm" paths={LUCIDE['user']} />
+              <span>Profile</span>
+            </a>
+            <button type="button" class="user-panel__item user-panel__item--danger">
+              <EsaIcon name="log-out" size="sm" paths={LUCIDE['log-out']} />
+              <span>Sign out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══ BODY (sidenav + content) ═══ -->
+    <div class="modern-layout__body">
+      <!-- ─── side nav ─── -->
+      <nav class="side-nav collapsed" id="side-nav">
+        <div class="sidebar-header">
+          <a href={withBase('/')} class="brand" aria-label="Biochar Atlas home">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="brand__mark"
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span class="brand__text">
+              <span class="brand__wordmark">Biochar Atlas</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="main-nav">
+          {
+            navSections.map((section) => (
+              <>
+                {section.link ? (
+                  <div class:list={['nav-section', { 'nav-section--active': section.active }]}>
+                    <a href={`#${section.id}`} class="nav-section__header nav-section__header--link">
+                      <EsaIcon
+                        name={section.icon}
+                        size="sm"
+                        paths={section.iconPaths ?? LUCIDE[section.icon as keyof typeof LUCIDE]}
+                      />
+                      <span class="nav-section__title">{section.title}</span>
+                    </a>
+                  </div>
+                ) : (
+                  <div
+                    class:list={[
+                      'nav-section',
+                      { 'nav-section--collapsed': !section.expanded, 'nav-section--active': section.active },
+                    ]}
+                  >
+                    <button type="button" class="nav-section__header" aria-expanded={section.expanded ? 'true' : 'false'}>
+                      <EsaIcon
+                        name={section.icon}
+                        size="sm"
+                        paths={section.iconPaths ?? LUCIDE[section.icon as keyof typeof LUCIDE]}
+                      />
+                      <span class="nav-section__title">{section.title}</span>
+                      {section.tag && <span class="nav-tag">{section.tag}</span>}
+                      <EsaIcon name="chevron-down" size="sm" />
+                    </button>
+                    <ul class="nav-section__items">
+                      {section.items?.map((item) => (
+                        <li class="nav-item">
+                          {item.disabled ? (
+                            <span class="nav-sublink nav-sublink--disabled" aria-disabled="true">
+                              {item.icon && (
+                                <EsaIcon
+                                  name={item.icon}
+                                  size="sm"
+                                  paths={item.iconPaths ?? LUCIDE[item.icon as keyof typeof LUCIDE]}
+                                />
+                              )}
+                              <span class="nav-sublink__label">{item.label}</span>
+                              {item.tag && <span class="nav-tag">{item.tag}</span>}
+                            </span>
+                          ) : (
+                            <a href={item.href ?? `#${item.id}`} class:list={['nav-sublink', { active: item.active }]}>
+                              {item.icon && (
+                                <EsaIcon
+                                  name={item.icon}
+                                  size="sm"
+                                  paths={item.iconPaths ?? LUCIDE[item.icon as keyof typeof LUCIDE]}
+                                />
+                              )}
+                              <span class="nav-sublink__label">{item.label}</span>
+                              {item.tag && <span class="nav-tag">{item.tag}</span>}
+                            </a>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {section.dividerAfter && <hr class="nav-divider" aria-hidden="true" />}
+              </>
+            ))
+          }
+        </div>
+      </nav>
+
+      <!-- content -->
+      <div class="modern-layout__content">
+        <slot />
+      </div>
+    </div>
+
+  </div>
+</BaseLayout>
+
+<script>
+  // Sidebar collapse toggle + chevron mirroring + user panel open/close.
+  // Same contracts as Beacon's AppShell (onToggleSidebar + ui-dropdown).
+  const toggle = document.getElementById('sidebar-toggle');
+  const sideNav = document.getElementById('side-nav');
+  if (toggle && sideNav) {
+    toggle.addEventListener('click', () => {
+      const collapsed = sideNav.classList.toggle('collapsed');
+      toggle.classList.toggle('sidebar-toggle--collapsed', collapsed);
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+      toggle.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+    });
+  }
+
+  // Nav-section expand/collapse (expanded sidebar only).
+  document.querySelectorAll<HTMLButtonElement>('.nav-section__header:not(.nav-section__header--link)').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const section = btn.closest('.nav-section');
+      if (!section) return;
+      const nowCollapsed = section.classList.toggle('nav-section--collapsed');
+      btn.setAttribute('aria-expanded', String(!nowCollapsed));
+    });
+  });
+
+  // User menu dropdown (outside-click + Escape close, like Beacon's user menu).
+  const userTrigger = document.getElementById('user-trigger');
+  const userPanel = document.getElementById('user-panel');
+  const userMenu = document.getElementById('user-menu');
+  if (userTrigger && userPanel && userMenu) {
+    const setOpen = (open: boolean) => {
+      userPanel.hidden = !open;
+      userTrigger.setAttribute('aria-expanded', String(open));
+    };
+    userTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setOpen(userPanel.hidden);
+    });
+    document.addEventListener('click', (e) => {
+      if (!userMenu.contains(e.target as Node)) setOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  }
+
+</script>
+
+<style>
+  /* ═══════════════════════════════════════════════════════════════════
+     .modern-layout frame
+     ═══════════════════════════════════════════════════════════════════ */
+  .modern-layout {
+    /* private knobs — public tokens with literal fallbacks */
+    --_topbar-h: 56px;
+    --_sidenav-w: 340px;
+    --_sidenav-w-collapsed: 72px;
+    --_chrome-border: var(--color-border, #ddd9d0);
+
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .modern-layout__body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+    padding-top: var(--_topbar-h, 56px); /* header height */
+  }
+
+  .modern-layout__content {
+    flex: 1;
+    overflow-y: auto;
+    min-width: 0;
+    /* min-height: 0 lets a child claim 100% height and run its own internal
+       scroll (the suitability tool fills this area edge-to-edge). */
+    min-height: 0;
+    position: relative;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     topbar
+     ═══════════════════════════════════════════════════════════════════ */
+  .topbar {
+    --_topbar-bg: var(--color-surface-sunken, #f3f1ea);
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--_topbar-h, 56px);
+    background: var(--_topbar-bg, #f3f1ea);
+    border-bottom: 1px solid var(--_chrome-border, #ddd9d0);
+    z-index: 1100;
+
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    padding: 0 var(--spacing-200, 0.5rem);
+  }
+
+  @media (min-width: 768px) {
+    .topbar {
+      padding: 0 var(--spacing-400, 1rem);
+    }
+  }
+
+  .topbar__left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-300, 0.75rem);
+    min-width: 0;
+  }
+
+  .topbar__center {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-400, 1rem);
+    padding: 0 var(--spacing-400, 1rem);
+  }
+
+  .topbar__right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-300, 0.75rem);
+  }
+
+  /* Sidebar toggle */
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-100, 0.25rem);
+    background: transparent;
+    color: var(--color-text-tertiary, #6a665e);
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease;
+  }
+  .sidebar-toggle:hover {
+    background: var(--color-border-light, #ebe8e1);
+    color: var(--color-primary, #234a31);
+  }
+  .sidebar-toggle:focus-visible {
+    outline: 2px solid var(--color-primary, #234a31);
+    outline-offset: 2px;
+  }
+  .sidebar-toggle__icon {
+    transition: transform 150ms ease;
+  }
+  .sidebar-toggle--collapsed .sidebar-toggle__icon {
+    transform: scaleX(-1);
+  }
+
+  /* ── User menu (Profile / Sign out) ── */
+  .user-menu {
+    position: relative;
+  }
+  .user-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-250, 0.625rem);
+    padding: var(--spacing-100, 0.25rem) var(--spacing-200, 0.5rem);
+    border: none;
+    border-radius: var(--radius-200, 0.5rem);
+    background: transparent;
+    cursor: pointer;
+    transition: background 150ms ease;
+  }
+  .user-trigger:hover {
+    background: var(--color-border-light, #ebe8e1);
+  }
+  .user-trigger:focus-visible {
+    outline: 2px solid var(--color-primary, #234a31);
+    outline-offset: 2px;
+  }
+  .user-trigger__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full, 9999px);
+    background: var(--bca-green-100, #e2ecda);
+    color: var(--color-primary, #234a31);
+    border: 2px solid var(--bca-green-200, #c8dabe);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold, 600);
+    transition: border-color 150ms ease;
+  }
+  .user-trigger:hover .user-trigger__avatar {
+    border-color: var(--color-primary, #234a31);
+  }
+  .user-trigger__name {
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--color-text-primary, #33312a);
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+  .user-trigger > :global(.esa-icon:last-child) {
+    flex-shrink: 0;
+    color: var(--color-text-muted, #807c73);
+  }
+
+  @media (max-width: 767px) {
+    .user-trigger__name {
+      display: none;
+    }
+  }
+
+  /* User panel (dropdown, position bottom-end) */
+  .user-panel {
+    position: absolute;
+    top: calc(100% + var(--spacing-200, 0.5rem));
+    right: 0;
+    min-width: 200px;
+    background: var(--color-surface, #fff);
+    border-radius: var(--radius-200, 0.5rem);
+    border: 1px solid var(--_chrome-border, #ddd9d0);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    z-index: 1200;
+    padding: var(--spacing-200, 0.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-050, 0.125rem);
+  }
+  .user-panel[hidden] {
+    display: none;
+  }
+
+  .user-panel__item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-300, 0.75rem);
+    width: 100%;
+    padding: var(--spacing-250, 0.625rem) var(--spacing-300, 0.75rem);
+    font-size: 0.9375rem;
+    font-weight: var(--font-weight-medium, 500);
+    color: var(--color-text-primary, #33312a);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-200, 0.5rem);
+    cursor: pointer;
+    text-align: left;
+    text-decoration: none;
+    transition: background-color 150ms ease;
+  }
+  .user-panel__item:hover {
+    background: var(--color-surface-sunken, #f3f1ea);
+  }
+  .user-panel__item :global(.esa-icon) {
+    color: var(--color-text-tertiary, #6a665e);
+  }
+  .user-panel__item--danger {
+    color: var(--color-danger, #ef4444);
+  }
+  .user-panel__item--danger:hover {
+    background: var(--color-danger-subtle, #fef2f2);
+  }
+  .user-panel__item--danger :global(.esa-icon) {
+    color: var(--color-danger, #ef4444);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     side nav ($sidebar-width 300px / collapsed 72px)
+     ═══════════════════════════════════════════════════════════════════ */
+  .side-nav {
+    --_sidenav-bg: var(--color-background, #faf9f6);
+    --_nav-hover-bg: var(--color-active-overlay, rgba(0, 0, 0, 0.04));
+    --_nav-active-bg: var(--color-primary-subtle, #f0f5ec);
+    --_nav-active-color: var(--color-primary, #234a31);
+
+    width: var(--_sidenav-w, 300px);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--_sidenav-bg, #faf9f6);
+    font-size: 0.9375rem;
+    overflow: visible;
+    transition: width 200ms ease-in-out;
+    border-right: 1px solid var(--_chrome-border, #ddd9d0);
+    flex-shrink: 0;
+  }
+  .side-nav.collapsed {
+    width: var(--_sidenav-w-collapsed, 72px);
+    max-width: var(--_sidenav-w-collapsed, 72px);
+  }
+
+  .sidebar-header {
+    flex-shrink: 0;
+    padding: var(--spacing-300, 0.75rem) var(--spacing-400, 1rem);
+    transition: padding 200ms ease-in-out;
+  }
+  .side-nav.collapsed .sidebar-header {
+    padding: var(--spacing-300, 0.75rem) var(--spacing-200, 0.5rem);
+  }
+
+  /* Brand — inline leaf mark + wordmark */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-250, 0.625rem);
+    padding: var(--spacing-200, 0.5rem);
+    border-radius: var(--radius-200, 0.5rem);
+    text-decoration: none;
+    transition: background 150ms ease;
+  }
+  .brand:hover {
+    background: var(--_nav-hover-bg, rgba(0, 0, 0, 0.04));
+  }
+  .brand__mark {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    color: var(--color-primary, #234a31);
+  }
+  .brand__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .brand__wordmark {
+    font-size: 1.0625rem;
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--color-text-primary, #33312a);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .side-nav.collapsed .brand {
+    justify-content: center;
+    padding: var(--spacing-200, 0.5rem) 0;
+    width: 100%;
+  }
+  .side-nav.collapsed .brand__text {
+    display: none;
+  }
+
+  .main-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: visible;
+    padding: 0 var(--spacing-400, 1rem) var(--spacing-400, 1rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-050, 0.125rem);
+    transition: padding 200ms ease-in-out;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .main-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .side-nav.collapsed .main-nav {
+    padding: 0 var(--spacing-200, 0.5rem);
+  }
+
+  .nav-section {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .nav-divider {
+    flex-shrink: 0;
+    height: 1px;
+    margin: var(--spacing-200, 0.5rem) 0;
+    border: 0;
+    background: var(--_chrome-border, #ddd9d0);
+  }
+
+  .nav-section__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-250, 0.625rem);
+    padding: var(--spacing-250, 0.625rem) var(--spacing-200, 0.5rem);
+    color: var(--color-text-primary, #33312a);
+    font-size: 0.9375rem; /* 15px */
+    font-weight: var(--font-weight-semibold, 600);
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-100, 0.25rem);
+    transition: all 150ms ease;
+    white-space: nowrap;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .nav-section__header--link {
+    text-decoration: none;
+    color: var(--color-text-primary, #33312a);
+  }
+  .nav-section__header:hover {
+    background: var(--_nav-hover-bg, rgba(0, 0, 0, 0.04));
+    color: var(--_nav-active-color, #234a31);
+  }
+  .nav-section__header:hover :global(.esa-icon) {
+    color: var(--_nav-active-color, #234a31);
+  }
+  .nav-section--active .nav-section__header {
+    color: var(--_nav-active-color, #234a31);
+  }
+  .nav-section--active .nav-section__header :global(.esa-icon) {
+    color: var(--_nav-active-color, #234a31);
+  }
+
+  /* icon (first esa-icon in the header) */
+  .nav-section__header > :global(.esa-icon:first-child) {
+    flex-shrink: 0;
+    color: var(--color-text-primary, #33312a);
+    transition: color 150ms ease;
+  }
+  /* chevron (last esa-icon in the header) */
+  .nav-section__header > :global(.esa-icon:last-child) {
+    color: var(--color-text-muted, #807c73);
+    transition: transform 150ms ease, opacity 200ms ease-in-out;
+    flex-shrink: 0;
+  }
+  .nav-section--collapsed .nav-section__header > :global(.esa-icon:last-child) {
+    transform: rotate(-90deg);
+  }
+
+  /* title spans flex between icon and chevron */
+  .nav-section__title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 200ms ease-in-out;
+  }
+  .side-nav.collapsed .nav-section__title,
+  .side-nav.collapsed .nav-section__header .nav-tag {
+    display: none;
+  }
+  .side-nav.collapsed .nav-section__header > :global(.esa-icon:last-child) {
+    display: none;
+  }
+  .side-nav.collapsed .nav-section__header {
+    justify-content: center;
+    padding: var(--spacing-250, 0.625rem) var(--spacing-200, 0.5rem);
+  }
+
+  .nav-section__items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: 500px;
+    opacity: 1;
+    transition: max-height 200ms ease-in-out, opacity 200ms ease-in-out;
+  }
+  .nav-section--collapsed .nav-section__items {
+    max-height: 0;
+    opacity: 0;
+  }
+  .side-nav.collapsed .nav-section__items {
+    display: none;
+  }
+
+  /* Indent is shallower than Beacon's 2.5rem — items carry their own icons
+     (or sit one level under an iconed section header), which do the hierarchy
+     work without eating label width. */
+  .nav-item {
+    padding: 0 0 0 var(--spacing-300, 0.75rem);
+  }
+  .nav-item + .nav-item {
+    margin-top: var(--spacing-050, 0.125rem);
+  }
+
+  .nav-sublink {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-250, 0.625rem);
+    padding: var(--spacing-200, 0.5rem);
+    color: var(--color-text-secondary, #54514a);
+    text-decoration: none;
+    border-radius: var(--radius-100, 0.25rem);
+    font-size: 0.9375rem; /* 15px — nav items stay ≥14px */
+    transition: all 150ms ease;
+    line-height: 1.2;
+  }
+  .nav-sublink :global(.esa-icon) {
+    flex-shrink: 0;
+    color: var(--color-text-tertiary, #6a665e);
+    transition: color 150ms ease;
+  }
+  .nav-sublink__label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .nav-sublink:hover {
+    background: var(--_nav-hover-bg, rgba(0, 0, 0, 0.04));
+    color: var(--color-text-primary, #33312a);
+  }
+  /* Active = tint + semibold + primary text (no left-border indicator) */
+  .nav-sublink.active {
+    background: var(--_nav-active-bg, #f0f5ec);
+    color: var(--_nav-active-color, #234a31);
+    font-weight: var(--font-weight-semibold, 600);
+  }
+  .nav-sublink.active :global(.esa-icon) {
+    color: var(--_nav-active-color, #234a31);
+  }
+
+  /* Ghosted roadmap items */
+  .nav-sublink--disabled {
+    color: var(--color-text-muted, #807c73);
+    cursor: not-allowed;
+  }
+  .nav-sublink--disabled :global(.esa-icon) {
+    color: var(--color-text-muted, #807c73);
+  }
+  .nav-sublink--disabled:hover {
+    background: transparent;
+    color: var(--color-text-muted, #807c73);
+  }
+
+  /* Roadmap tag pill — 12px floor, normal case (readable, not ornament) */
+  .nav-tag {
+    flex-shrink: 0;
+    padding: var(--spacing-050, 0.125rem) var(--spacing-150, 0.375rem);
+    font-size: 0.75rem; /* 12px minimum */
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 1.4;
+    color: var(--color-text-muted, #807c73);
+    background: var(--color-surface-sunken, #f3f1ea);
+    border: 1px solid var(--_chrome-border, #ddd9d0);
+    border-radius: var(--radius-full, 9999px);
+    white-space: nowrap;
+  }
+
+</style>
