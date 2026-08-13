@@ -36,7 +36,7 @@ async function load() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'User-Agent': 'biochar-design-prototype/0.1 (ESA design spoke)',
+      'User-Agent': 'biochar-atlas-design/0.1 (ESA design spoke)',
     },
     body: `data=${encodeURIComponent(QUERY)}`,
   });
