@@ -27,9 +27,34 @@ else from them. Extending with lighter/darker steps is the agreement with ABI
 - `--focus-ring-color` / `-width` / `-offset` are now DEFINED. Hub components
   outline with them but the token package never declared them, so the var()
   resolved invalid and focus rings computed to none across every spoke.
-- Status families are in-brand: info Sage, success Jade, warning Gold-11,
-  danger Purple. The palette contains no red (hues span 67–150 plus Purple at
-  335; the 0–60 band is empty), so Purple carries the negative signal.
+- Status families are conventional and deliberately NOT brand — success green,
+  warning yellow/amber, danger red (Andy, 2026-08-13). Status is functional
+  convention; brand colors carry identity. Info stays Sage and stays in-brand:
+  it is the advisory voice, not a state. This supersedes the earlier in-brand
+  mapping (success Jade, warning Gold-11, danger Purple), which existed because
+  the ABI palette contains no red — hues span 67–150 plus Purple at 335, and
+  the 0–60 band is empty. That gap is still real; the statuses just no longer
+  try to cover it with Purple. Nothing needs to be asked of ABI.
+- Status values live in `--bca-status-{green,amber,red}-*`, NOT in the
+  `--bca-<hue>-*` namespace, which means "derived from an issued ABI color".
+  Steps 3/6/12 reference the HUB's own Radix primitives (`--color-green-*`,
+  `--color-yellow-*`, `--color-red-*`) — conventional status was already in
+  @esa/tokens' primitive layer, so no new literals were minted and the
+  "[data-theme] re-points semantics, never primitives" contract holds. Step 11
+  is the one spoke literal: darkened along OKLCH lightness (hue + chroma held)
+  by the least amount that clears 4.5:1 on white, canvas AND its own subtle.
+- Deleting the overrides to inherit the hub's status SEMANTICS was checked and
+  rejected: the hub spells success in lime (`--color-lime-9` `#bdee63`, a
+  bright fill wanting dark text) and info in blue. Lime next to ABI Green reads
+  as a second, wronger green. The hub's primitives are the right borrow; its
+  status semantics are not.
+- Warning's subtle surface is luminance-identical to the canvas (1.00:1), so a
+  warning container separates by hue and border, never by value — `-border` is
+  load-bearing there in a way it is not for the other three.
+- Status solids on the panel surface (#dedddb) run 3.70–3.90:1: fine as dots,
+  icons and bars (over the 3.0 non-text floor), not as text. Status text on a
+  panel must use `-strong`. Danger regressed here specifically — Purple was
+  4.90:1 on the panel, red is 3.90:1.
 - Functional scales: `--bca-soh-1..5` (the map's 5 discrete suitability
   classes, a Gold→Green path that clears worst-case colorblind ΔE 0.120 per
   adjacent pair), `--bca-bar-1..5` (continuous 0–100, single-hue — the dev

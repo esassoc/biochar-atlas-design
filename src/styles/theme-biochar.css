@@ -127,9 +127,10 @@
   --bca-sage-11: #676556;
   --bca-sage-12: #22200b;
 
-  /* Purple — links, and the palette's negative signal. There is no red in
-     the ABI palette; Purple is what carries "not recommended" until testing
-     proves a color-alone signal unreadable. */
+  /* Purple — links, and the "Not Recommended" badge ink. It is no longer the
+     danger status: statuses went to conventional red on 2026-08-13. The
+     recommendation badges are a categorical brand scale, not a state, so
+     Purple keeps that job. */
   --bca-purple-1:  #fefcfe;
   --bca-purple-2:  #fcf7fb;
   --bca-purple-3:  #f9ecf5;
@@ -225,36 +226,93 @@
 
   --color-active-overlay: color-mix(in srgb, var(--bca-green-12) 8%, transparent);
 
-  /* ═══ STATUS ══════════════════════════════════════════════════════════
-     Four in-brand families. Each "strong" is the step-12 ink measured on its
-     own subtle surface; each "solid" is the step-11 icon/bar weight.
+  /* ═══ STATUS SCALE — deliberately NOT brand ═══════════════════════════
+     Success, warning and danger use conventional green / yellow / red
+     (Andy, 2026-08-13). Status is functional convention: a user reads red as
+     "stop" before they read it as anyone's brand, and a palette that spells
+     that in Jade and Purple asks them to learn a private language on a
+     compliance tool. Brand colors carry identity; these carry meaning. The
+     earlier in-brand mapping is superseded, not lost — it is in git at c2e1d62.
 
-     Danger is Purple because the ABI palette contains no red — its chromatic
-     hues span OKLCH 67–150 plus Purple at 335, leaving the whole 0–60 band
-     empty. Adding a red is an ask to ABI, and not one worth making until
-     usability testing shows a color-alone negative signal failing. */
+     These are the HUB's own primitives, not new spoke literals. @esa/tokens
+     ships the Radix light scales — --color-green-*, --color-yellow-* (Radix
+     amber values) and --color-red-* — so conventional status is already in
+     the primitive layer and the theming contract at the top of this file
+     holds: the [data-theme] block re-points SEMANTICS, it does not mint
+     primitives. Steps 3, 6 and 12 reference the hub directly.
+
+     Step 11 is the one exception, and only because the spoke and the hub tint
+     to different depths. The hub pairs its step-11 solid with a step-2 subtle;
+     this spoke's subtle is step 3 (set by info/Sage, so all four families sit
+     at one tint depth), and step 3 is darker. Against it the stock step 11
+     falls to 4.21 / 4.25 / 4.54 — under 4.5 as text. Same story on the canvas:
+     4.33 / 4.23 / 4.79. So each is darkened along OKLCH lightness, hue and
+     chroma held, by the least amount that clears 4.5:1 on all three surfaces
+     it can land on. The drops are L -0.022 / -0.021 / -0.004; these still read
+     as the stock scales. Only the -11 step is a spoke literal, which also
+     means it does not get the hub's display-p3 variant — negligible at this
+     darkness, where there is little chroma headroom to gain.
+
+     Letting the hub's own status SEMANTICS through by deleting these
+     overrides was the cheaper move and it does not fit: the hub spells
+     success in lime (--color-lime-9 #bdee63, a bright fill needing dark text)
+     and info in blue. Lime beside ABI Green reads as a second, wronger green,
+     and blue is nowhere in this palette. The hub's PRIMITIVES are the right
+     borrow; its status semantics are not. */
+  --bca-status-green-3:  var(--color-green-3);
+  --bca-status-green-6:  var(--color-green-6);
+  --bca-status-green-11: #177c52;  /* --color-green-11 #218358 darkened, L 0.543 → 0.521 */
+  --bca-status-green-12: var(--color-green-12);
+
+  --bca-status-amber-3:  var(--color-yellow-3);
+  --bca-status-amber-6:  var(--color-yellow-6);
+  --bca-status-amber-11: #a45e00;  /* --color-yellow-11 #ab6400 darkened, L 0.571 → 0.550 */
+  --bca-status-amber-12: var(--color-yellow-12);
+
+  --bca-status-red-3:  var(--color-red-3);
+  --bca-status-red-6:  var(--color-red-6);
+  --bca-status-red-11: #cd2a30;    /* --color-red-11 #ce2c31 darkened, L 0.557 → 0.553 */
+  --bca-status-red-12: var(--color-red-12);
+
+  /* ═══ STATUS ══════════════════════════════════════════════════════════
+     Each "strong" is the step-12 ink measured on its own subtle surface;
+     each "solid" is the step-11 icon/bar/dot weight, which also clears 4.5:1
+     as text on white, the canvas and its own subtle.
+
+     Info stays Sage and stays in-brand — it is the advisory voice, not a
+     state, and nothing conventional is being spelled by it.
+
+     One thing the in-brand mapping did better: on the panel surface
+     (#dedddb, the worst light surface in the shell) danger fell from 4.90:1
+     to 3.90:1. Solids on the panel are now 3.70–3.90 across all three —
+     above the 3.0 non-text floor, under 4.5 for text. Status TEXT on a panel
+     uses -strong (8.38:1 worst), which is what the token was for. */
   --color-info:            var(--bca-sage-11);   /* advisory, the quiet one */
   --color-info-subtle:     var(--bca-sage-3);
   --color-info-border:     var(--bca-sage-6);
   --color-info-strong:     var(--bca-sage-12);   /* 14.49:1 on subtle */
 
-  --color-success:         var(--bca-jade-11);
-  --color-success-subtle:  var(--bca-jade-3);
-  --color-success-border:  var(--bca-jade-6);
-  --color-success-strong:  var(--bca-jade-12);   /* 10.69:1 on subtle */
+  --color-success:         var(--bca-status-green-11);  /* 5.20 white · 4.77 canvas · 4.64 subtle */
+  --color-success-subtle:  var(--bca-status-green-3);
+  --color-success-border:  var(--bca-status-green-6);
+  --color-success-strong:  var(--bca-status-green-12);  /* 11.00:1 on subtle */
 
-  --color-warning:         var(--bca-gold-11);   /* NOT brand Gold — 5.68:1 vs 2.07:1 */
-  --color-warning-subtle:  var(--bca-gold-3);
-  --color-warning-border:  var(--bca-gold-6);
-  --color-warning-strong:  var(--bca-gold-12);   /* 9.97:1 on subtle */
+  --color-warning:         var(--bca-status-amber-11);  /* 5.02 white · 4.61 canvas · 4.63 subtle */
+  --color-warning-subtle:  var(--bca-status-amber-3);   /* 1.00 vs canvas — see note below */
+  --color-warning-border:  var(--bca-status-amber-6);
+  --color-warning-strong:  var(--bca-status-amber-12);  /* 10.47:1 on subtle */
 
-  --color-danger:          var(--bca-purple-11);
-  --color-danger-subtle:   var(--bca-purple-3);
-  --color-danger-border:   var(--bca-purple-6);
-  --color-danger-strong:   var(--bca-purple-12); /* 12.71:1 on subtle */
+  --color-danger:          var(--bca-status-red-11);    /* 5.29 white · 4.86 canvas · 4.61 subtle */
+  --color-danger-subtle:   var(--bca-status-red-3);
+  --color-danger-border:   var(--bca-status-red-6);
+  --color-danger-strong:   var(--bca-status-red-12);    /* 10.84:1 on subtle */
   --color-error:           var(--color-danger);
   --color-error-subtle:    var(--color-danger-subtle);
   --color-error-border:    var(--color-danger-border);
+  /* The amber subtle surface is luminance-identical to the canvas (1.00:1).
+     A warning callout separates from the page by hue and by its border, never
+     by value — so -border is not optional on a warning container the way it
+     is on the other three. */
 
   /* ═══ TYPE ════════════════════════════════════════════════════════════
      ABI brand type. Inter for the interface; Crimson Pro Light for headlines
