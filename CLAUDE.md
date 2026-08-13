@@ -19,8 +19,12 @@ layer only.
 
 ## Spoke conventions
 - Theme: `[data-theme="biochar"]` in `src/styles/theme-biochar.css`. Semantic
-  overrides only; spoke-local tokens use the `--bca-*` prefix. Public Sans
-  (weights 400/500/600/700 — NOT DM Sans's 350/450/550/650).
+  overrides only; spoke-local tokens use the `--bca-*` prefix. **The ABI brand
+  colors are final as issued** — the `--bca-brand-*` block holds the twelve
+  hexes verbatim and everything else derives from them. Extend with ramp
+  steps; never edit an issued value. Type is Inter (300–700) with Crimson Pro
+  Light on h1/h2, sentence case — NOT DM Sans's 350/450/550/650, and no
+  longer Public Sans (that was proposal-era).
 - Custom components: `src/components/bca/` with `bca-` prefix. Reuse `esa-*`
   from the hub first; build `bca-*` only when no hub equivalent exists.
 - App shell: `src/layouts/AppShell.astro` (ported from beacon-design). The

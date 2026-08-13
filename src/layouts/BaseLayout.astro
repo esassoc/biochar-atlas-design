@@ -1,7 +1,7 @@
 ---
 // Biochar Atlas base layout — wires the hub tokens + the Biochar theme, loads
-// Public Sans / Roboto Mono, and sets data-theme="biochar" so every inherited
-// esa-* component re-skins.
+// the ABI brand faces (Inter + Crimson Pro) and Roboto Mono for data values,
+// and sets data-theme="biochar" so every inherited esa-* component re-skins.
 import '@esa/tokens/tokens.css';
 import '@esa/tokens/component-tokens.css';
 import '../styles/theme-biochar.css';
@@ -24,7 +24,7 @@ const { title = 'Biochar Atlas' } = Astro.props;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Crimson+Pro:wght@300;400&family=Roboto+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <title>{title}</title>
@@ -34,11 +34,13 @@ const { title = 'Biochar Atlas' } = Astro.props;
         margin: 0;
         font-family: var(--font-sans, system-ui, sans-serif);
         font-weight: var(--font-weight-regular, 400);
-        color: var(--color-text-primary, #33312a);
-        background: var(--color-surface, #fff);
+        color: var(--color-text-primary, #21201c);
+        /* Canvas, not card — the shell's content region has no background of
+           its own, so the body IS the canvas the topbar and sidebar sit on. */
+        background: var(--color-background, #f6f5f4);
         -webkit-font-smoothing: antialiased;
       }
-      a { color: var(--color-text-link, #234a31); text-decoration: none; }
+      a { color: var(--color-text-link, #45173d); text-decoration: none; }
       img { display: block; max-width: 100%; }
       button { font-family: inherit; cursor: pointer; background: none; border: 0; }
     </style>

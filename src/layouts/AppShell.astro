@@ -479,7 +479,9 @@ if (activeNavId) {
      topbar
      ═══════════════════════════════════════════════════════════════════ */
   .topbar {
-    --_topbar-bg: var(--color-surface-sunken, #f3f1ea);
+    /* The sidebar stepper is this app's primary chrome, so it takes the
+       heavier surface and the topbar stays the light one. */
+    --_topbar-bg: var(--color-surface, #fff);
 
     position: fixed;
     top: 0;
@@ -668,10 +670,10 @@ if (activeNavId) {
      side nav ($sidebar-width 300px / collapsed 72px)
      ═══════════════════════════════════════════════════════════════════ */
   .side-nav {
-    --_sidenav-bg: var(--color-background, #faf9f6);
+    --_sidenav-bg: var(--color-surface-sunken, #e8e5de);
     --_nav-hover-bg: var(--color-active-overlay, rgba(0, 0, 0, 0.04));
-    --_nav-active-bg: var(--color-primary-subtle, #f0f5ec);
-    --_nav-active-color: var(--color-primary, #234a31);
+    --_nav-active-bg: var(--color-primary-subtle, #eef7dc);
+    --_nav-active-color: var(--color-primary, #364500);
 
     width: var(--_sidenav-w, 300px);
     height: 100%;

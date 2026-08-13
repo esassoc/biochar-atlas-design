@@ -15,25 +15,29 @@ const scale = [
 ];
 
 const weights = [
-  { name: 'Regular', value: 400, dm: 350, token: 'font-weight-regular' },
-  { name: 'Medium', value: 500, dm: 450, token: 'font-weight-medium' },
-  { name: 'Semibold', value: 600, dm: 550, token: 'font-weight-semibold' },
-  { name: 'Bold', value: 700, dm: 650, token: 'font-weight-bold' },
+  { name: 'Light', value: 300, note: 'Brand', token: 'font-weight-light' },
+  { name: 'Regular', value: 400, note: 'Brand', token: 'font-weight-regular' },
+  { name: 'Medium', value: 500, note: 'Extension', token: 'font-weight-medium' },
+  { name: 'Semibold', value: 600, note: 'Extension', token: 'font-weight-semibold' },
+  { name: 'Bold', value: 700, note: 'Brand', token: 'font-weight-bold' },
 ];
 ---
 <DocsLayout title="Typography — Biochar Atlas" activeHref="/design-system/foundations/typography">
   <nav class="crumbs"><a href={withBase('/design-system')}>Biochar Atlas</a> <span>/</span> <span>Foundations</span> <span>/</span> <span>Typography</span></nav>
   <h1>Typography</h1>
   <p class="lede">
-    Public Sans for everything; Roboto Mono for data values. Public Sans is the U.S. Web Design
-    System typeface — a deliberately USDA-adjacent choice that reads as quiet credibility to the
-    NRCS conservationists who are this tool's primary users.
+    The ABI brand faces: Inter for the interface, Crimson Pro Light for headlines. Roboto Mono
+    carries data values. Sentence case throughout — the brand does not set Title Case.
   </p>
 
   <Section id="families" title="Type families">
     <div class="fam">
+      <div class="fam__sample fam__sample--display">Evaluate a site</div>
+      <div class="fam__meta"><code>--bca-font-display</code> · Crimson Pro Light · h1 and h2 only — the brand headline voice, which stops being one at h3 where the interface needs Inter's clarity at small sizes</div>
+    </div>
+    <div class="fam">
       <div class="fam__sample">The quick brown fox jumps over the lazy dog</div>
-      <div class="fam__meta"><code>--font-sans</code> · Public Sans · the only UI face — headings differ by size and weight, not family</div>
+      <div class="fam__meta"><code>--font-sans</code> · Inter · every interface surface — labels, body, tables, controls</div>
     </div>
     <div class="fam">
       <div class="fam__sample fam__sample--mono">pH 6.2 · CEC 18.5 · 78 / 100</div>
@@ -45,7 +49,8 @@ const weights = [
     <p>
       Sizes shown at their desktop px / line-height; components read the matching fluid
       <code>--type-size-*</code> token. Body text never drops below 16px; meta text never
-      below 14px.
+      below 14px. Samples render in Inter — the two largest sizes land on <code>h1</code> and
+      <code>h2</code> in the app, where the display face and Light weight take over.
     </p>
     <div class="scale">
       {scale.map((t) => (
@@ -63,18 +68,18 @@ const weights = [
 
   <Section id="weights" title="Weights">
     <p>
-      Public Sans ships standard weights, so the theme re-points the hub's weight tokens:
-      <strong>400 / 500 / 600 / 700</strong> replace DM Sans's variable-font
-      <strong>350 / 450 / 550 / 650</strong>. Components that read
-      <code>--font-weight-*</code> get the right optical weight on either face; never
-      hard-code a DM Sans weight number in this spoke.
+      The brand names three identity weights — <strong>Light, Regular, Bold</strong>. Label
+      hierarchy at this data density needs a mid weight too, so 500 and 600 are loaded and mapped
+      as an extension, the same way the color ramps extend the issued palette. Components read
+      <code>--font-weight-*</code>; never hard-code a DM Sans number (350 / 450 / 550 / 650) in
+      this spoke.
     </p>
     <div class="weights">
       {weights.map((w) => (
         <div class="wt">
           <div class="wt__sample" style={`font-weight: ${w.value};`}>{w.name}</div>
           <code>--{w.token}</code>
-          <span class="wt__val">{w.value} <span class="wt__dm">(DM Sans: {w.dm})</span></span>
+          <span class="wt__val">{w.value} <span class="wt__dm">· {w.note}</span></span>
         </div>
       ))}
     </div>
@@ -84,7 +89,12 @@ const weights = [
 <style>
   .fam { padding: var(--spacing-400, 1rem) 0; border-bottom: 1px solid var(--color-border-light, #ebe8e1); }
   .fam:last-child { border-bottom: 0; }
-  .fam__sample { font-size: 28px; color: var(--color-text-primary, #33312a); }
+  .fam__sample { font-size: 28px; color: var(--color-text-primary, #21201c); }
+  /* bcn-lego-checked: no esa- lego or type role fits because this page's job IS
+     to show the raw faces side by side at a fixed size; a type role would show
+     the role, not the family. Checked Beacon (no type-specimen component).
+     The specimen rows are this page's own furniture, not a reusable pattern. */
+  .fam__sample--display { font-family: var(--bca-font-display, Georgia, serif); font-weight: 300; font-size: 40px; }
   .fam__sample--mono { font-family: var(--font-mono, monospace); font-size: 22px; }
   .fam__meta { margin-top: var(--spacing-200, 0.5rem); font-size: 14px; color: var(--color-text-muted, #807c73); }
   .fam__meta code { font-family: var(--font-mono, monospace); }

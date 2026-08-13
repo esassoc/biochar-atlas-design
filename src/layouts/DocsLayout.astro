@@ -2,7 +2,7 @@
 // Thin spoke wrapper around @esa/docs DocsShell. The shell (sidebar, topbar,
 // "On this page" rail, all CSS + scroll-spy) is shared with the hub and every
 // other spoke; this wrapper supplies only the Biochar-specific axes: the brand
-// theme CSS, the Public Sans font links, the brand chrome, and the nav data.
+// theme CSS, the ABI brand font links, the brand chrome, and the nav data.
 // Import DocsShell FIRST — it pulls in @esa/tokens (the :root primitives +
 // default teal semantics). The theme CSS must load AFTER so it wins: a
 // [data-theme] block and :root have equal specificity, so source order decides.
@@ -31,7 +31,7 @@ const { title = 'Biochar Atlas — Design System', activeHref = '' } = Astro.pro
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Crimson+Pro:wght@300;400&family=Roboto+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
   </Fragment>

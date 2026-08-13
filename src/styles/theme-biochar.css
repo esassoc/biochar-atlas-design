@@ -6,126 +6,403 @@
  * default teal semantics on :root; this re-skins to the Biochar Atlas brand
  * WITHOUT touching primitives.
  *
- * Brand sources: olive/forest greens (forest-green CTA, parchment map terrain,
- * amber score bars), and a deliberately USDA-adjacent type choice — Public Sans
- * is the U.S. Web Design System typeface, a quiet credibility signal for NRCS
- * users.
+ * THE COLORS ARE FINAL AS ISSUED. The twelve values in "Brand — as issued"
+ * came off the ABI Brand Guide and are never edited, re-mixed, or nudged.
+ * Everything else in this file is DERIVED from them: 12-step ramps anchored so
+ * each brand color keeps its own natural lightness position, plus a warm
+ * neutral built on the palette's own hue (OKLCH 87.1°). Extending is the
+ * agreement with ABI (kickoff 2026-08-12); replacing is not.
+ *
+ * Contrast: every text pairing asserted in a comment here was measured, and
+ * the three sub-AA pairings in the guide all involve Sage — it fills and sits
+ * behind large text, never body copy. WCAG 2.1 AA validation is a contracted
+ * Task 3 deliverable, so this palette is built to pass rather than be fixed
+ * later.
+ *
+ * Ramp derivation and the colorblind/collision analysis behind the map and
+ * badge scales: margot/specimens/abi-color-ramps/index.html in andy-work.
  */
 
 [data-theme="biochar"] {
-  /* ===== PRIMARY — forest green replaces ecology teal ===== */
-  --color-primary:         #234a31;   /* bca-green-800 — the "Evaluate suitability" green */
-  --color-primary-hover:   #1b3b27;
-  --color-primary-active:  #142e1e;
-  --color-primary-subtle:  #f0f5ec;   /* bca-green-50 */
-  --color-primary-border:  #c8dabe;   /* bca-green-200 */
-  --color-secondary:       #4e7d52;   /* bca-green-500 */
-  --color-secondary-hover: #2d5839;
+  /* ═══ BRAND — AS ISSUED ═══════════════════════════════════════════════
+     Verbatim from the ABI Brand Guide. Never modify. Anywhere the brand
+     color itself must appear (logo lockups, print parity, a swatch card),
+     reference these — not a ramp step that happens to sit nearby. */
+  --bca-brand-green:       #364500;
+  --bca-brand-green-dark:  #262903;
+  --bca-brand-sage:        #918f7a;
+  --bca-brand-sage-dark:   #666345;
+  --bca-brand-gold:        #ffc261;
+  --bca-brand-gold-dark:   #ff9e00;
+  --bca-brand-ash:         #e8e5de;
+  --bca-brand-ash-dark:    #bfb8a3;
+  --bca-brand-grey:        #474540;
+  --bca-brand-grey-dark:   #292621;
+  --bca-brand-purple:      #45173d;
+  --bca-brand-jade:        #bae8c2;
 
-  /* ===== FEEDBACK ===== */
-  --color-success: #2e7d4f;
-  --color-warning: #c77f1f;           /* score amber doubles as warning */
-  --color-info:    #3a7ca5;
-  /* Dark readable text to sit ON the matching -subtle/tinted status surface
-     (status-pill text). The hub's -strong shades are tuned to ITS hues; these
-     re-point them to the biochar amber/green ramps so text pairs with the warm
-     biochar tints rather than the hub's redder defaults. */
-  --color-warning-strong: #7c5310;    /* dark biochar amber — on bca-amber-100 */
-  --color-success-strong: var(--bca-green-900, #1b3b27);
+  /* ═══ NEUTRAL — the chrome scale ══════════════════════════════════════
+     12 steps on the palette's own neutral hue (OKLCH 87.1°, sand profile),
+     so app chrome reads as the same family as the brand rather than a cool
+     gray parked next to it. Step 3 IS Ash exactly; Grey Dark lands on 12 and
+     Grey between 11 and 12 — the brand's own neutrals are already on this
+     line, which is why the cast matches.
 
-  /* ===== NEUTRAL CHAIN — warm field-notebook grays (slight olive cast) ===== */
-  --color-text-primary:   #33312a;    /* bca-gray-900 */
-  --color-text-secondary: #54514a;    /* bca-gray-700 */
-  --color-text-tertiary:  #6a665e;    /* bca-gray-600 */
-  --color-text-muted:     #807c73;    /* bca-gray-500 */
-  --color-border:         #ddd9d0;    /* bca-gray-200 */
-  --color-border-light:   #ebe8e1;    /* bca-gray-100 */
-  --color-border-strong:  #c2beb4;    /* bca-gray-300 */
-  --color-background:     #faf9f6;    /* bca-gray-50 — warm paper */
-  --color-surface-sunken: #f3f1ea;
+     1–2 backgrounds · 3–5 surfaces · 6–7 borders · 8–10 disabled/subtle
+     11–12 text. */
+  --bca-neutral-1:  #fdfdfc;
+  --bca-neutral-2:  #f6f5f4;
+  --bca-neutral-3:  #e8e5de;
+  --bca-neutral-4:  #dedddb;
+  --bca-neutral-5:  #d8d7d4;
+  --bca-neutral-6:  #d0cfcc;
+  --bca-neutral-7:  #c6c5c1;
+  --bca-neutral-8:  #b5b2ad;
+  --bca-neutral-9:  #898780;
+  --bca-neutral-10: #7f7c77;
+  --bca-neutral-11: #615f5a;
+  --bca-neutral-12: #21201c;
 
-  /* ===== OVERLAY (re-pointed to forest green) ===== */
-  --color-active-overlay: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  /* ═══ BRAND RAMPS — natural anchor ════════════════════════════════════
+     Each ramp is anchored at the step the brand color actually occupies by
+     lightness, so the issued hex appears in its own scale unmodified. That
+     puts the anchor in a different place per family, and the place matters:
 
-  /* ===== TYPE — Public Sans (USWDS) replaces DM Sans ===== */
-  --font-sans: 'Public Sans', system-ui, sans-serif;
+       Green  → step 12   the darkest step. Green is text and solid action.
+       Gold   → step 9    a solid fill, not a text color.
+       Sage   → step 9    a fill. Sage fails AA against white AND against
+                          dark text — it carries no body copy, ever.
+       Purple → step 12   text and links.
+       Jade   → step 5    a light tint; its text weight is step 11–12. */
+
+  /* Green — primary. Steps 8–10 are mid-greens: TINTS ONLY, never text
+     (step 9 #8aa056 reads 2.9:1 on white). Text is 11 or 12. */
+  --bca-green-1:  #fcfef8;
+  --bca-green-2:  #f7fbef;
+  --bca-green-3:  #eef7dc;
+  --bca-green-4:  #e3f2c3;
+  --bca-green-5:  #d5eaa9;
+  --bca-green-6:  #c6de92;
+  --bca-green-7:  #b5cc80;
+  --bca-green-8:  #9db369;
+  --bca-green-9:  #8aa056;
+  --bca-green-10: #80954c;
+  --bca-green-11: #687c32;
+  --bca-green-12: #364500;  /* = brand Green */
+
+  /* Gold — accent and CTA fill. Dark labels only: white on Gold is 1.60:1
+     and white on Gold Dark 2.07:1. Green Dark on Gold is 9.38:1, which is
+     the pairing the brand guide's own CTA examples already use. */
+  --bca-gold-1:  #fefdfb;
+  --bca-gold-2:  #fff9f1;
+  --bca-gold-3:  #fff3e2;
+  --bca-gold-4:  #ffe9c9;
+  --bca-gold-5:  #ffdeae;
+  --bca-gold-6:  #fece86;
+  --bca-gold-7:  #ecbd76;
+  --bca-gold-8:  #d9a450;
+  --bca-gold-9:  #ffc261;  /* = brand Gold */
+  --bca-gold-10: #fbba4e;
+  --bca-gold-11: #9b6d1b;
+  --bca-gold-12: #473822;
+
+  /* Sage — secondary. Decorative fill and large text only. */
+  --bca-sage-1:  #fdfdf7;
+  --bca-sage-2:  #f9f9f3;
+  --bca-sage-3:  #f2f1e9;
+  --bca-sage-4:  #eae9e1;
+  --bca-sage-5:  #e3e2d9;
+  --bca-sage-6:  #dbdad3;
+  --bca-sage-7:  #d0cfc4;
+  --bca-sage-8:  #bebdb2;
+  --bca-sage-9:  #918f7a;  /* = brand Sage */
+  --bca-sage-10: #878570;
+  --bca-sage-11: #676556;
+  --bca-sage-12: #22200b;
+
+  /* Purple — links, and the palette's negative signal. There is no red in
+     the ABI palette; Purple is what carries "not recommended" until testing
+     proves a color-alone signal unreadable. */
+  --bca-purple-1:  #fefcfe;
+  --bca-purple-2:  #fcf7fb;
+  --bca-purple-3:  #f9ecf5;
+  --bca-purple-4:  #f4dfee;
+  --bca-purple-5:  #edd2e6;
+  --bca-purple-6:  #e4c2db;
+  --bca-purple-7:  #d8aecd;
+  --bca-purple-8:  #c892bb;
+  --bca-purple-9:  #965a89;
+  --bca-purple-10: #8d5180;
+  --bca-purple-11: #834877;
+  --bca-purple-12: #45173d;  /* = brand Purple */
+
+  /* Jade — the positive tint. */
+  --bca-jade-1:  #fafefb;
+  --bca-jade-2:  #f2fbf4;
+  --bca-jade-3:  #e3f6e6;
+  --bca-jade-4:  #d0f1d5;
+  --bca-jade-5:  #bae8c2;  /* = brand Jade */
+  --bca-jade-6:  #a7dcb1;
+  --bca-jade-7:  #95c99f;
+  --bca-jade-8:  #7db087;
+  --bca-jade-9:  #699c73;
+  --bca-jade-10: #5f9169;
+  --bca-jade-11: #457750;
+  --bca-jade-12: #143e20;
+
+  /* Extensions below the darkest issued step — pressed states need somewhere
+     to go once Green Dark and Purple are already the floor. */
+  --bca-green-13:  #191b00;
+  --bca-purple-13: #36082f;
+
+  /* ═══ CHROME ══════════════════════════════════════════════════════════
+     Four surfaces, each one neutral step apart, validated against the map
+     ramp so a suitability class never dissolves into the app frame it sits
+     on (worst clearance 0.091 in OKLab, floor 0.090). The spec's left
+     sidebar stepper is the primary chrome, so the sidebar carries the most
+     weight and gets the strongest surface. */
+  --color-surface:         #ffffff;              /* cards, topbar, panels over canvas */
+  --color-surface-elevated: #ffffff;
+  --color-background:      var(--bca-neutral-2); /* canvas */
+  --color-surface-sunken:  var(--bca-neutral-3); /* sidebar stepper, wells */
+  --color-surface-inverse: var(--bca-neutral-12);
+
+  /* ═══ PRIMARY CHAIN ═══════════════════════════════════════════════════
+     Green at its natural position: 10.46:1 on white, 8.31:1 on the sidebar.
+     Hover is Green Dark (issued); active extends one step past it. */
+  --color-primary:         var(--bca-green-12);
+  --color-primary-hover:   var(--bca-brand-green-dark);
+  --color-primary-active:  var(--bca-green-13);
+  --color-primary-subtle:  var(--bca-green-3);
+  --color-primary-border:  var(--bca-green-6);
+  --color-secondary:       var(--bca-sage-11);
+  --color-secondary-hover: var(--bca-brand-sage-dark);
+
+  /* ═══ TEXT ════════════════════════════════════════════════════════════
+     Measured on the worst light surface in the shell (panel #dedddb):
+     primary 12.01 · secondary 7.05 · tertiary 4.70. Muted deliberately
+     collapses onto tertiary — anything lighter on this hue falls under 4.5:1
+     against the panel, so the palette has no room for a fourth text weight.
+     Data-dense tables get their hierarchy from weight and alignment. */
+  --color-text-primary:   var(--bca-neutral-12);
+  --color-text-secondary: var(--bca-brand-grey);
+  --color-text-tertiary:  var(--bca-neutral-11);
+  --color-text-muted:     var(--bca-neutral-11);
+  --color-text-inverse:   #ffffff;
+  --color-text-disabled:  var(--bca-neutral-9);   /* non-text UI only — 3.60:1 */
+
+  /* Links: purple on light, jade on dark, per the brand guide. */
+  --color-text-link:       var(--bca-purple-12);
+  --color-text-link-hover: var(--bca-purple-13);
+  --color-text-link-inverse: var(--bca-brand-jade);
+
+  /* ═══ BORDERS ═════════════════════════════════════════════════════════ */
+  --color-border:        var(--bca-neutral-6);
+  --color-border-light:  var(--bca-neutral-5);
+  --color-border-strong: var(--bca-neutral-7);
+
+  /* ═══ FOCUS ═══════════════════════════════════════════════════════════
+     The hub's components all outline with --focus-ring-*, but nothing in the
+     token package ever defines them — the var() resolves invalid and the
+     outline computes to none, so hub components currently have no visible
+     focus ring at all. Defining them here turns focus back on spoke-wide.
+
+     Green, never Gold: Gold Dark is 1.90:1 against the canvas, under the
+     3.0 that WCAG 1.4.11 requires of a non-text indicator. Green is 9.60:1. */
+  --focus-ring-color:  var(--bca-green-12);
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+
+  --color-active-overlay: color-mix(in srgb, var(--bca-green-12) 8%, transparent);
+
+  /* ═══ STATUS ══════════════════════════════════════════════════════════
+     Four in-brand families. Each "strong" is the step-12 ink measured on its
+     own subtle surface; each "solid" is the step-11 icon/bar weight.
+
+     Danger is Purple because the ABI palette contains no red — its chromatic
+     hues span OKLCH 67–150 plus Purple at 335, leaving the whole 0–60 band
+     empty. Adding a red is an ask to ABI, and not one worth making until
+     usability testing shows a color-alone negative signal failing. */
+  --color-info:            var(--bca-sage-11);   /* advisory, the quiet one */
+  --color-info-subtle:     var(--bca-sage-3);
+  --color-info-border:     var(--bca-sage-6);
+  --color-info-strong:     var(--bca-sage-12);   /* 14.49:1 on subtle */
+
+  --color-success:         var(--bca-jade-11);
+  --color-success-subtle:  var(--bca-jade-3);
+  --color-success-border:  var(--bca-jade-6);
+  --color-success-strong:  var(--bca-jade-12);   /* 10.69:1 on subtle */
+
+  --color-warning:         var(--bca-gold-11);   /* NOT brand Gold — 4.57:1 vs 2.07:1 */
+  --color-warning-subtle:  var(--bca-gold-3);
+  --color-warning-border:  var(--bca-gold-6);
+  --color-warning-strong:  var(--bca-gold-12);   /* 10.33:1 on subtle */
+
+  --color-danger:          var(--bca-purple-11);
+  --color-danger-subtle:   var(--bca-purple-3);
+  --color-danger-border:   var(--bca-purple-6);
+  --color-danger-strong:   var(--bca-purple-12); /* 12.71:1 on subtle */
+  --color-error:           var(--color-danger);
+  --color-error-subtle:    var(--color-danger-subtle);
+  --color-error-border:    var(--color-danger-border);
+
+  /* ═══ TYPE ════════════════════════════════════════════════════════════
+     ABI brand type. Inter for the interface; Crimson Pro Light for headlines
+     (applied to h1/h2 at the bottom of this file). Sentence case everywhere —
+     the brand does not set Title Case.
+
+     The guide names three identity weights (Light / Regular / Bold). UI label
+     hierarchy at this data density needs a mid weight too, so 500 and 600 are
+     loaded and mapped — an extension, same as the color ramps. */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'Roboto Mono', ui-monospace, monospace;
-  /* Public Sans weights: 400/500/600/700 (not 350/450/550/650 like DM Sans) */
+  --bca-font-display: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  --font-weight-light:    300;
   --font-weight-regular:  400;
   --font-weight-medium:   500;
   --font-weight-semibold: 600;
   --font-weight-bold:     700;
 
-  /* ===== BIOCHAR SPOKE TOKENS (no hub equivalent) ===== */
-  /* Forest-green ramp — raw material feeding the semantic chain above */
-  --bca-green-50:  #f0f5ec;
-  --bca-green-100: #e2ecda;
-  --bca-green-200: #c8dabe;
-  --bca-green-300: #a3c096;
-  --bca-green-500: #4e7d52;
-  --bca-green-700: #2d5839;
-  --bca-green-800: #234a31;
-  --bca-green-900: #1b3b27;
-  --bca-green-950: #122a1b;
+  /* ═══ SOH-BC SUITABILITY — the map's classed ramp ═════════════════════
+     Five discrete classes (Not suited → Well suited), the national map's
+     primary overlay. A Gold→Green path: the ABI palette natively supplies a
+     YlGn sequential ramp, so the map reads as brand rather than as a
+     cartographic library dropped on top of one.
 
-  /* Score amber ramp — suitability meters, 0–100 bars */
-  --bca-amber-100: #f7ead2;
-  --bca-amber-300: #e9c477;
-  --bca-amber-500: #d99a2b;
-  --bca-amber-700: #b3791a;
-  --bca-score-track: #efe9da;
+     Every adjacent pair clears ΔL 0.130 and worst-case colorblind ΔE 0.120
+     across protanopia, deuteranopia and tritanopia. ColorBrewer's published
+     YlGn-5 measures 0.092 on its own 1→2 pair under the same test.
 
-  /* Parchment terrain — map surfaces and cartographic accents */
-  --bca-parchment-50:  #f6f4ea;
-  --bca-parchment-100: #ece9d8;
-  --bca-parchment-200: #dfdcc4;
-  --bca-sage:          #dde2cc;
-  --bca-water:         #b8cfd8;
-  --bca-field-fill:    color-mix(in srgb, #4e7d52 28%, transparent);
-  --bca-field-stroke:  #234a31;
-  /* Surrounding-parcel patchwork: a single shared hairline stroke + the
-     representative legend-swatch fill (the per-parcel fills are an 8-tone
-     array in the map island's JS, where Leaflet's canvas API can't read
-     CSS vars). Source of truth for both the legend chip and the JS stroke. */
-  --bca-parcel-fill:   #dee3cd;
-  --bca-parcel-stroke: #b3ac92;
+     Class 1 carries chroma on purpose: a pale achromatic light end collides
+     with the app chrome AND the basemap (0.044 to a boundary line). The
+     freed achromatic value becomes "no data" instead.
 
-  /* Provenance + status accents */
-  --bca-recommended-bg:   #e2ecda;
-  --bca-recommended-text: #1b3b27;
-  --bca-provenance-ssurgo: #6a665e;   /* "Auto-derived from SSURGO" */
-  --bca-provenance-user:   #3a7ca5;   /* "User-provided soil test" */
+     Do NOT draw labels on classes 2–4: best ink contrast against class 3 is
+     4.29:1. Values belong in the legend and the readout. */
+  --bca-soh-1: #ffd393;  /* Not suited              0 */
+  --bca-soh-2: #d9aa0a;  /* Poorly suited           0.001–0.25 */
+  --bca-soh-3: #9b8901;  /* Moderately suited       0.251–0.50 */
+  --bca-soh-4: #656702;  /* Moderately well suited  0.501–0.75 */
+  --bca-soh-5: #364500;  /* Well suited             0.751–1.0  = brand Green */
+  --bca-soh-nodata: var(--bca-neutral-4);
 
-  /* ===== META LAYER — the dark "behind the curtain" chrome =====
-     A deliberately distinct sub-palette for the supplemental experience
-     (assumptions mode + the "how we'd build this" screen). It sits OVER the
-     parchment-light product, so it borrows the @esa/handoff inspector's
-     GitHub-dark family rather than the warm field-notebook neutrals above —
-     the contrast IS the message: you've stepped off the product and behind it.
-     Fixed dark values (not theme-reactive): the meta layer is always dark. */
-  --bca-meta-surface:        #0d1117;   /* deep slate base */
-  --bca-meta-surface-raised: #161b22;   /* raised rows / nested cards */
-  --bca-meta-surface-2:      #1c232c;   /* hover / second elevation */
-  --bca-meta-glass:          color-mix(in srgb, #0d1117 82%, transparent); /* glassy panels (+ backdrop-blur) */
+  /* ═══ INDICATOR BARS — continuous 0–100 ═══════════════════════════════
+     Single-hue, lightness-carried. The developer guide's screenshots show a
+     red→yellow→green gradient (called "a rough idea" there); its two ends
+     collapse to ΔE 0.051 under deuteranopia — the two readings that matter
+     most become the same color. This path holds 0.580 worst-case. */
+  --bca-bar-1: #fceeda;
+  --bca-bar-2: #ccbfa0;
+  --bca-bar-3: #9a9369;
+  --bca-bar-4: #686b36;
+  --bca-bar-5: #364500;
+  --bca-bar-track: var(--bca-neutral-4);
+
+  /* ═══ RECOMMENDATION BADGES ═══════════════════════════════════════════
+     Four categorical values, and they share a page with the map ramp — so
+     they must not read as map classes. One shared neutral fill, hue carried
+     in the ink at step 12: tinted fills at badge weight sit 0.008 apart in
+     OKLab (indistinguishable) and their step-11 inks fail AA at 4.20:1.
+     Inks here run 8.31–12.96:1 and separate by 0.034–0.062. */
+  --bca-badge-bg:   var(--bca-neutral-3);
+  --bca-badge-line: var(--bca-neutral-6);
+  --bca-badge-recommended:     var(--bca-green-12);   /*  8.31:1 */
+  --bca-badge-suitable:        var(--bca-gold-12);    /*  8.99:1 */
+  --bca-badge-not-recommended: var(--bca-purple-12);  /* 11.57:1 */
+  --bca-badge-excluded:        var(--bca-neutral-12); /* 12.96:1 */
+
+  /* ═══ PROVENANCE ══════════════════════════════════════════════════════
+     SSURGO-derived vs user-entered vs lab-report. Color is already spoken
+     for by the rating classes, so provenance separates by WEIGHT here and by
+     SHAPE in the component (triangle / circle / square). The two tokens below
+     are the weight half; the shape half is component work still to land. */
+  --bca-provenance-derived:  var(--bca-neutral-11);
+  --bca-provenance-authored: var(--bca-neutral-12);
+
+  /* ═══ CARTOGRAPHY ═════════════════════════════════════════════════════
+     Basemap values the map ramp was cleared against. Leaflet tiles get muted
+     toward these with CSS filters. */
+  --bca-map-land:     #f2f1ee;
+  --bca-map-water:    #dfe6e8;
+  --bca-map-road:     #ffffff;
+  --bca-map-boundary: #c9c7c2;
+  --bca-field-fill:   color-mix(in srgb, var(--bca-green-12) 22%, transparent);
+  --bca-field-stroke: var(--bca-green-12);
+  --bca-parcel-fill:  var(--bca-sage-4);
+  --bca-parcel-stroke: var(--bca-neutral-7);
+
+  /* ═══ COMPATIBILITY ═══════════════════════════════════════════════════
+     Names the existing prototype pages still reference, re-pointed onto the
+     real system. Nothing new should use these — they exist so the cutover
+     didn't have to touch module code, and each usage should migrate to the
+     token above it. Retire once the pages are rebuilt. */
+  --bca-green-50:  var(--bca-green-2);
+  --bca-green-100: var(--bca-green-3);
+  --bca-green-200: var(--bca-green-6);
+  --bca-green-300: var(--bca-green-7);
+  --bca-green-500: var(--bca-green-11);
+  --bca-green-700: var(--bca-green-12);
+  --bca-green-800: var(--bca-green-12);
+  --bca-green-900: var(--bca-brand-green-dark);
+  --bca-green-950: var(--bca-green-13);
+
+  --bca-amber-100:   var(--bca-gold-3);
+  --bca-amber-300:   var(--bca-gold-5);
+  --bca-amber-500:   var(--bca-gold-9);
+  --bca-amber-700:   var(--bca-gold-11);
+  --bca-score-track: var(--bca-bar-track);
+
+  --bca-parchment-50:  var(--bca-neutral-2);
+  --bca-parchment-100: var(--bca-map-land);
+  --bca-parchment-200: var(--bca-neutral-3);
+  --bca-sage:          var(--bca-sage-7);
+  --bca-water:         var(--bca-map-water);
+
+  --bca-recommended-bg:    var(--bca-badge-bg);
+  --bca-recommended-text:  var(--bca-badge-recommended);
+  --bca-provenance-ssurgo: var(--bca-provenance-derived);
+  --bca-provenance-user:   var(--bca-provenance-authored);
+
+  /* ═══ META LAYER — the dark "behind the curtain" chrome ═══════════════
+     Deliberately NOT brand. This sub-palette dresses the supplemental
+     experience (assumptions mode + the "how we'd build this" screen), which
+     sits OVER the product; it borrows the @esa/handoff inspector's
+     GitHub-dark family because the contrast IS the message — you've stepped
+     off the product and behind it. Fixed dark values, not theme-reactive. */
+  --bca-meta-surface:        #0d1117;
+  --bca-meta-surface-raised: #161b22;
+  --bca-meta-surface-2:      #1c232c;
+  --bca-meta-glass:          color-mix(in srgb, #0d1117 82%, transparent);
   --bca-meta-border:         #30363d;
   --bca-meta-border-faint:   #21262d;
-  --bca-meta-text:           #e6edf3;   /* near-white body */
+  --bca-meta-text:           #e6edf3;
   --bca-meta-text-secondary: #adbac7;
   --bca-meta-text-muted:     #7d8590;
-  --bca-meta-accent:         #4493f8;   /* inspection blue — pins, links, focus */
+  --bca-meta-accent:         #4493f8;
   --bca-meta-accent-soft:    color-mix(in srgb, #4493f8 16%, transparent);
-  --bca-meta-claude:         #d97757;   /* Anthropic terracotta — "the disciplined process" */
+  --bca-meta-claude:         #d97757;
   --bca-meta-claude-soft:    color-mix(in srgb, #d97757 14%, transparent);
 
-  /* Confidence + uncertainty status hues (on dark) */
-  --bca-meta-confident:    #7ee787;     /* green  — pattern-confident / confident */
-  --bca-meta-limited:      #e3b341;     /* amber  — biochar-unvalidated / limited */
-  --bca-meta-insufficient: #7d8590;     /* gray   — insufficient data */
-  --bca-meta-constraint:   #f85149;     /* red    — hard constraint */
+  --bca-meta-confident:    #7ee787;
+  --bca-meta-limited:      #e3b341;
+  --bca-meta-insufficient: #7d8590;
+  --bca-meta-constraint:   #f85149;
   --bca-meta-confident-soft:    color-mix(in srgb, #7ee787 14%, transparent);
   --bca-meta-limited-soft:      color-mix(in srgb, #e3b341 16%, transparent);
   --bca-meta-insufficient-soft: color-mix(in srgb, #7d8590 16%, transparent);
   --bca-meta-constraint-soft:   color-mix(in srgb, #f85149 15%, transparent);
 
   --bca-meta-shadow: 0 16px 50px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* Headline face. Scoped to the theme selector so it can't leak, and kept here
+   rather than duplicated per layout — AppShell and DocsShell both set
+   data-theme="biochar" on <html>. h1/h2 only: Crimson Pro Light is the brand
+   headline voice, and it stops being one at h3 and below where the interface
+   needs Inter's clarity at small sizes. */
+[data-theme="biochar"] h1,
+[data-theme="biochar"] h2 {
+  font-family: var(--bca-font-display);
+  font-weight: var(--font-weight-light, 300);
+  letter-spacing: -0.005em;
 }

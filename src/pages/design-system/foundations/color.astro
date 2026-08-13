@@ -4,79 +4,121 @@ import Section from '@esa/docs/Section.astro';
 import ColorScale from '@esa/docs/ColorScale.astro';
 import { withBase } from '../../../lib/base';
 
-// Spoke ramps — verbatim from theme-biochar.css. These are --bca-* spoke-local
-// tokens (no hub equivalent); the semantic chain below is re-pointed onto them.
-const green = [
-  { step: '50', value: '#f0f5ec', token: 'bca-green-50' },
-  { step: '100', value: '#e2ecda', token: 'bca-green-100' },
-  { step: '200', value: '#c8dabe', token: 'bca-green-200' },
-  { step: '300', value: '#a3c096', token: 'bca-green-300' },
-  { step: '500', value: '#4e7d52', token: 'bca-green-500' },
-  { step: '700', value: '#2d5839', token: 'bca-green-700' },
-  { step: '800', value: '#234a31', token: 'bca-green-800' },
-  { step: '900', value: '#1b3b27', token: 'bca-green-900' },
-  { step: '950', value: '#122a1b', token: 'bca-green-950' },
+// The ABI brand palette, as issued. Final — never edited, re-mixed or nudged.
+const issued = [
+  { step: 'Green', value: '#364500', token: 'bca-brand-green' },
+  { step: 'Green Dark', value: '#262903', token: 'bca-brand-green-dark' },
+  { step: 'Sage', value: '#918f7a', token: 'bca-brand-sage' },
+  { step: 'Sage Dark', value: '#666345', token: 'bca-brand-sage-dark' },
+  { step: 'Gold', value: '#ffc261', token: 'bca-brand-gold' },
+  { step: 'Gold Dark', value: '#ff9e00', token: 'bca-brand-gold-dark' },
+  { step: 'Ash', value: '#e8e5de', token: 'bca-brand-ash' },
+  { step: 'Ash Dark', value: '#bfb8a3', token: 'bca-brand-ash-dark' },
+  { step: 'Grey', value: '#474540', token: 'bca-brand-grey' },
+  { step: 'Grey Dark', value: '#292621', token: 'bca-brand-grey-dark' },
+  { step: 'Purple', value: '#45173d', token: 'bca-brand-purple' },
+  { step: 'Jade', value: '#bae8c2', token: 'bca-brand-jade' },
 ];
-const amber = [
-  { step: '100', value: '#f7ead2', token: 'bca-amber-100' },
-  { step: '300', value: '#e9c477', token: 'bca-amber-300' },
-  { step: '500', value: '#d99a2b', token: 'bca-amber-500' },
-  { step: '700', value: '#b3791a', token: 'bca-amber-700' },
-  { step: 'track', value: '#efe9da', token: 'bca-score-track' },
-];
-const parchment = [
-  { step: '50', value: '#f6f4ea', token: 'bca-parchment-50' },
-  { step: '100', value: '#ece9d8', token: 'bca-parchment-100' },
-  { step: '200', value: '#dfdcc4', token: 'bca-parchment-200' },
-  { step: 'sage', value: '#dde2cc', token: 'bca-sage' },
-  { step: 'water', value: '#b8cfd8', token: 'bca-water' },
-];
+
+const ramp = (name: string, hexes: string[]) =>
+  hexes.map((value, i) => ({ step: String(i + 1), value, token: `bca-${name}-${i + 1}` }));
+
+const neutral = ramp('neutral', ['#fdfdfc', '#f6f5f4', '#e8e5de', '#dedddb', '#d8d7d4', '#d0cfcc', '#c6c5c1', '#b5b2ad', '#898780', '#7f7c77', '#615f5a', '#21201c']);
+const green = ramp('green', ['#fcfef8', '#f7fbef', '#eef7dc', '#e3f2c3', '#d5eaa9', '#c6de92', '#b5cc80', '#9db369', '#8aa056', '#80954c', '#687c32', '#364500']);
+const gold = ramp('gold', ['#fefdfb', '#fff9f1', '#fff3e2', '#ffe9c9', '#ffdeae', '#fece86', '#ecbd76', '#d9a450', '#ffc261', '#fbba4e', '#9b6d1b', '#473822']);
+const sage = ramp('sage', ['#fdfdf7', '#f9f9f3', '#f2f1e9', '#eae9e1', '#e3e2d9', '#dbdad3', '#d0cfc4', '#bebdb2', '#918f7a', '#878570', '#676556', '#22200b']);
+const purple = ramp('purple', ['#fefcfe', '#fcf7fb', '#f9ecf5', '#f4dfee', '#edd2e6', '#e4c2db', '#d8aecd', '#c892bb', '#965a89', '#8d5180', '#834877', '#45173d']);
+const jade = ramp('jade', ['#fafefb', '#f2fbf4', '#e3f6e6', '#d0f1d5', '#bae8c2', '#a7dcb1', '#95c99f', '#7db087', '#699c73', '#5f9169', '#457750', '#143e20']);
 
 // Semantic roles — these ARE wired under [data-theme="biochar"], so the
 // swatches render live via var() and reflect exactly what ships.
 const roles = [
-  { token: 'color-primary', value: '#234a31', note: 'Forest green (green/800) — the "Evaluate suitability" CTA. Buttons, links, focus rings chain off this.' },
-  { token: 'color-primary-subtle', value: '#f0f5ec', note: 'Tinted fills for selected/hover states (green/50).' },
-  { token: 'color-primary-border', value: '#c8dabe', note: 'Borders on primary-tinted surfaces (green/200).' },
-  { token: 'color-secondary', value: '#4e7d52', note: 'Lighter forest green (green/500) for secondary emphasis.' },
-  { token: 'color-success', value: '#2e7d4f', note: 'Positive feedback — suitable, saved, complete.' },
-  { token: 'color-warning', value: '#c77f1f', note: 'Caution — the score amber doubles as warning.' },
-  { token: 'color-info', value: '#3a7ca5', note: 'Informational feedback; also the user-provided provenance blue.' },
-  { token: 'color-text-primary', value: '#33312a', note: 'Body text — warm field-notebook gray with a slight olive cast.' },
-  { token: 'color-text-secondary', value: '#54514a', note: 'Supporting text.' },
-  { token: 'color-text-muted', value: '#807c73', note: 'Meta text — timestamps, captions.' },
-  { token: 'color-border', value: '#ddd9d0', note: 'Hairline dividers, warm to match the neutrals.' },
-  { token: 'color-background', value: '#faf9f6', note: 'Page background — warm paper, not white.' },
-  { token: 'color-surface-sunken', value: '#f3f1ea', note: 'Sunken panels, stat tiles, control wells.' },
+  { token: 'color-primary', value: '#364500', note: 'ABI Green at its natural ramp position. Buttons, solid actions, focus rings. 10.46:1 on white.' },
+  { token: 'color-primary-hover', value: '#262903', note: 'Green Dark — the issued darker green, so hover stays in-brand.' },
+  { token: 'color-primary-subtle', value: '#eef7dc', note: 'Tinted fills for selected and hover states (green/3).' },
+  { token: 'color-primary-border', value: '#c6de92', note: 'Borders on primary-tinted surfaces (green/6).' },
+  { token: 'color-secondary', value: '#676556', note: 'Sage at text weight (sage/11). Brand Sage itself fills; it never carries body copy.' },
+  { token: 'color-info', value: '#676556', note: 'Advisory messages — the quiet one. Sage family.' },
+  { token: 'color-success', value: '#457750', note: 'Positive — suitable, saved, complete. Jade family.' },
+  { token: 'color-warning', value: '#9b6d1b', note: 'Caution. Gold at text/icon weight — brand Gold is 2.07:1 and cannot carry a state.' },
+  { token: 'color-danger', value: '#834877', note: 'Negative. Purple, because the ABI palette contains no red.' },
+  { token: 'color-text-primary', value: '#21201c', note: 'Body text. 16.30:1 on white, 12.01:1 on the panel surface.' },
+  { token: 'color-text-secondary', value: '#474540', note: 'Supporting text — brand Grey, doing real work.' },
+  { token: 'color-text-muted', value: '#615f5a', note: 'Meta text. The palette floor: anything lighter fails AA on the panel surface.' },
+  { token: 'color-text-link', value: '#45173d', note: 'Purple on light, jade on dark — per the brand guide.' },
+  { token: 'color-border', value: '#d0cfcc', note: 'Hairline dividers (neutral/6).' },
+  { token: 'color-surface', value: '#ffffff', note: 'Cards, panels, and the topbar.' },
+  { token: 'color-background', value: '#f6f5f4', note: 'The canvas the shell sits on (neutral/2).' },
+  { token: 'color-surface-sunken', value: '#e8e5de', note: 'The sidebar stepper — the app’s primary chrome — and control wells. This is brand Ash exactly.' },
 ];
 
-// Cartography + provenance accents — single-purpose spoke tokens.
+// Functional scales — the app's data-carrying color, separate from the brand
+// ramps that feed the semantic chain.
+const suitability = [
+  { step: '1', value: '#ffd393', token: 'bca-soh-1' },
+  { step: '2', value: '#d9aa0a', token: 'bca-soh-2' },
+  { step: '3', value: '#9b8901', token: 'bca-soh-3' },
+  { step: '4', value: '#656702', token: 'bca-soh-4' },
+  { step: '5', value: '#364500', token: 'bca-soh-5' },
+  { step: 'n/a', value: '#dedddb', token: 'bca-soh-nodata' },
+];
+const bars = [
+  { step: '1', value: '#fceeda', token: 'bca-bar-1' },
+  { step: '2', value: '#ccbfa0', token: 'bca-bar-2' },
+  { step: '3', value: '#9a9369', token: 'bca-bar-3' },
+  { step: '4', value: '#686b36', token: 'bca-bar-4' },
+  { step: '5', value: '#364500', token: 'bca-bar-5' },
+];
+
+// Cartography + badge accents — single-purpose spoke tokens.
 const accents = [
-  { token: 'bca-field-stroke', value: '#234a31', note: 'Selected field outline on the map.' },
-  { token: 'bca-recommended-bg', value: '#e2ecda', note: 'Background tint behind the recommended biochar.' },
-  { token: 'bca-recommended-text', value: '#1b3b27', note: 'Text on the recommended tint.' },
-  { token: 'bca-provenance-ssurgo', value: '#6a665e', note: '"Auto-derived from SSURGO" provenance badge.' },
-  { token: 'bca-provenance-user', value: '#3a7ca5', note: '"User-provided soil test" provenance badge.' },
+  { token: 'bca-badge-recommended', value: '#364500', note: 'Badge ink, "Recommended". Badges share one neutral fill and separate by ink — tinted fills sit 0.008 apart and read as one color.' },
+  { token: 'bca-badge-suitable', value: '#473822', note: 'Badge ink, "Suitable".' },
+  { token: 'bca-badge-not-recommended', value: '#45173d', note: 'Badge ink, "Not Recommended".' },
+  { token: 'bca-badge-excluded', value: '#21201c', note: 'Badge ink, "Excluded".' },
+  { token: 'bca-field-stroke', value: '#364500', note: 'Selected field outline on the map.' },
+  { token: 'bca-map-land', value: '#f2f1ee', note: 'Basemap land. The map ramp was cleared against this and the other three tile values.' },
+  { token: 'bca-map-water', value: '#dfe6e8', note: 'Basemap water.' },
+  { token: 'bca-provenance-derived', value: '#615f5a', note: 'SSURGO-derived values. Provenance separates by weight here and by shape in the component.' },
+  { token: 'bca-provenance-authored', value: '#21201c', note: 'User-entered and lab-report values.' },
 ];
 ---
 <DocsLayout title="Color — Biochar Atlas" activeHref="/design-system/foundations/color">
   <nav class="crumbs"><a href={withBase('/design-system')}>Biochar Atlas</a> <span>/</span> <span>Foundations</span> <span>/</span> <span>Color</span></nav>
   <h1>Color</h1>
   <p class="lede">
-    Forest green replaces Ecology's teal; score amber and parchment cartography carry the
-    Suitability Tool's map-and-meter language. Spoke ramps (<code>--bca-*</code>) feed the
-    semantic roles components actually read.
+    The ABI brand palette, extended for app use. The twelve issued colors are final; the ramps
+    below are derived from them, and the neutral chrome is built on the palette's own hue so it
+    reads as the same family rather than a gray parked beside it.
   </p>
 
-  <Section id="ramps" title="Spoke ramps">
+  <Section id="issued" title="Brand — as issued">
     <p>
-      Raw material, prefixed <code>--bca-*</code> because they have no hub equivalent. The
-      forest-green ramp feeds the primary chain; the amber ramp drives the 0–100 suitability
-      meters; parchment is the map terrain palette (tiles are muted toward it with CSS filters).
+      Verbatim from the ABI Brand Guide, and never modified. Reference these wherever the brand
+      color itself has to appear — a logo lockup, print parity, a swatch card — rather than a
+      ramp step that happens to sit nearby.
     </p>
-    <ColorScale name="Forest green — primary" steps={green} />
-    <ColorScale name="Score amber — suitability meters" steps={amber} />
-    <ColorScale name="Parchment — cartography" steps={parchment} />
+    <ColorScale name="ABI palette" steps={issued} />
+  </Section>
+
+  <Section id="ramps" title="Derived ramps">
+    <p>
+      Twelve steps each, anchored so the issued hex appears unmodified at the step it actually
+      occupies by lightness. That anchor moves per family, and where it lands tells you what the
+      color is for: <strong>Green</strong> anchors at 12, the darkest step, because it is a text
+      and solid-action color. <strong>Gold</strong> and <strong>Sage</strong> anchor at 9 — they
+      are fills. <strong>Jade</strong> anchors at 5, a light tint.
+    </p>
+    <p>
+      Steps read the Radix way: 1–2 backgrounds, 3–5 surfaces, 6–7 borders, 8–10 solid fills,
+      11–12 text. Green 8–10 are mid-greens and take tints only — green/9 is 2.9:1 on white.
+    </p>
+    <ColorScale name="Neutral — chrome, on the palette's own hue (87.1°)" steps={neutral} />
+    <ColorScale name="Green — primary" steps={green} />
+    <ColorScale name="Gold — accent and CTA fill" steps={gold} />
+    <ColorScale name="Sage — secondary" steps={sage} />
+    <ColorScale name="Purple — links and the negative signal" steps={purple} />
+    <ColorScale name="Jade — the positive tint" steps={jade} />
   </Section>
 
   <Section id="roles" title="Semantic roles">
@@ -98,11 +140,35 @@ const accents = [
     </div>
   </Section>
 
-  <Section id="accents" title="Cartography &amp; provenance accents">
+  <Section id="functional" title="Functional scales">
     <p>
-      Single-purpose spoke tokens for the map layer and data-provenance signals. Provenance
-      matters here: NRCS users need to see at a glance whether a soil value came from SSURGO
-      or from their own lab test.
+      The app's data-carrying color, kept separate from the brand ramps that feed the semantic
+      chain. The <strong>suitability</strong> scale is the national map's five discrete SOH-BC
+      classes — a Gold→Green path, which the ABI palette supplies natively. Every adjacent pair
+      clears worst-case ΔE 0.120 under protanopia, deuteranopia and tritanopia; ColorBrewer's
+      published YlGn-5 measures 0.092 on its own first pair under the same test. Class 1 carries
+      chroma on purpose, because a pale achromatic light end collides with both the app chrome
+      and the basemap; the freed achromatic value becomes "no data".
+    </p>
+    <p>
+      Labels never sit on classes 2–4 — best ink contrast against class 3 is 4.29:1. Values
+      belong in the legend and the readout.
+    </p>
+    <ColorScale name="SOH-BC suitability — 5 discrete map classes" steps={suitability} />
+    <p>
+      The <strong>bar</strong> scale is continuous 0–100 indicator scores, single-hue with
+      lightness doing the work. The developer guide's screenshots show a red→yellow→green
+      gradient; its two ends collapse to ΔE 0.051 under deuteranopia, which makes the two
+      readings that matter most the same color. This path holds 0.580 worst-case.
+    </p>
+    <ColorScale name="Indicator bars — continuous 0–100" steps={bars} />
+  </Section>
+
+  <Section id="accents" title="Badge, cartography &amp; provenance accents">
+    <p>
+      Single-purpose spoke tokens. Provenance matters here: NRCS users need to see at a glance
+      whether a soil value came from SSURGO or from their own lab test — and since color is
+      already spoken for by the rating classes, provenance separates by weight and by shape.
     </p>
     <div class="roles">
       {accents.map((r) => (
@@ -121,17 +187,22 @@ const accents = [
   <Section id="theming" title="Theming">
     <p>
       One <code>[data-theme="biochar"]</code> block in <code>theme-biochar.css</code> overrides the
-      semantic layer; primitives never move. Because the hub chains <code>--color-text-link</code>
-      and the focus-ring tokens off <code>--color-primary</code>, re-pointing primary alone re-skins
-      links and focus states too.
+      semantic layer; primitives never move. Links are the exception to chaining off primary — the
+      brand guide puts them on Purple, so <code>--color-text-link</code> is set directly.
     </p>
     <p class="note">
-      <strong>Neutral chain —</strong> the full neutral chain (<code>--color-text-primary</code>,
-      <code>-secondary</code>, <code>-tertiary</code>, <code>-muted</code>, the borders, and
-      <code>--color-background</code>) is re-pointed to warm field-notebook grays with a slight
-      olive cast, so the whole app reads as paper in the field rather than the hub's cooler
-      neutrals. <code>--color-warning</code> is deliberately the score amber — caution and
-      mid-range suitability share one hue.
+      <strong>Gold cannot carry a state.</strong> White on Gold is 1.60:1 and white on Gold Dark
+      2.07:1, so Gold fills take dark labels only — Green Dark on Gold is 9.38:1, which is what
+      the brand guide's own CTA examples already do. Gold Dark against the canvas is 1.90:1,
+      under the 3.0 WCAG 1.4.11 requires of a non-text indicator, so focus rings, selected-state
+      borders and icon-only controls come from Green or Purple.
+    </p>
+    <p class="note">
+      <strong>Focus rings exist now.</strong> Hub components outline with
+      <code>--focus-ring-color</code> and <code>--focus-ring-width</code>, but nothing in
+      <code>@esa/tokens</code> ever declared them — the <code>var()</code> resolved invalid and
+      the outline computed to <code>none</code>. This theme defines them, which turns focus
+      visibility back on across every inherited component.
     </p>
   </Section>
 </DocsLayout>

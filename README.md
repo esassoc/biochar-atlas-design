@@ -35,9 +35,11 @@ locally** (`npm run build:tokens` in ../ecology) before `npm install` here.
 
 Theming is a `[data-theme="biochar"]` override of the semantic layer, loaded
 after hub tokens — see [`src/styles/theme-biochar.css`](./src/styles/theme-biochar.css):
-forest green primary, warm field-notebook neutrals, score amber, parchment
-cartography accents, and Public Sans (the USWDS typeface — a deliberate
-credibility signal for the NRCS audience).
+the ABI brand palette as issued, extended into 12-step ramps; warm neutral
+chrome built on the palette's own hue; the functional map, bar and badge
+scales; and the brand type (Inter, with Crimson Pro Light headlines). The
+twelve issued brand hexes are final — this spoke extends them and never
+replaces them.
 
 ## Commands
 
