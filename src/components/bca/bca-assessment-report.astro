@@ -122,7 +122,10 @@ const ASSESSMENT_NAME = 'Lane Co. spring biochar assessment';
 </script>
 
 <style>
-  .bca-report { min-height: 100vh; background: var(--bca-parchment-100, #ece9d8); padding: var(--spacing-500, 1.5rem) 0 var(--spacing-700, 3rem); }
+  /* The page ground is the canvas, not a map tile. This read --bca-parchment-100,
+     a compat alias for --bca-map-land — so the report was grounded in cartography
+     and would not have followed the shell. */
+  .bca-report { min-height: 100vh; background: var(--color-background, #f4f3ee); padding: var(--spacing-500, 1.5rem) 0 var(--spacing-700, 3rem); }
 
   .bca-report__bar {
     max-width: 8.5in;

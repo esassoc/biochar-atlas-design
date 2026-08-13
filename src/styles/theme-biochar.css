@@ -68,27 +68,43 @@
      lightness, so the issued hex appears in its own scale unmodified. That
      puts the anchor in a different place per family, and the place matters:
 
-       Green  → step 12   the darkest step. Green is text and solid action.
+       Green  → step 9    a solid fill and the action color; Green Dark is 10.
        Gold   → step 9    a solid fill, not a text color.
        Sage   → step 9    a fill. Sage fails AA against white AND against
                           dark text — it carries no body copy, ever.
        Purple → step 12   text and links.
        Jade   → step 5    a light tint; its text weight is step 11–12. */
 
-  /* Green — primary. Steps 8–10 are mid-greens: TINTS ONLY, never text
-     (step 9 #8aa056 reads 2.9:1 on white). Text is 11 or 12. */
-  --bca-green-1:  #fcfef8;
-  --bca-green-2:  #f7fbef;
-  --bca-green-3:  #eef7dc;
-  --bca-green-4:  #e3f2c3;
-  --bca-green-5:  #d5eaa9;
-  --bca-green-6:  #c6de92;
-  --bca-green-7:  #b5cc80;
-  --bca-green-8:  #9db369;
-  --bca-green-9:  #8aa056;
-  --bca-green-10: #80954c;
-  --bca-green-11: #687c32;
-  --bca-green-12: #364500;  /* = brand Green */
+  /* Green — primary. Green anchors at 9, the Radix home of a solid, and Green
+     Dark falls out at 10 on its own — the brand ships its hover state. 11–12
+     extend past Green Dark on its hue with chroma eased out, so pressed states
+     have somewhere to go.
+
+     Anchoring at 9 rather than 12 is what makes 1–8 a usable tint range: the
+     light steps span 0.509 in lightness and 9–12 span 0.177, both over the
+     0.150 floor. Anchoring Green at 12 spanned 0.509 and 0.059 — the dark end
+     had no room and the tints crowded the anchor.
+
+     What it costs: 1–8 desaturate toward neutral, so green-3 is a near-neutral
+     tint rather than a yellow-green one. That is why the active nav state is a
+     solid fill now and not a wash — see AppShell. What it buys: green-7 is the
+     first step in this palette's history to clear WCAG 1.4.11 (3.40 on card,
+     3.12 on canvas), so --color-primary-border is a legitimate indicator.
+
+     The dark end reads as black with a green cast (11 and 12 sit ΔE 0.046 and
+     0.066 from neutral-12); text uses neutral-12, so nothing depends on it. */
+  --bca-green-1:  #fdfdfb;
+  --bca-green-2:  #f5f6f2;
+  --bca-green-3:  #e6eae0;
+  --bca-green-4:  #d6dccc;
+  --bca-green-5:  #c1c8b2;
+  --bca-green-6:  #a6b092;
+  --bca-green-7:  #84906a;
+  --bca-green-8:  #576631;
+  --bca-green-9:  #364500;  /* = brand Green */
+  --bca-green-10: #262903;  /* = brand Green Dark */
+  --bca-green-11: #1d1f00;
+  --bca-green-12: #131500;
 
   /* Gold — accent and CTA fill. Dark labels only: white on Gold is 1.60:1
      and white on Gold Dark 2.07:1. Green Dark on Gold is 9.38:1, which is
@@ -158,46 +174,113 @@
   --bca-jade-11: #457750;
   --bca-jade-12: #143e20;
 
-  /* Extensions below the darkest issued step — pressed states need somewhere
-     to go once Green Dark and Purple are already the floor. */
-  --bca-green-13:  #191b00;
+  /* Extension below the darkest issued step — pressed states need somewhere to
+     go once Purple is already the floor. Green no longer needs one: anchoring
+     at 9 puts two real steps below Green Dark inside the ramp. */
   --bca-purple-13: #36082f;
 
   /* ═══ CHROME ══════════════════════════════════════════════════════════
-     Four surfaces, each one neutral step apart, validated against the map
-     ramp so a suitability class never dissolves into the app frame it sits
-     on (worst clearance 0.091 in OKLab, floor 0.090). The spec's left
-     sidebar stepper is the primary chrome, so the sidebar carries the most
-     weight and gets the strongest surface. */
-  --color-surface:         #ffffff;              /* cards, topbar, panels over canvas */
-  --color-surface-elevated: #ffffff;
-  --color-background:      var(--bca-neutral-2); /* canvas */
-  --color-surface-sunken:  var(--bca-neutral-3); /* sidebar stepper, wells */
-  --color-surface-inverse: var(--bca-neutral-12);
+     A tinted shell: four surfaces on ONE hue (OKLCH 106.6°, the Sage family),
+     stepped in lightness, with chroma tapering as they lighten so the tint
+     stays even instead of going chalky at the top. Chosen by Andy 2026-08-13
+     from four lightness ladders; this is the third-lightest ("Sage Light 2").
+
+     The problem it solves is measurable. Shipped, the white topbar sat ΔE
+     0.0783 from the Ash sidebar and the sidebar sat 0.0783 from the white
+     workflow panel — the two hardest seams in the app, about four times the
+     0.020 visible-edge floor. Tinting collapses the topbar seam to 0.0073 and
+     the panel seam to 0.0427. The panel cannot come down further and stay
+     legible at table density, so that seam is halved, not erased.
+
+     Adjacencies as shipped (OKLab ΔE, floor 0.020):
+       topbar → sidenav  0.0073   one frame, deliberately continuous
+       sidenav → panel   0.0427   the tool page's real seam (was 0.0783)
+       sidenav → canvas  0.0218   report and landing pages
+       canvas → panel    0.0209   every card on a report page
+       panel → basemap   0.0262   map legend / search / north arrow on tiles
+
+     TWO CROSSINGS, both resolved rather than shipped quietly:
+
+     1. The panel could not clear the canvas AND white at once. Between canvas
+        L 0.964 and white there is 0.036 of room and two 0.020 gaps do not fit.
+        The panel takes the canvas side (0.0209) because a card on a page is an
+        everyday relationship; white over the panel is 0.0162 and would be
+        shadow-carried. Nothing pairs them today — --color-surface-elevated has
+        zero consumers, and cards inside the workflow panel are themselves
+        --color-surface, so they are already border-carried at ΔE 0.
+     2. The sidenav sits ΔE 0.0170 from basemap land (#f2f1ee) — under floor.
+        Declared at --bca-chrome-seam below.
+
+     The neutral ramp keeps borders, text, wells and disabled states. Only the
+     four shell surfaces moved onto the Sage hue. */
+  --bca-chrome-topbar:  #eaeae2;  /* L 0.935 */
+  --bca-chrome-sidenav: #edece5;  /* L 0.943 */
+  /* The shell's hairline. It carries the sidenav/basemap seam outright: on the
+     report and landing layouts the sidenav meets basemap land at ΔE 0.0170,
+     under the 0.020 floor, so those two edges are the border and nothing else.
+     The tool page is unaffected — there the sidenav's neighbour is the panel
+     (0.0427). Anything that puts the sidenav against the map without this
+     border loses the edge. */
+  --bca-chrome-seam:    #deddd4;  /* L 0.896 — vs sidenav ΔE 0.0462 */
+
+  --color-surface:          #fafaf7;  /* L 0.985 — cards, workflow panel, map controls */
+  --color-surface-elevated: #ffffff;  /* no consumers yet; 0.0162 over the panel — shadow, not fill */
+  --color-background:       #f4f3ee;  /* L 0.964 — canvas (report + landing only; see below) */
+  --color-surface-sunken:   var(--bca-neutral-3); /* wells, hover fills, pills — NOT the sidebar */
+  --color-surface-inverse:  var(--bca-neutral-12);
+
+  /* --color-background paints less than its name suggests. On the suitability
+     tool .modern-layout__content has no background and .tool fills it edge to
+     edge, so the canvas never appears on the flagship page — BaseLayout's own
+     comment, "the body IS the canvas", is the whole story. Canvas pairings
+     govern the report and landing layouts. */
 
   /* ═══ PRIMARY CHAIN ═══════════════════════════════════════════════════
-     Green at its natural position: 10.46:1 on white, 8.31:1 on the sidebar.
-     Hover is Green Dark (issued); active extends one step past it. */
-  --color-primary:         var(--bca-green-12);
-  --color-primary-hover:   var(--bca-brand-green-dark);
-  --color-primary-active:  var(--bca-green-13);
+     Green at its natural position: 10.46:1 on white, 8.83:1 on the sidenav.
+     Hover is Green Dark, which the ramp now supplies as step 10 rather than a
+     reach outside it; active is step 11.
+
+     -subtle is a near-neutral tint (the cost of anchoring at 9), so it holds
+     only on the two light surfaces: ΔE 0.0334 on canvas and 0.0540 on the
+     panel, but 0.0062 on the topbar and 0.0126 on the sidenav — i.e. it
+     disappears into the shell's darker half. Use it for callout fills on
+     canvas and panel; never as a state on chrome. That is why the active nav
+     item is a solid fill (AppShell) and not a wash.
+
+     -border is the first primary border in this palette that is legitimate as
+     a non-text indicator: 3.06 on canvas and 3.25 on the panel, clearing WCAG
+     1.4.11. It is 2.81/2.87 on topbar and sidenav, which is fine because form
+     fields live on the panel and on cards, not in the chrome. The step it
+     replaced (green-6) measured 1.47 and never cleared anywhere. */
+  --color-primary:         var(--bca-green-9);
+  --color-primary-hover:   var(--bca-green-10);
+  --color-primary-active:  var(--bca-green-11);
   --color-primary-subtle:  var(--bca-green-3);
-  --color-primary-border:  var(--bca-green-6);
+  --color-primary-border:  var(--bca-green-7);
   --color-secondary:       var(--bca-sage-11);
   --color-secondary-hover: var(--bca-brand-sage-dark);
 
   /* ═══ TEXT ════════════════════════════════════════════════════════════
-     Measured on the worst light surface in the shell (panel #dedddb):
-     primary 12.01 · secondary 7.05 · tertiary 4.70. Muted deliberately
-     collapses onto tertiary — anything lighter on this hue falls under 4.5:1
-     against the panel, so the palette has no room for a fourth text weight.
-     Data-dense tables get their hierarchy from weight and alignment. */
+     Measured on the worst light surface in the shell, which is the topbar
+     (#eaeae2): primary 13.48 · secondary 7.92 · tertiary 5.27. On the panel,
+     the lightest, they run 15.59 / 9.16 / 6.10. Muted deliberately collapses
+     onto tertiary — anything lighter on this hue falls under 4.5:1 against the
+     topbar, so the palette has no room for a fourth text weight. Data-dense
+     tables get their hierarchy from weight and alignment.
+
+     (An earlier version of this comment measured against a panel of #dedddb.
+     No surface in the app was ever that color — it came from a proposal-era
+     mock. The numbers above are the shipped shell.) */
   --color-text-primary:   var(--bca-neutral-12);
   --color-text-secondary: var(--bca-brand-grey);
   --color-text-tertiary:  var(--bca-neutral-11);
   --color-text-muted:     var(--bca-neutral-11);
   --color-text-inverse:   #ffffff;
-  --color-text-disabled:  var(--bca-neutral-9);   /* non-text UI only — 3.60:1 */
+  /* Disabled: 3.44 on the panel down to 2.97 on the topbar. WCAG exempts
+     inactive controls from contrast, and the ghosted Phase 2 nav items are the
+     main consumer, but it is under 3.0 on the shell's darkest surface — do not
+     borrow this token for anything that is merely quiet rather than disabled. */
+  --color-text-disabled:  var(--bca-neutral-9);
 
   /* Links: purple on light, jade on dark, per the brand guide. */
   --color-text-link:       var(--bca-purple-12);
@@ -214,17 +297,17 @@
      component-tokens.css loads after it and re-points the same token to
      --color-border-focus, which resolves to the hub's --color-grass-8
      (#65ba74) — a mint green from a ramp this brand doesn't use. Unoverridden
-     that is what every focus ring in the app would be: off-brand, and 2.18:1
+     that is what every focus ring in the app would be: off-brand, and 2.14:1
      against the canvas, under the 3.0 WCAG 1.4.11 requires of a non-text
      indicator. Re-pointing it is a real fix, not a restatement.
 
-     Green, never Gold: Gold Dark is 1.90:1 against the canvas. Green is
-     9.60:1. */
-  --focus-ring-color:  var(--bca-green-12);
+     Green, never Gold: Gold Dark is 1.86:1 against the canvas. Green is
+     9.41:1. */
+  --focus-ring-color:  var(--bca-green-9);
   --focus-ring-width:  2px;
   --focus-ring-offset: 2px;
 
-  --color-active-overlay: color-mix(in srgb, var(--bca-green-12) 8%, transparent);
+  --color-active-overlay: color-mix(in srgb, var(--bca-green-9) 8%, transparent);
 
   /* ═══ STATUS SCALE — deliberately NOT brand ═══════════════════════════
      Success, warning and danger use conventional green / yellow / red
@@ -243,8 +326,8 @@
 
      Step 11 is the one exception, and only because the spoke and the hub tint
      to different depths. The hub pairs its step-11 solid with a step-2 subtle;
-     this spoke's subtle is step 3 (set by info/Sage, so all four families sit
-     at one tint depth), and step 3 is darker. Against it the stock step 11
+     this spoke's subtle is step 3, and step 3 is darker. Against it the stock
+     step 11
      falls to 4.21 / 4.25 / 4.54 — under 4.5 as text. Same story on the canvas:
      4.33 / 4.23 / 4.79. So each is darkened along OKLCH lightness, hue and
      chroma held, by the least amount that clears 4.5:1 on all three surfaces
@@ -282,37 +365,47 @@
      Info stays Sage and stays in-brand — it is the advisory voice, not a
      state, and nothing conventional is being spelled by it.
 
-     One thing the in-brand mapping did better: on the panel surface
-     (#dedddb, the worst light surface in the shell) danger fell from 4.90:1
-     to 3.90:1. Solids on the panel are now 3.70–3.90 across all three —
-     above the 3.0 non-text floor, under 4.5 for text. Status TEXT on a panel
-     uses -strong (8.38:1 worst), which is what the token was for. */
-  --color-info:            var(--bca-sage-11);   /* advisory, the quiet one */
-  --color-info-subtle:     var(--bca-sage-3);
-  --color-info-border:     var(--bca-sage-6);
-  --color-info-strong:     var(--bca-sage-12);   /* 14.49:1 on subtle */
+     Info is the one family whose subtle is step 4 rather than step 3, and the
+     tinted shell is why. The shell IS the Sage hue, so sage-3 sits 3.5° of hue
+     and 0.000 of chroma from the canvas — ΔE 0.0079, the same color. Warning
+     has the identical problem by luminance (see the note at the end of this
+     block) and gets to solve it with hue, because amber is 3.0° from the
+     canvas in hue but carries six times the chroma. Sage has no such escape:
+     an advisory callout on this canvas separates by VALUE or not at all. So
+     info-subtle steps down to sage-4 (ΔE 0.0312 on canvas, 0.0521 on panel)
+     and pays 5.19 → 4.83 on its own ink, still over 4.5.
 
-  --color-success:         var(--bca-status-green-11);  /* 5.20 white · 4.77 canvas · 4.64 subtle */
+     Solids on the worst light surface — the topbar — run 4.15 to 4.37, above
+     the 3.0 non-text floor and just under 4.5 for text. That is the intended
+     division of labour: solids are icons, bars and dots; status TEXT uses
+     -strong, which is 10.47:1 at worst on its own subtle. */
+  --color-info:            var(--bca-sage-11);   /* advisory, the quiet one */
+  --color-info-subtle:     var(--bca-sage-4);    /* step 4, not 3 — see above */
+  --color-info-border:     var(--bca-sage-6);
+  --color-info-strong:     var(--bca-sage-12);   /* 13.48:1 on subtle */
+
+  --color-success:         var(--bca-status-green-11);  /* 5.20 white · 4.68 canvas · 4.64 subtle */
   --color-success-subtle:  var(--bca-status-green-3);
   --color-success-border:  var(--bca-status-green-6);
   --color-success-strong:  var(--bca-status-green-12);  /* 11.00:1 on subtle */
 
-  --color-warning:         var(--bca-status-amber-11);  /* 5.02 white · 4.61 canvas · 4.63 subtle */
+  --color-warning:         var(--bca-status-amber-11);  /* 5.02 white · 4.52 canvas · 4.63 subtle */
   --color-warning-subtle:  var(--bca-status-amber-3);   /* 1.00 vs canvas — see note below */
   --color-warning-border:  var(--bca-status-amber-6);
   --color-warning-strong:  var(--bca-status-amber-12);  /* 10.47:1 on subtle */
 
-  --color-danger:          var(--bca-status-red-11);    /* 5.29 white · 4.86 canvas · 4.61 subtle */
+  --color-danger:          var(--bca-status-red-11);    /* 5.29 white · 4.76 canvas · 4.61 subtle */
   --color-danger-subtle:   var(--bca-status-red-3);
   --color-danger-border:   var(--bca-status-red-6);
   --color-danger-strong:   var(--bca-status-red-12);    /* 10.84:1 on subtle */
   --color-error:           var(--color-danger);
   --color-error-subtle:    var(--color-danger-subtle);
   --color-error-border:    var(--color-danger-border);
-  /* The amber subtle surface is luminance-identical to the canvas (1.00:1).
+  /* The amber subtle surface is luminance-identical to the canvas (1.02:1).
      A warning callout separates from the page by hue and by its border, never
      by value — so -border is not optional on a warning container the way it
-     is on the other three. */
+     is on the other three. It does clear the perceptual floor (ΔE 0.062),
+     which is chroma doing the work value cannot. */
 
   /* ═══ TYPE ════════════════════════════════════════════════════════════
      ABI brand type. Inter for the interface; Crimson Pro Light for headlines
@@ -378,7 +471,7 @@
      Inks here run 8.31–12.96:1 and separate by 0.034–0.062. */
   --bca-badge-bg:   var(--bca-neutral-3);
   --bca-badge-line: var(--bca-neutral-6);
-  --bca-badge-recommended:     var(--bca-green-12);   /*  8.31:1 */
+  --bca-badge-recommended:     var(--bca-green-9);    /*  8.31:1 */
   --bca-badge-suitable:        var(--bca-gold-12);    /*  8.99:1 */
   --bca-badge-not-recommended: var(--bca-purple-12);  /* 11.57:1 */
   --bca-badge-excluded:        var(--bca-neutral-12); /* 12.96:1 */
@@ -398,8 +491,8 @@
   --bca-map-water:    #dfe6e8;
   --bca-map-road:     #ffffff;
   --bca-map-boundary: #c9c7c2;
-  --bca-field-fill:   color-mix(in srgb, var(--bca-green-12) 22%, transparent);
-  --bca-field-stroke: var(--bca-green-12);
+  --bca-field-fill:   color-mix(in srgb, var(--bca-green-9) 22%, transparent);
+  --bca-field-stroke: var(--bca-green-9);
   --bca-parcel-fill:  var(--bca-sage-4);
   --bca-parcel-stroke: var(--bca-neutral-7);
 
@@ -410,13 +503,17 @@
      token above it. Retire once the pages are rebuilt. */
   --bca-green-50:  var(--bca-green-2);
   --bca-green-100: var(--bca-green-3);
+  /* Stays at step 6 despite the primary border moving to 7. All four uses are
+     decorative outlines around a green-100 fill (avatar ring, badge outline,
+     verdict box) — none is a state indicator, so the 1.4.11 floor that forced
+     the primary border down a step does not apply here. */
   --bca-green-200: var(--bca-green-6);
   --bca-green-300: var(--bca-green-7);
-  --bca-green-500: var(--bca-green-11);
-  --bca-green-700: var(--bca-green-12);
-  --bca-green-800: var(--bca-green-12);
-  --bca-green-900: var(--bca-brand-green-dark);
-  --bca-green-950: var(--bca-green-13);
+  --bca-green-500: var(--bca-green-8);
+  --bca-green-700: var(--bca-green-9);
+  --bca-green-800: var(--bca-green-9);
+  --bca-green-900: var(--bca-green-10);
+  --bca-green-950: var(--bca-green-11);
 
   --bca-amber-100:   var(--bca-gold-3);
   --bca-amber-300:   var(--bca-gold-5);

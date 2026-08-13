@@ -450,7 +450,7 @@ if (activeNavId) {
     --_topbar-h: 56px;
     --_sidenav-w: 340px;
     --_sidenav-w-collapsed: 72px;
-    --_chrome-border: var(--color-border, #ddd9d0);
+    --_chrome-border: var(--bca-chrome-seam, #deddd4);
 
     display: flex;
     flex-direction: column;
@@ -479,9 +479,11 @@ if (activeNavId) {
      topbar
      ═══════════════════════════════════════════════════════════════════ */
   .topbar {
-    /* The sidebar stepper is this app's primary chrome, so it takes the
-       heavier surface and the topbar stays the light one. */
-    --_topbar-bg: var(--color-surface, #fff);
+    /* Darkest of the four shell surfaces, and only just: it sits ΔE 0.0073
+       from the sidenav, so the two read as one continuous frame around the
+       work. That seam was 0.0783 when the topbar was white, which is what
+       made the old shell feel cut in half. */
+    --_topbar-bg: var(--bca-chrome-topbar, #eaeae2);
 
     position: fixed;
     top: 0;
@@ -670,10 +672,17 @@ if (activeNavId) {
      side nav ($sidebar-width 300px / collapsed 72px)
      ═══════════════════════════════════════════════════════════════════ */
   .side-nav {
-    --_sidenav-bg: var(--color-surface-sunken, #e8e5de);
+    --_sidenav-bg: var(--bca-chrome-sidenav, #edece5);
     --_nav-hover-bg: var(--color-active-overlay, rgba(0, 0, 0, 0.04));
-    --_nav-active-bg: var(--color-primary-subtle, #eef7dc);
+    /* Solid, not a tint. --color-primary-subtle sits ΔE 0.0126 from this
+       sidenav — the same color — so a wash reads as no state at all. The solid
+       fill is 8.83:1 against the sidenav, which clears WCAG 1.4.11 outright. */
+    --_nav-active-bg: var(--color-primary, #364500);
+    /* Stays primary: this also colors .nav-section__header hover and active
+       text, which sit directly on the sidenav. Inverting it here would blank
+       those labels. The label ON the solid fill uses --_nav-active-ink. */
     --_nav-active-color: var(--color-primary, #364500);
+    --_nav-active-ink: var(--color-text-inverse, #ffffff);
 
     width: var(--_sidenav-w, 300px);
     height: 100%;
@@ -901,14 +910,15 @@ if (activeNavId) {
     background: var(--_nav-hover-bg, rgba(0, 0, 0, 0.04));
     color: var(--color-text-primary, #33312a);
   }
-  /* Active = tint + semibold + primary text (no left-border indicator) */
+  /* Active = solid primary fill + semibold + inverse text (no left-border
+     indicator). Label on the fill is 10.46:1. */
   .nav-sublink.active {
-    background: var(--_nav-active-bg, #f0f5ec);
-    color: var(--_nav-active-color, #234a31);
+    background: var(--_nav-active-bg, #364500);
+    color: var(--_nav-active-ink, #fff);
     font-weight: var(--font-weight-semibold, 600);
   }
   .nav-sublink.active :global(.esa-icon) {
-    color: var(--_nav-active-color, #234a31);
+    color: var(--_nav-active-ink, #fff);
   }
 
   /* Ghosted roadmap items */
