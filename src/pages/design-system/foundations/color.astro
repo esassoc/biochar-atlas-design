@@ -25,7 +25,7 @@ const ramp = (name: string, hexes: string[]) =>
 
 const neutral = ramp('neutral', ['#fdfdfc', '#f6f5f4', '#e8e5de', '#dedddb', '#d8d7d4', '#d0cfcc', '#c6c5c1', '#b5b2ad', '#898780', '#7f7c77', '#615f5a', '#21201c']);
 const green = ramp('green', ['#fcfef8', '#f7fbef', '#eef7dc', '#e3f2c3', '#d5eaa9', '#c6de92', '#b5cc80', '#9db369', '#8aa056', '#80954c', '#687c32', '#364500']);
-const gold = ramp('gold', ['#fefdfb', '#fff9f1', '#fff3e2', '#ffe9c9', '#ffdeae', '#fece86', '#ecbd76', '#d9a450', '#ffc261', '#fbba4e', '#9b6d1b', '#473822']);
+const gold = ramp('gold', ['#fefdfb', '#fcf6ee', '#fbefde', '#fee8c8', '#ffe1b4', '#ffd9a2', '#ffd28e', '#ffca79', '#ffc261', '#ca8c02', '#8b5e01', '#473822']);
 const sage = ramp('sage', ['#fdfdf7', '#f9f9f3', '#f2f1e9', '#eae9e1', '#e3e2d9', '#dbdad3', '#d0cfc4', '#bebdb2', '#918f7a', '#878570', '#676556', '#22200b']);
 const purple = ramp('purple', ['#fefcfe', '#fcf7fb', '#f9ecf5', '#f4dfee', '#edd2e6', '#e4c2db', '#d8aecd', '#c892bb', '#965a89', '#8d5180', '#834877', '#45173d']);
 const jade = ramp('jade', ['#fafefb', '#f2fbf4', '#e3f6e6', '#d0f1d5', '#bae8c2', '#a7dcb1', '#95c99f', '#7db087', '#699c73', '#5f9169', '#457750', '#143e20']);
@@ -40,7 +40,7 @@ const roles = [
   { token: 'color-secondary', value: '#676556', note: 'Sage at text weight (sage/11). Brand Sage itself fills; it never carries body copy.' },
   { token: 'color-info', value: '#676556', note: 'Advisory messages — the quiet one. Sage family.' },
   { token: 'color-success', value: '#457750', note: 'Positive — suitable, saved, complete. Jade family.' },
-  { token: 'color-warning', value: '#9b6d1b', note: 'Caution. Gold at text/icon weight — brand Gold is 2.07:1 and cannot carry a state.' },
+  { token: 'color-warning', value: '#8b5e01', note: 'Caution. Gold at text/icon weight — brand Gold is 2.07:1 and cannot carry a state.' },
   { token: 'color-danger', value: '#834877', note: 'Negative. Purple, because the ABI palette contains no red.' },
   { token: 'color-text-primary', value: '#21201c', note: 'Body text. 16.30:1 on white, 12.01:1 on the panel surface.' },
   { token: 'color-text-secondary', value: '#474540', note: 'Supporting text — brand Grey, doing real work.' },
@@ -198,11 +198,11 @@ const accents = [
       borders and icon-only controls come from Green or Purple.
     </p>
     <p class="note">
-      <strong>Focus rings exist now.</strong> Hub components outline with
-      <code>--focus-ring-color</code> and <code>--focus-ring-width</code>, but nothing in
-      <code>@esa/tokens</code> ever declared them — the <code>var()</code> resolved invalid and
-      the outline computed to <code>none</code>. This theme defines them, which turns focus
-      visibility back on across every inherited component.
+      <strong>Focus rings are re-pointed.</strong> <code>@esa/tokens</code> defines
+      <code>--focus-ring-color</code> twice, and the later one wins:
+      <code>component-tokens.css</code> chains it to <code>--color-grass-8</code> (#65ba74),
+      a mint green from a ramp this brand doesn't use, measuring 2.18:1 against the canvas —
+      below the 3.0 WCAG 1.4.11 requires. This theme points it back at Green, at 9.60:1.
     </p>
   </Section>
 </DocsLayout>

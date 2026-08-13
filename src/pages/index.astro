@@ -100,22 +100,23 @@ const STATUS_LABEL: Record<PrototypeStatus, string> = {
       padding: var(--spacing-900, 96px) 0 var(--spacing-800, 64px);
     }
     .hero__mark {
-      color: var(--color-primary, #234a31);
+      color: var(--color-primary, #364500);
       line-height: 0;
-      /* soft brand halo behind the mark for depth */
-      background: radial-gradient(circle at center, var(--color-primary-subtle, #f0f5ec) 0%, transparent 68%);
+      /* No tinted halo. Green at tint weight on this palette is a yellow-green
+         (#eef7dc) and reads as a highlighter smudge behind the mark; the
+         drop-shadow alone carries the depth. */
       padding: var(--spacing-700, 48px);
       margin: calc(-1 * var(--spacing-500, 24px)) 0 var(--spacing-400, 16px);
-      filter: drop-shadow(0 8px 24px color-mix(in srgb, var(--color-primary, #234a31) 18%, transparent));
+      filter: drop-shadow(0 8px 24px color-mix(in srgb, var(--color-primary, #364500) 18%, transparent));
     }
     .hero__title {
       margin: 0;
-      font-family: var(--font-sans, system-ui, sans-serif);
-      font-weight: var(--font-weight-bold, 700);
+      /* Face and weight inherit from the theme — this is the one place the
+         brand headline voice gets to be the whole composition. */
       font-size: clamp(2.75rem, 2rem + 3.5vw, 4.25rem);
       line-height: 1.02;
       letter-spacing: -0.02em;
-      color: var(--color-text-primary, #33312a);
+      color: var(--color-text-primary, #21201c);
     }
     .hero__tagline {
       margin: var(--spacing-400, 16px) auto 0;

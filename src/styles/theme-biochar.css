@@ -92,18 +92,25 @@
 
   /* Gold — accent and CTA fill. Dark labels only: white on Gold is 1.60:1
      and white on Gold Dark 2.07:1. Green Dark on Gold is 9.38:1, which is
-     the pairing the brand guide's own CTA examples already use. */
+     the pairing the brand guide's own CTA examples already use.
+
+     Steps 1–8 are all lighter than the anchor because brand Gold genuinely IS
+     a light color (OKLCH L 0.851) — the usable dark golds live at 10–12. The
+     first cut of this ramp put step 8 DARKER than step 9, which is not a scale
+     at all; re-spacing lightness monotonically around the pinned anchor also
+     lifted the warning solid from 4.17:1 to 5.00:1 on its own subtle surface,
+     i.e. out of an AA failure. */
   --bca-gold-1:  #fefdfb;
-  --bca-gold-2:  #fff9f1;
-  --bca-gold-3:  #fff3e2;
-  --bca-gold-4:  #ffe9c9;
-  --bca-gold-5:  #ffdeae;
-  --bca-gold-6:  #fece86;
-  --bca-gold-7:  #ecbd76;
-  --bca-gold-8:  #d9a450;
+  --bca-gold-2:  #fcf6ee;
+  --bca-gold-3:  #fbefde;
+  --bca-gold-4:  #fee8c8;
+  --bca-gold-5:  #ffe1b4;
+  --bca-gold-6:  #ffd9a2;
+  --bca-gold-7:  #ffd28e;
+  --bca-gold-8:  #ffca79;
   --bca-gold-9:  #ffc261;  /* = brand Gold */
-  --bca-gold-10: #fbba4e;
-  --bca-gold-11: #9b6d1b;
+  --bca-gold-10: #ca8c02;
+  --bca-gold-11: #8b5e01;
   --bca-gold-12: #473822;
 
   /* Sage — secondary. Decorative fill and large text only. */
@@ -202,13 +209,16 @@
   --color-border-strong: var(--bca-neutral-7);
 
   /* ═══ FOCUS ═══════════════════════════════════════════════════════════
-     The hub's components all outline with --focus-ring-*, but nothing in the
-     token package ever defines them — the var() resolves invalid and the
-     outline computes to none, so hub components currently have no visible
-     focus ring at all. Defining them here turns focus back on spoke-wide.
+     tokens.css points --focus-ring-color at --color-primary, but
+     component-tokens.css loads after it and re-points the same token to
+     --color-border-focus, which resolves to the hub's --color-grass-8
+     (#65ba74) — a mint green from a ramp this brand doesn't use. Unoverridden
+     that is what every focus ring in the app would be: off-brand, and 2.18:1
+     against the canvas, under the 3.0 WCAG 1.4.11 requires of a non-text
+     indicator. Re-pointing it is a real fix, not a restatement.
 
-     Green, never Gold: Gold Dark is 1.90:1 against the canvas, under the
-     3.0 that WCAG 1.4.11 requires of a non-text indicator. Green is 9.60:1. */
+     Green, never Gold: Gold Dark is 1.90:1 against the canvas. Green is
+     9.60:1. */
   --focus-ring-color:  var(--bca-green-12);
   --focus-ring-width:  2px;
   --focus-ring-offset: 2px;
@@ -233,10 +243,10 @@
   --color-success-border:  var(--bca-jade-6);
   --color-success-strong:  var(--bca-jade-12);   /* 10.69:1 on subtle */
 
-  --color-warning:         var(--bca-gold-11);   /* NOT brand Gold — 4.57:1 vs 2.07:1 */
+  --color-warning:         var(--bca-gold-11);   /* NOT brand Gold — 5.68:1 vs 2.07:1 */
   --color-warning-subtle:  var(--bca-gold-3);
   --color-warning-border:  var(--bca-gold-6);
-  --color-warning-strong:  var(--bca-gold-12);   /* 10.33:1 on subtle */
+  --color-warning-strong:  var(--bca-gold-12);   /* 9.97:1 on subtle */
 
   --color-danger:          var(--bca-purple-11);
   --color-danger-subtle:   var(--bca-purple-3);
@@ -256,7 +266,11 @@
      loaded and mapped — an extension, same as the color ramps. */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'Roboto Mono', ui-monospace, monospace;
-  --bca-font-display: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  /* --font-display is the hub's own hook (DocsShell's .article h1 reads it and
+     falls back to --font-sans). Wiring it here is what gets the brand headline
+     face onto documentation page titles with no fork. */
+  --font-display: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  --bca-font-display: var(--font-display);
   --font-weight-light:    300;
   --font-weight-regular:  400;
   --font-weight-medium:   500;
@@ -395,14 +409,22 @@
   --bca-meta-shadow: 0 16px 50px -12px rgba(0, 0, 0, 0.6);
 }
 
-/* Headline face. Scoped to the theme selector so it can't leak, and kept here
-   rather than duplicated per layout — AppShell and DocsShell both set
-   data-theme="biochar" on <html>. h1/h2 only: Crimson Pro Light is the brand
-   headline voice, and it stops being one at h3 and below where the interface
-   needs Inter's clarity at small sizes. */
-[data-theme="biochar"] h1,
-[data-theme="biochar"] h2 {
-  font-family: var(--bca-font-display);
+/* Headline face — page titles only. Scoped to the theme selector so it can't
+   leak, and kept here rather than duplicated per layout: AppShell and DocsShell
+   both set data-theme="biochar" on <html>.
+
+   h1 and not h2. Crimson Pro is the brand's headline voice, and this is a
+   data-dense tool — a serif on every step title and section heading turns an
+   NRCS worksheet editorial.
+
+   The WEIGHT only lands where nothing downstream sets one. Component and page
+   rules here are all `.class[astro-cid] h1[astro-cid]`, which outranks this by
+   two attribute selectors, and the hub's own `.article h1` hardcodes 600. So
+   this declares the intent and the rules that own a heading opt in by NOT
+   pinning a weight. Ones that still pin 600/700 render Crimson Pro semibold —
+   see NEEDS.md; making Light stick everywhere is a heading pass, not a token. */
+[data-theme="biochar"] h1 {
+  font-family: var(--font-display);
   font-weight: var(--font-weight-light, 300);
   letter-spacing: -0.005em;
 }

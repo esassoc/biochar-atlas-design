@@ -37,8 +37,9 @@ else from them. Extending with lighter/darker steps is the agreement with ABI
   `--bca-badge-*` (4 recommendation values: one neutral fill, hue in the ink).
 - Provenance separates by weight here and by SHAPE in the component — color is
   already spoken for by the rating classes.
-- Type: Inter (300–700) + Crimson Pro Light for h1/h2 headlines; Roboto Mono
-  for data values. Sentence case, never Title Case.
+- Type: Inter (300–700) + Crimson Pro Light on page titles; Roboto Mono for
+  data values. Sentence case, never Title Case. `--font-display` is the hub's
+  own hook, so DocsShell page titles pick the face up with no fork.
 - Compatibility block at the end of the theme re-points the old `--bca-*`
   names the prototype pages still reference. Retire with those pages.
 
@@ -55,7 +56,28 @@ else from them. Extending with lighter/darker steps is the agreement with ABI
 - [ ] `bca-map-legend` — layer legend card with toggles
 - [ ] Leaflet map island (suitability-tool page script, not a component yet)
 
+## Heading weight is component-owned (follow-up)
+The theme declares Crimson Pro Light on `h1`, but the weight only lands where
+the rule that owns the heading doesn't pin one. Every heading rule in this
+spoke and in the hub compiles to `.class[astro-cid] h1[astro-cid]`, which
+outranks a `[data-theme] h1` rule by two attribute selectors — a token cannot
+win that. Two page titles were opted in by removing their hardcoded weight
+(suitability-tool, home hero); the rest still render Crimson Pro semibold if
+they inherit the face at all. Making Light stick everywhere is a heading pass
+over the components, not a token change.
+
 ## Hub gaps found while building (candidates to promote)
+- `--focus-ring-color` is defined twice in `@esa/tokens` and the second one
+  wins: `tokens.css` sets it to `--color-primary` (correct — it follows the
+  theme), then `component-tokens.css` re-points it to `--color-border-focus`,
+  which is `--color-grass-8` (#65ba74). Any spoke importing both in the
+  documented order gets mint-green focus rings that ignore its brand and
+  measure 2.18:1 against a light canvas — below WCAG 1.4.11's 3.0. Overridden
+  here; the hub fix is for `component-tokens.css` to leave the focus ring
+  chained to primary.
+- `@esa/docs` DocsShell hardcodes `font-weight: 600` on `.article h1` and `h2`
+  while reading `--font-display` for the family — so a brand can set the face
+  but not the weight. Hub fix: read `--font-weight-*` tokens there too.
 - `esa-button` (.astro) drops unknown attributes — icon-only buttons can't
   receive an `aria-label`, so they have no accessible name. Hub fix: forward
   rest attrs to the native button (or add an `ariaLabel` prop).

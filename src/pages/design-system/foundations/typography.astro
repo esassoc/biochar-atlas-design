@@ -33,7 +33,7 @@ const weights = [
   <Section id="families" title="Type families">
     <div class="fam">
       <div class="fam__sample fam__sample--display">Evaluate a site</div>
-      <div class="fam__meta"><code>--bca-font-display</code> · Crimson Pro Light · h1 and h2 only — the brand headline voice, which stops being one at h3 where the interface needs Inter's clarity at small sizes</div>
+      <div class="fam__meta"><code>--font-display</code> · Crimson Pro Light · page titles only — this is a data-dense tool, and a serif on every step title and section heading turns an NRCS worksheet editorial</div>
     </div>
     <div class="fam">
       <div class="fam__sample">The quick brown fox jumps over the lazy dog</div>
@@ -49,8 +49,7 @@ const weights = [
     <p>
       Sizes shown at their desktop px / line-height; components read the matching fluid
       <code>--type-size-*</code> token. Body text never drops below 16px; meta text never
-      below 14px. Samples render in Inter — the two largest sizes land on <code>h1</code> and
-      <code>h2</code> in the app, where the display face and Light weight take over.
+      below 14px. Samples render in Inter; only <code>h1</code> takes the display face.
     </p>
     <div class="scale">
       {scale.map((t) => (

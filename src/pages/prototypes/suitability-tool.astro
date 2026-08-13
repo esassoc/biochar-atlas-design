@@ -1167,9 +1167,10 @@ const defaultRate = String(BASELINE_RATE_TONS_PER_ACRE);
     align-items: center;
     gap: var(--spacing-250, 0.625rem);
     margin: 0;
-    font-size: 1.5rem;
-    font-weight: var(--font-weight-bold, 700);
-    color: var(--color-text-primary, #33312a);
+    font-size: 1.75rem;
+    /* No font-weight or font-family here on purpose — the page title inherits
+       the brand headline face and its Light weight from the theme. */
+    color: var(--color-text-primary, #21201c);
     letter-spacing: -0.01em;
   }
   .config__head h1 svg {
