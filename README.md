@@ -1,8 +1,11 @@
-# @biochar/design
+# @biochar-atlas/design
 
-The **Biochar Atlas** design spoke — the brand and prototype layer for a
-**Biochar Suitability Tool**, built on the **[ESA Ecology](../ecology)** hub
-design system.
+`biochar-atlas-design` — the active prototyping surface for the **Biochar
+Atlas**, the brand and prototype layer for a **Biochar Suitability Tool**,
+built on the **[ESA Ecology](../ecology)** hub design system.
+
+Supersedes the interview-era spoke `biochar-design` as of 2026-08-13, when
+Phase 1 was contracted. All design work happens here.
 
 ## What this is
 
@@ -16,8 +19,8 @@ would interpret.
 ## Hub & spoke
 
 ```
-@esa/ecology (hub)                   @biochar/design (spoke)
-──────────────────────              ─────────────────────────
+@esa/ecology (hub)                   @biochar-atlas/design (spoke)
+──────────────────────              ─────────────────────────────
 primitives ────────────────────────> inherit (never override)
 semantic ──────────────────────────> inherit, then OVERRIDE brand
 component ─────────────────────────> inherit

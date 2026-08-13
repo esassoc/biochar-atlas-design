@@ -7,7 +7,7 @@ import { defineConfig } from 'astro/config';
 // Intended to publish to GitHub Pages as a project site, so production builds
 // need the subpath as `base`. Dev stays at root for clean local URLs —
 // withBase() (src/lib/base.ts) reads whichever base is active.
-const base = process.env.NODE_ENV === 'production' ? '/biochar-design/' : '/';
+const base = process.env.NODE_ENV === 'production' ? '/biochar-atlas-design/' : '/';
 
 export default defineConfig({
   site: 'https://esassoc.github.io',

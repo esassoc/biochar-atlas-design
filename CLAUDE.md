@@ -1,8 +1,12 @@
-# Biochar Atlas — Ecology spoke
+# Biochar Atlas — Ecology spoke (`biochar-atlas-design`)
 
 Astro spoke of the Ecology hub (`../ecology`) for a **Biochar Suitability
 Tool** prototype. Read `../ecology/CLAUDE.md` for hub conventions — they all
 apply here.
+
+This is the active Phase 1 design spoke, superseding `biochar-design` as of
+2026-08-13. Package name is `@biochar-atlas/design`; the component prefix
+stays `bca-`.
 
 ## The product in one paragraph
 NRCS conservationists (primary), conservation district planners, agronomists,

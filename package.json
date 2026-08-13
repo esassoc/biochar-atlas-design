@@ -1,7 +1,7 @@
 {
-  "name": "@biochar/design",
+  "name": "@biochar-atlas/design",
   "version": "0.0.1",
-  "description": "Biochar Atlas \u2014 an Astro spoke of the ESA Ecology hub (../ecology). Prototyping surface for the Biochar Suitability Tool.",
+  "description": "Biochar Atlas \u2014 an Astro spoke of the ESA Ecology hub (../ecology). The active Phase 1 design spoke for the Biochar Suitability Tool.",
   "type": "module",
   "private": true,
   "scripts": {

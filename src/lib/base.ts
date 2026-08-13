@@ -6,7 +6,7 @@
  * Assets imported through the build pipeline already get the base — don't
  * wrap those.
  *
- * `import.meta.env.BASE_URL` always ends in `/` (e.g. `/biochar-design/` in
+ * `import.meta.env.BASE_URL` always ends in `/` (e.g. `/biochar-atlas-design/` in
  * a production build, `/` in dev), so we strip any leading slash from `path`
  * to avoid a doubled separator.
  */
