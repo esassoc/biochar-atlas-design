@@ -36,7 +36,10 @@ interface NavSection {
   /** Inline Lucide path markup for glyphs not in esa-icon's registry. */
   iconPaths?: string;
   items?: NavItem[];
-  /** Single-link section (no sublist) — the header IS the link. */
+  /**
+   * Single-link section (no sublist) — the header IS the link. Declares intent;
+   * a section with no `items` is forced to this shape regardless (see below).
+   */
   link?: boolean;
   /** Destination for a `link` section (already withBase'd). */
   href?: string;
@@ -110,6 +113,16 @@ const {
     },
   ],
 } = Astro.props as Props;
+
+// A section with no sublinks IS a link, whatever the data says. `link: true`
+// declares the intent; this makes the RENDER follow the items, so a section
+// whose children are pruned can never leave a chevron behind disclosing an
+// empty list. Runs before everything downstream, so `section.link === true` is
+// the single honest test for "header is the destination" from here on — the
+// active-match below, the accordion script, and the rail flyout all read it.
+for (const section of navSections) {
+  if (!section.items?.length) section.link = true;
+}
 
 // Per-page section expansion — when provided, a section is expanded iff its id is listed.
 if (expandedSections) {
