@@ -69,7 +69,12 @@ const rows = users.map((u) => ({
 <script>
   import { createGrid, ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
   import type { GridApi, GridOptions, ColDef } from 'ag-grid-community';
-  import { atlasTheme, makeStatusChipRenderer, makeLinkRenderer } from '../../lib/bca-grid';
+  import {
+    atlasTheme,
+    atlasDefaultColDef,
+    makeStatusChipRenderer,
+    makeLinkRenderer,
+  } from '../../lib/bca-grid';
   import '@esa/ecology/esa-text-field';
 
   ModuleRegistry.registerModules([AllCommunityModule]);
@@ -112,27 +117,39 @@ const rows = users.map((u) => ({
       deactivated: { chip: '#898780', quiet: true }, // --bca-neutral-9
     };
 
+    // Flex WEIGHTS, not widths — the six columns divide the full grid between
+    // them, so nothing is left over on the right. The ratios are the old fixed
+    // widths carried across (210/290/140/150/140/140), so the resting layout at
+    // a typical viewport is the one that was already approved; what changed is
+    // that the surplus now goes to the columns instead of to dead space.
+    //
+    // minWidth is the real work here. Name and Email hold the two values that
+    // truncate worst, so they stop shrinking first and the grid scrolls rather
+    // than crushing an address to "kathleen.elm…".
     const columnDefs: ColDef<UserRow>[] = [
       {
         field: 'name',
         headerName: 'Name',
-        width: 210,
+        flex: 2.1,
+        minWidth: 170,
         cellRenderer: makeLinkRenderer({ href: (d) => `?user=${d.id}` }),
       },
-      { field: 'email', headerName: 'Email', width: 290 },
-      { field: 'org', headerName: 'Organization', width: 140 },
-      { field: 'role', headerName: 'Role', width: 150 },
+      { field: 'email', headerName: 'Email', flex: 2.9, minWidth: 230 },
+      { field: 'org', headerName: 'Organization', flex: 1.4, minWidth: 130 },
+      { field: 'role', headerName: 'Role', flex: 1.5, minWidth: 120 },
       {
         field: 'status',
         headerName: 'Status',
-        width: 140,
+        flex: 1.4,
+        minWidth: 120,
         cellRenderer: makeStatusChipRenderer(statusTones),
         cellClass: 'bca-grid-chip-cell',
       },
       {
         field: 'lastActive',
         headerName: 'Last active',
-        width: 140,
+        flex: 1.4,
+        minWidth: 125,
         valueFormatter: (p) => asDate(p.value),
       },
     ];
@@ -154,13 +171,7 @@ const rows = users.map((u) => ({
       // Stable row ids so a saved edit can find its node instead of rebuilding
       // the whole rowData and losing sort, filter and scroll position.
       getRowId: (p) => p.data.id,
-      defaultColDef: {
-        sortable: true,
-        resizable: true,
-        filter: true,
-        suppressHeaderMenuButton: true,
-        tooltipValueGetter: (p) => p.value,
-      },
+      defaultColDef: atlasDefaultColDef,
       tooltipShowDelay: 0,
       tooltipShowMode: 'whenTruncated',
       onFirstDataRendered: updateCounts,
@@ -180,15 +191,18 @@ const rows = users.map((u) => ({
 
     const api: GridApi<UserRow> = createGrid(host, gridOptions);
 
-    // The panel's edit dialog saved. Re-read the row so the grid cannot
-    // contradict the record open on top of it.
+    // The edit panel saved. Re-read the row so the grid cannot contradict the
+    // record open on top of it. The event carries the whole person now that the
+    // edit surface does — the grid takes the five fields it renders and ignores
+    // `title`, which lives only in the panel.
     document.addEventListener('bca:user-updated', (e) => {
-      const { id, role, status } = (e as CustomEvent<{ id: string; role: string; status: string }>).detail;
+      const { id, ...patch } = (e as CustomEvent<{ id: string } & Partial<UserRow>>).detail;
       const node = api.getRowNode(id) ?? null;
       const row = rows.find((r) => r.id === id);
       if (!row) return;
-      row.role = role;
-      row.status = status;
+      for (const key of ['name', 'email', 'org', 'role', 'status'] as const) {
+        if (patch[key] != null) row[key] = patch[key]!;
+      }
       if (node) node.setData({ ...row });
       else api.applyTransaction({ update: [row] });
     });

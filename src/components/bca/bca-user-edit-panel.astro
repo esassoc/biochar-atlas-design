@@ -1,0 +1,269 @@
+---
+// bca-user-edit-panel — the write surface for a user account, as a second
+// esa-side-dialog that STACKS on top of the read-only record panel.
+//
+// Replaces bca-user-edit-dialog. A centred modal over a right-hand drawer put
+// two different overlay grammars on one screen for one record; the stack keeps
+// one grammar and makes the relationship legible — the record you were reading
+// is still there, one card back.
+//
+// The stacking mechanics are ported from beacon-design's permit-tracking
+// prototype (segment drawer → permit editor), which is the same shape: a
+// read-only dossier that opens an editor over itself. Two knobs, both
+// esa-side-dialog custom properties, both documented in the style block below.
+//
+// SCOPE — every field on AtlasUser that an administrator can change:
+//   name, email, job title, organization, application role, account status.
+// Left out, and left read-only in the panel underneath rather than shown as a
+// disabled input: user id (the account's identity), member since (an event),
+// last active (a measurement), invited by (a fact of history). A disabled
+// control invites a click and answers with nothing; a value on the record
+// behind reads as what it is.
+import EsaButton from '@esa/ecology/esa-button.astro';
+import { users, type UserOrg, type UserRole, type UserStatus } from '../../data/users';
+
+const roles: UserRole[] = ['Administrator', 'Contributor', 'Viewer'];
+const statuses: UserStatus[] = ['Active', 'Invited', 'Deactivated'];
+const orgs: UserOrg[] = ['ESA', 'ABI', 'USDA ARS'];
+const asOptions = <T extends string>(vs: T[]) => vs.map((v) => ({ label: v, value: v }));
+
+const seed = {
+  roles: asOptions(roles),
+  statuses: asOptions(statuses),
+  orgs: asOptions(orgs),
+  users: Object.fromEntries(
+    users.map((u) => [
+      u.id,
+      { name: u.name, email: u.email, title: u.title, org: u.org, role: u.role, status: u.status },
+    ]),
+  ),
+};
+---
+
+<!-- bcn-lego-checked: esa-side-dialog is the drawer, esa-text-field and
+     esa-select are every input, esa-button is both footer actions. Nothing
+     here re-implements a control.
+
+     Width matches the record panel at 520px rather than taking Beacon's 640
+     write-surface figure, and the reason is the stack itself: the under card
+     peeks by sliding LEFT under a --side-dialog-inset, so a wider top card
+     would cover the peek entirely and the two would read as one panel that
+     changed its mind. Equal widths plus the inset is what makes a stack look
+     like a stack — it is how permit-tracking does it, where both drawers are
+     640. Six fields sit comfortably in 520. -->
+
+<esa-side-dialog
+  id="users-edit-panel"
+  position="right"
+  style="--_width: 520px; --z-modal: 1340; --z-modal-backdrop: 1310;"
+>
+  <div slot="header" class="bca-user-edit-panel__head">
+    <h2 class="bca-user-edit-panel__title">Edit user</h2>
+    <p class="bca-user-edit-panel__who" id="users-edit-who"></p>
+  </div>
+
+  <form class="stack" data-gap="md" id="users-edit-form" novalidate>
+    <esa-text-field id="users-edit-name" label="Name" size="sm"></esa-text-field>
+    <esa-text-field id="users-edit-email" label="Email" type="email" size="sm"></esa-text-field>
+    <esa-text-field id="users-edit-title" label="Job title" size="sm"></esa-text-field>
+    <esa-select id="users-edit-org" label="Organization" size="sm"></esa-select>
+    <esa-select id="users-edit-role" label="Role" size="sm"></esa-select>
+    <esa-select id="users-edit-status" label="Status" size="sm"></esa-select>
+  </form>
+
+  <!-- A real element carries slot="footer", never a <Fragment>: esa-side-dialog
+       is a web component, so the slot attribute has to survive into the DOM and
+       Astro unwraps a Fragment before it gets there. -->
+  <div slot="footer" class="bca-user-edit-panel__foot">
+    <EsaButton id="users-edit-cancel" color="ghost" appearance="outline">Cancel</EsaButton>
+    <EsaButton id="users-edit-save" color="primary">Save changes</EsaButton>
+  </div>
+</esa-side-dialog>
+
+<script type="application/json" id="users-edit-seed" set:html={JSON.stringify(seed)}></script>
+
+<script>
+  import '@esa/ecology/esa-side-dialog';
+  import '@esa/ecology/esa-text-field';
+  import '@esa/ecology/esa-select';
+  import '@esa/ecology/esa-snackbar-container';
+
+  interface UserDraft {
+    name: string;
+    email: string;
+    title: string;
+    org: string;
+    role: string;
+    status: string;
+  }
+  interface Seed {
+    roles: { label: string; value: string }[];
+    statuses: { label: string; value: string }[];
+    orgs: { label: string; value: string }[];
+    users: Record<string, UserDraft>;
+  }
+  type Panel = HTMLElement & { open: boolean; heading: string; show(): void; close(): void };
+  type Field = HTMLElement & { value: string; options?: { label: string; value: string }[] };
+
+  const seedEl = document.getElementById('users-edit-seed');
+  const panel = document.getElementById('users-edit-panel') as Panel | null;
+  // The record panel this one stacks over. Looked up rather than passed: the
+  // two components are siblings on the page and the id is the contract between
+  // them, exactly as the two drawers in permit-tracking share one scope.
+  const record = document.getElementById('users-record-panel') as Panel | null;
+
+  if (seedEl && panel) {
+    const seed = JSON.parse(seedEl.textContent!) as Seed;
+    // A live copy, not the server-rendered values. Saving mutates this so
+    // reopening shows what the record now says; cancelling leaves it untouched,
+    // so a discarded edit is genuinely discarded.
+    const current = structuredClone(seed.users);
+    let editingId: string | null = null;
+
+    const $ = <T extends HTMLElement = Field>(id: string) => document.getElementById(id) as T | null;
+    const who = $<HTMLElement>('users-edit-who');
+
+    // `options` is an array PROPERTY, not an attribute — it has to be assigned,
+    // and `value` assigned after it so the select can resolve the label.
+    const fields: { el: Field | null; key: keyof UserDraft; options?: Seed['roles'] }[] = [
+      { el: $('users-edit-name'), key: 'name' },
+      { el: $('users-edit-email'), key: 'email' },
+      { el: $('users-edit-title'), key: 'title' },
+      { el: $('users-edit-org'), key: 'org', options: seed.orgs },
+      { el: $('users-edit-role'), key: 'role', options: seed.roles },
+      { el: $('users-edit-status'), key: 'status', options: seed.statuses },
+    ];
+
+    function fill(id: string): void {
+      const user = current[id];
+      if (!user) return;
+      for (const f of fields) {
+        if (!f.el) continue;
+        if (f.options) f.el.options = f.options;
+        f.el.value = user[f.key];
+      }
+      panel!.heading = `Edit ${user.name}`; // the lego's aria-label
+      if (who) who.textContent = user.name;
+    }
+
+    function openEdit(id: string): void {
+      if (!current[id]) return;
+      editingId = id;
+      fill(id);
+      // Card-stack when the editor opens over the record: the under card slides
+      // left to peek out, and the top card brings NO second backdrop so the page
+      // does not double-dim. Both classes are removed again on close.
+      const stacked = !!record?.open;
+      panel!.classList.toggle('is-stacked', stacked);
+      record?.classList.toggle('is-under', stacked);
+      panel!.show();
+    }
+
+    // Escape, the backdrop and the ✕ all land here. esa-side-dialog binds
+    // Escape to its OWN panel's keydown rather than to the document, and focus
+    // moves into the top card on open — so Escape unwinds one level at a time
+    // instead of collapsing the whole stack.
+    panel.addEventListener('close', () => {
+      record?.classList.remove('is-under');
+      editingId = null;
+    });
+
+    document.querySelectorAll('[data-opens-user-edit]').forEach((trigger) =>
+      trigger.addEventListener('click', () => {
+        const id = (trigger as HTMLElement).dataset.userId;
+        if (id) openEdit(id);
+      }),
+    );
+
+    $<HTMLElement>('users-edit-cancel')?.addEventListener('click', () => panel.close());
+
+    $<HTMLElement>('users-edit-save')?.addEventListener('click', () => {
+      if (!editingId) return;
+      const user = current[editingId];
+      const patch: Partial<UserDraft> = {};
+      for (const f of fields) {
+        if (!f.el) continue;
+        const next = String(f.el.value ?? '').trim();
+        // An emptied text field is a mistake, not an intent to blank a name.
+        if (!next) continue;
+        if (next !== user[f.key]) patch[f.key] = next;
+        user[f.key] = next;
+      }
+
+      // One event, the whole person. The grid takes the five fields it renders,
+      // the record panel takes all six — neither can end up disagreeing with
+      // the other because both read the same payload.
+      document.dispatchEvent(
+        new CustomEvent('bca:user-updated', { detail: { id: editingId, ...user } }),
+      );
+
+      const changed = Object.keys(patch).length;
+      panel.close();
+
+      const toasts = document.getElementById('app-toasts') as
+        | (HTMLElement & { success: (m: string) => void; info: (m: string) => void })
+        | null;
+      if (changed) toasts?.success(`${user.name} updated · ${changed} field${changed > 1 ? 's' : ''}`);
+      else toasts?.info(`No changes to ${user.name}`);
+    });
+  }
+</script>
+
+<style>
+  /* ═══ The top card of the stack ═══
+     No second backdrop: the record panel underneath already dims the page, and
+     a second one at 50% darkens it twice, which makes the under card read as
+     disabled rather than as a card behind. The under card's own slide is set on
+     the record panel, in bca-user-panel.astro, because a component styles its
+     own element.
+
+     IT HAS TO BE --side-dialog-backdrop-bg, NOT --color-backdrop. The lego
+     reads `var(--side-dialog-backdrop-bg, var(--color-backdrop, …))`, so
+     --color-backdrop is only consulted when the component token is unset — and
+     component-tokens.css sets it at :root as
+     `--side-dialog-backdrop-bg: var(--color-backdrop, …)`. That substitution
+     happens once, at :root, and the CONCRETE colour is what inherits down. By
+     the time it reaches this element there is no fallback chain left to
+     redirect, so re-pointing --color-backdrop here does nothing at all.
+     Measured: the backdrop stayed rgba(0,0,0,.5) with the class applied.
+     beacon-design's permit-tracking sets --color-backdrop for this and loads
+     the same token file, so its stacked editor double-dims today. Filed in
+     NEEDS.md. */
+  #users-edit-panel.is-stacked {
+    --side-dialog-backdrop-bg: transparent;
+  }
+
+  .bca-user-edit-panel__head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  /* Same drawer-title scale as the record panel's name, so the two cards in the
+     stack read as one product rather than two. */
+  .bca-user-edit-panel__title {
+    margin: 0;
+    font-size: var(--type-size-400, 1.25rem);
+    font-weight: var(--font-weight-semibold, 600);
+    line-height: 1.2;
+    color: var(--color-text-primary, #21201c);
+  }
+  .bca-user-edit-panel__who {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--color-text-secondary, #474540);
+  }
+
+  /* The form runs at the panel's density, matching the record it edits. */
+  #users-edit-form {
+    --form-font-size-sm: 0.9375rem;
+    --form-label-font-size: 0.875rem;
+  }
+
+  .bca-user-edit-panel__foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-300, 0.75rem);
+  }
+</style>

@@ -10,7 +10,7 @@
 // Import from a page's client <script>:
 //   import { atlasTheme, makeStatusChipRenderer } from '../lib/bca-grid';
 import { themeQuartz, iconOverrides } from 'ag-grid-community';
-import type { ICellRendererParams } from 'ag-grid-community';
+import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 
 const lucideFunnelSvg =
   '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>';
@@ -80,6 +80,37 @@ export const atlasTheme = themeQuartz.withPart(atlasIconOverrides).withParams({
 export const atlasCardTheme = atlasTheme.withParams({
   wrapperBorderRadius: '4px',
 });
+
+/**
+ * The house column defaults. **Columns fill the grid** — `flex` rather than
+ * fixed `width`, so the last column ends at the right edge instead of leaving a
+ * dead band of empty grid beside it. A page sets a `flex` WEIGHT per column
+ * (how much of the surplus that column takes) and a `minWidth` (the point below
+ * which it stops shrinking and the grid scrolls instead).
+ *
+ * `flex` over `sizeColumnsToFit()` deliberately, on two counts:
+ *
+ *  - It is declarative. AG Grid re-solves it on every container resize with no
+ *    `gridSizeChanged` handler to write, so there is nothing to thrash.
+ *  - It survives a manual resize. `sizeColumnsToFit()` on a resize event snaps
+ *    every column back to the fit, which silently undoes the drag the user just
+ *    made. Dragging a flex column pins THAT column and leaves the rest flexing,
+ *    which is the behaviour a resize handle promises.
+ *
+ * The record panel overlays the grid rather than pushing it, so the container
+ * width does not change when a record opens and neither approach would thrash
+ * there — but a browser resize still happens, and only one of the two survives
+ * it intact.
+ */
+export const atlasDefaultColDef: ColDef = {
+  sortable: true,
+  resizable: true,
+  filter: true,
+  suppressHeaderMenuButton: true,
+  flex: 1,
+  minWidth: 120,
+  tooltipValueGetter: (p) => p.value,
+};
 
 /** A status value's chip colour. `quiet` draws the dot only, leaving the chip
  *  untinted — for values that are the norm rather than the exception. */

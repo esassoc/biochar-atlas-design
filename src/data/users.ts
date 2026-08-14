@@ -121,9 +121,9 @@ export const users: AtlasUser[] = [
     memberSince: '2026-06-18',
   },
   {
-    id: 'miles-gray',
-    name: 'Miles Gray',
-    email: 'miles.gray@americanbiochar.org',
+    id: 'myles-gray',
+    name: 'Myles Gray',
+    email: 'myles.gray@americanbiochar.org',
     org: 'ABI',
     title: 'Executive Director',
     role: 'Viewer',

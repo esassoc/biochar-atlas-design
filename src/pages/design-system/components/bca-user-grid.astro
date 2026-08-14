@@ -4,7 +4,7 @@ import Section from '@esa/docs/Section.astro';
 import Api from '@esa/docs/Api.astro';
 import BcaUserGrid from '../../../components/bca/bca-user-grid.astro';
 import BcaUserPanel from '../../../components/bca/bca-user-panel.astro';
-import BcaUserEditDialog from '../../../components/bca/bca-user-edit-dialog.astro';
+import BcaUserEditPanel from '../../../components/bca/bca-user-edit-panel.astro';
 
 const themeParams = [
   { name: 'headerHeight / rowHeight', type: 'number', default: '48 / 44', description: 'Beacon’s numbers. The row height carries the density; the header sits one step taller so the slab has presence.' },
@@ -23,6 +23,7 @@ const renderers = [
 ];
 
 const options = [
+  { name: 'atlasDefaultColDef', type: 'ColDef', description: 'Pass as defaultColDef. Carries sortable / resizable / filter / tooltip plus flex: 1 and minWidth: 120, so columns fill the grid by default and a page only sets the weights it wants to differ.' },
   { name: 'getRowId', type: '(p) => string', description: 'Set to the record id. Without it a saved edit cannot find its node and has to rebuild rowData, losing sort, filter and scroll position.' },
   { name: 'onRowClicked', type: '(e) => void', description: 'Opens the record. Guarded against the anchor in the name cell so the two gestures do not fire together; guard against .ag-checkbox too on any grid with selection.' },
 ];
@@ -56,10 +57,34 @@ const options = [
       Cells and header run at 13px in 44px rows, and the control strip and count
       strip come down with them. That is below the 16px minimum this design
       system holds everywhere else, and it is deliberate: a dense data grid is
-      the one surface where the number of rows a person can compare at once
-      beats the comfort of any single row. The exception travels with this
-      pattern and nothing outside it — a record opened from the grid goes back
-      to the app scale.
+      the surface where the number of rows a person can compare at once beats
+      the comfort of any single row. The exception covers the dense data
+      surfaces — this pattern and the record panel that reads out of a row — and
+      stops there. Page content is still at the floor.
+    </p>
+  </Section>
+
+  <Section id="columns" title="Columns fill the grid">
+    <p>
+      The house default is <code>flex: 1</code> with a <code>minWidth</code>, and
+      a page sets a flex <em>weight</em> per column rather than a width. Six
+      columns therefore divide the whole grid between them and the last one ends
+      at the right edge, instead of stopping two-thirds across and leaving a dead
+      band beside it.
+    </p>
+    <p>
+      <code>flex</code> rather than <code>sizeColumnsToFit()</code>, for two
+      reasons. It is declarative — AG Grid re-solves it on container resize with
+      no <code>gridSizeChanged</code> handler to write, so there is nothing to
+      thrash. And it survives a manual drag: <code>sizeColumnsToFit()</code>
+      bound to a resize event snaps every column back and silently undoes the
+      resize the user just made.
+    </p>
+    <p>
+      <code>minWidth</code> does the real work. Below it a column stops shrinking
+      and the grid scrolls, so a narrow window truncates nothing that matters —
+      put the floors on the columns whose values truncate worst, which here are
+      Name and Email.
     </p>
   </Section>
 
@@ -100,6 +125,6 @@ const options = [
   </Section>
 
   <BcaUserPanel />
-  <BcaUserEditDialog />
+  <BcaUserEditPanel />
   <esa-snackbar-container id="app-toasts"></esa-snackbar-container>
 </ComponentDoc>

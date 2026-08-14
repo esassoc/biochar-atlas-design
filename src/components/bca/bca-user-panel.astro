@@ -13,6 +13,12 @@
 // BcnProjectDataPanel, including the two parts that are easy to miss: the
 // `push` flag so a history-driven open does not re-push, and the re-entrancy
 // guard so popstate → close() does not push a second entry.
+//
+// The URL carries the RECORD only, never the stack depth. Editing opens a
+// second panel over this one (bca-user-edit-panel) and `?user=` does not
+// change, which is what beacon-design's permit-tracking does — its drawers are
+// not addressable at all. A link that reopened someone else's half-filled edit
+// form would be a worse contract than no link.
 import BcaRecordHeader from './bca-record-header.astro';
 import BcaFieldGroup from './bca-field-group.astro';
 import BcaField from './bca-field.astro';
@@ -30,9 +36,14 @@ import { users, usersById, formatDate } from '../../data/users';
      esa-side-dialog is a CUSTOM overlay, not a native <dialog>, so it has no
      top layer and DOM order will not save it.
 
-     Width is 520px: Beacon's own split is 520 for a read-only dossier and 640
-     for a write surface, and this one reads — the two editable fields open a
-     separate esa-dialog on top. -->
+     Width is 520px, and the edit panel that stacks over it matches — a stack
+     only reads as a stack when the under card can peek out from behind the top
+     one, and the peek is a --side-dialog-inset slide, not a width difference.
+
+     Density is set once here, on the header and body scopes, as --record-*
+     custom properties. bca-record-header, bca-field-group and bca-field all
+     read them, so a component nested three deep picks up the panel's scale
+     without a `density` prop threaded through every signature. -->
 
 <esa-side-dialog
   id="users-record-panel"
@@ -47,6 +58,7 @@ import { users, usersById, formatDate } from '../../data/users';
           name={user.name}
           context={`${user.title} · ${user.org}`}
           avatarName={user.name}
+          avatarSize="md"
         >
           <Fragment slot="chips">
             <BcaStatusChip value={user.status} field="status" />
@@ -67,9 +79,16 @@ import { users, usersById, formatDate } from '../../data/users';
         data-user-scope={user.id}
         hidden
       >
+        {/* Editable values carry data-user-field so a save can repaint them in
+            place. Read-only ones do not — nothing can change them, so an
+            attribute pointing at them would be a hook to nowhere. That split is
+            the same one the edit panel makes: it edits exactly the fields that
+            are instrumented here. */}
         <BcaFieldGroup title="Account" flush>
           <BcaField label="Email">
-            <a href={`mailto:${user.email}`}>{user.email}</a>
+            <a href={`mailto:${user.email}`} data-user-field="email" data-user-mailto>
+              {user.email}
+            </a>
           </BcaField>
           <BcaField label="User ID" value={user.id} mono />
           <BcaField label="Member since" value={formatDate(user.memberSince)} />
@@ -96,8 +115,12 @@ import { users, usersById, formatDate } from '../../data/users';
         </BcaFieldGroup>
 
         <BcaFieldGroup title="Organization" flush>
-          <BcaField label="Organization" value={user.org} />
-          <BcaField label="Job title" value={user.title} />
+          <BcaField label="Organization">
+            <span data-user-field="org">{user.org}</span>
+          </BcaField>
+          <BcaField label="Job title">
+            <span data-user-field="title">{user.title}</span>
+          </BcaField>
         </BcaFieldGroup>
       </div>
     );
@@ -129,6 +152,23 @@ import { users, usersById, formatDate } from '../../data/users';
     const bodies = [...document.querySelectorAll<HTMLElement>('[data-user-body]')];
     const nameOf = (id: string) =>
       document.querySelector<HTMLElement>(`[data-user-head="${id}"] h2`)?.textContent?.trim() ?? '';
+
+    // esa-avatar derives both of these from the name at build time. A renamed
+    // account has to re-derive them here, by the same two rules, or the disc
+    // keeps the old initials in the old colour. Copied from the lego rather
+    // than imported: it is an .astro component, so there is no runtime module
+    // to import them from. Filed in NEEDS.md.
+    const initialsOf = (n: string) => {
+      const parts = n.trim().split(/\s+/);
+      return parts.length === 1
+        ? parts[0][0].toUpperCase()
+        : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    };
+    const hueOf = (n: string) => {
+      let hash = 0;
+      for (let i = 0; i < n.length; i++) hash = n.charCodeAt(i) + ((hash << 5) - hash);
+      return Math.abs(hash) % 360;
+    };
 
     // Guards the one re-entrancy the URL contract has: popstate calls close(),
     // close() fires the lego's `close` event, and that handler would push a
@@ -183,25 +223,51 @@ import { users, usersById, formatDate } from '../../data/users';
       openUser((e as CustomEvent<{ id: string }>).detail.id);
     });
 
-    // The edit dialog saves; the open record and the grid both re-read it.
+    // The edit panel saved; the open record and the grid both re-read it. The
+    // payload is the whole person, so this repaints by field name rather than
+    // knowing which two fields the write surface happened to expose.
     document.addEventListener('bca:user-updated', (e) => {
-      const { id, role, status } = (e as CustomEvent<{ id: string; role: string; status: string }>).detail;
+      const detail = (e as CustomEvent<Record<string, string>>).detail;
+      const { id } = detail;
       // Kept in step with the TONES map in bca-status-chip.astro.
       const toneOf = (v: string) =>
         ({ active: 'quiet', invited: 'notice', deactivated: 'muted' })[v.toLowerCase()] ?? 'plain';
 
       document.querySelectorAll<HTMLElement>(`[data-user-scope="${id}"]`).forEach((scope) => {
         scope.querySelectorAll<HTMLElement>('[data-user-field]').forEach((el) => {
-          const value = el.dataset.userField === 'role' ? role : status;
+          const value = detail[el.dataset.userField!];
+          if (value == null) return;
+          // esa-pill renders its text in a child; a plain span holds its own.
           const label = el.querySelector<HTMLElement>('.esa-pill__label');
           if (label) label.textContent = value;
           else el.textContent = value;
+          // The mailto has to follow the address or the link sends to the old one.
+          if (el.dataset.userMailto !== undefined) el.setAttribute('href', `mailto:${value}`);
           // A status chip's tone is derived from its value, so it has to be
           // recomputed here or a deactivated account keeps the live treatment.
           if (el.dataset.userField === 'status' && el.classList.contains('bca-status-chip')) {
-            el.dataset.tone = toneOf(status);
+            el.dataset.tone = toneOf(value);
           }
         });
+
+        // The identity band is rendered by bca-record-header, which takes its
+        // name and context as props — so it is repainted by class rather than
+        // by adding a data hook to a component that has no reason to know about
+        // users. The avatar's initials AND its hue both derive from the name.
+        const name = detail.name;
+        if (name) {
+          const heading = scope.querySelector<HTMLElement>('.bca-record-header__name');
+          if (heading) heading.textContent = name;
+          const initials = scope.querySelector<HTMLElement>('.esa-avatar__initials');
+          if (initials) initials.textContent = initialsOf(name);
+          const avatar = scope.querySelector<HTMLElement>('.esa-avatar');
+          if (avatar) avatar.style.setProperty('--_avatar-hue', String(hueOf(name)));
+          if (openId === id) panel!.heading = name;
+        }
+        const context = scope.querySelector<HTMLElement>('.bca-record-header__context');
+        if (context && detail.title && detail.org) {
+          context.textContent = `${detail.title} · ${detail.org}`;
+        }
       });
     });
 
@@ -214,6 +280,58 @@ import { users, usersById, formatDate } from '../../data/users';
 </script>
 
 <style>
+  /* ═══ Panel density ═══
+     One block, set on both slot scopes, inherited by every record component
+     inside. The numbers are beacon-design's drawer scale verbatim (its segment
+     dossier: --type-size-400 title, 0.875rem labels, 0.9375rem values), which
+     is the same source that settled the grid's 13px/44px — so the drawer and
+     the table it opens over are one product rather than two.
+
+     THIS IS BELOW THE 16px FLOOR, and it widens Andy's 2026-08-14 carve-out
+     from "data-grid cells" to "the dense data surfaces" — the grid and the
+     record panel that reads out of it. His call, from looking at the panel
+     over the finished grid: the header especially, but the body too. The floor
+     still holds for page content; a record panel is a read-out of a row.
+
+     The name takes Inter semibold rather than a smaller Crimson Pro. The
+     display serif is the PAGE title's voice — bca-page-header owns it one
+     level up on the same screen — and a second serif line inside a drawer over
+     that page competes with it instead of sitting under it. */
+  .bca-user-panel__heads,
+  .bca-user-panel__body {
+    --record-name-family: var(--font-sans, Inter, system-ui, sans-serif);
+    --record-name-size: var(--type-size-400, 1.25rem);
+    --record-name-weight: var(--font-weight-semibold, 600);
+    --record-context-size: 0.875rem;
+    --record-section-size: 0.9375rem;
+    --record-label-size: 0.875rem;
+    --record-value-size: 0.9375rem;
+    --record-label-column: 6.5rem;
+    --record-row-gap: var(--spacing-200, 0.5rem);
+    --record-title-gap: var(--spacing-150, 0.375rem);
+    --record-identity-gap: var(--spacing-300, 0.75rem);
+  }
+
+  /* ═══ The under card of the stack ═══
+     When the edit panel opens over this one, it slides left by the inset so it
+     peeks out from behind — the lego animates --side-dialog-inset itself, and
+     explicitly supports a host re-pointing it while open. The class is toggled
+     by the edit panel, which owns the stack; the rule lives here because a
+     component styles its own element.
+
+     36px, NOT Beacon's 44. The peek is the DIFFERENCE between the two insets,
+     so 44 against the top card's default 16 exposes 28px of the under card —
+     and esa-side-dialog pads its header, body and footer by 24px, so the last
+     4px are the first sliver of every label. Measured on the first pass: a
+     column of clipped glyph fragments down the left edge, which reads as a
+     rendering fault rather than as a card behind. 36 gives a 20px peek that
+     lands entirely inside the padding, so the strip is the card's own surface
+     and its rounded corner. permit-tracking has the same 28px overhang; it is
+     masked there by the double-dim bug noted in bca-user-edit-panel.astro. */
+  #users-record-panel.is-under {
+    --side-dialog-inset: 36px;
+  }
+
   /* The lego's header slot is a single row; the hidden siblings must not
      reserve space in it. */
   .bca-user-panel__heads > [hidden] {
@@ -227,5 +345,15 @@ import { users, usersById, formatDate } from '../../data/users';
      than they do on a full page, and the chips wrap under rather than beside. */
   .bca-user-panel__head {
     padding-right: var(--spacing-500, 1.5rem);
+  }
+
+  /* esa-pill hardcodes its font-size with no public hook, and the theme lifts
+     it to 16px app-wide (theme-biochar.css § pill). Beside a 20px name and
+     above 15px values, a 16px chip outweighs the record it labels — so the
+     panel takes the grid chip's 13px and the two read as the same object.
+     One class heavier than the theme rule, (0,4,0) against (0,3,0), so this
+     wins on specificity rather than on bundle order. */
+  .bca-user-panel__heads :global(.esa-pill.esa-pill--md) {
+    font-size: 0.8125rem;
   }
 </style>

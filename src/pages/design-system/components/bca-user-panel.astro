@@ -4,7 +4,7 @@ import Section from '@esa/docs/Section.astro';
 import Api from '@esa/docs/Api.astro';
 import EsaButton from '@esa/ecology/esa-button.astro';
 import BcaUserPanel from '../../../components/bca/bca-user-panel.astro';
-import BcaUserEditDialog from '../../../components/bca/bca-user-edit-dialog.astro';
+import BcaUserEditPanel from '../../../components/bca/bca-user-edit-panel.astro';
 import { users } from '../../../data/users';
 
 const demo = users.slice(0, 3);
@@ -19,9 +19,11 @@ const legoApi = [
 ];
 
 const hooks = [
-  { name: '--_width', type: 'length', default: 'per size', description: 'The one to set. 520px for a read-only record, 640px for a write surface — Beacon’s split, and this spoke follows it.' },
-  { name: '--z-modal / --z-modal-backdrop', type: 'number', default: '400 / 300', description: 'Must be raised above the app shell. esa-side-dialog is a custom overlay, not a native <dialog>, so it has no top layer and DOM order will not save it. This shell’s topbar is 1100 and its nav flyout 1200, so the panel runs at 1300 / 1250.' },
-  { name: '--side-dialog-inset', type: 'length', default: '16px', description: 'The gap on all four sides. It is a floating panel rather than a drawer flush to the edge.' },
+  { name: '--_width', type: 'length', default: 'per size', description: 'The one to set. 520px here, and the edit panel that stacks over it matches — a stack needs equal widths, because the under card peeks by sliding rather than by being wider.' },
+  { name: '--z-modal / --z-modal-backdrop', type: 'number', default: '400 / 300', description: 'Must be raised above the app shell. esa-side-dialog is a custom overlay, not a native <dialog>, so it has no top layer and DOM order will not save it. This shell’s topbar is 1100 and its nav flyout 1200, so the record panel runs at 1300 / 1250 and the edit panel above it at 1340 / 1310.' },
+  { name: '--side-dialog-inset', type: 'length', default: '16px', description: 'The gap on all four sides, and the stacking knob: the under card re-points it to 36px while a second panel is open, which the lego animates. The peek is the difference between the two insets and must stay under the 24px body padding.' },
+  { name: '--side-dialog-backdrop-bg', type: 'color', default: 'rgba(0,0,0,.5)', description: 'The top card of a stack sets it transparent so the page dims once, not twice. It must be this token and not --color-backdrop: the lego falls back to --color-backdrop only when this one is unset, and component-tokens.css sets it at :root — so the substitution has already happened and the concrete colour is what inherits down.' },
+  { name: '--record-*', type: 'length / weight', default: 'page scale', description: 'The density block. bca-record-header, bca-field-group and bca-field all read these, so a panel sets its scale once on the slot scopes rather than threading a prop through three components.' },
 ];
 ---
 <ComponentDoc
@@ -86,6 +88,70 @@ const hooks = [
     </p>
   </Section>
 
+  <Section id="stacking" title="Stacking: the write surface">
+    <p>
+      Editing opens a <em>second</em> panel over the record rather than a modal
+      beside it. Two overlay grammars on one screen for one record is the thing
+      being avoided; the stack keeps one grammar and shows the relationship —
+      the record you were reading is still there, one card back.
+    </p>
+    <p>
+      Two knobs do all of it, both esa-side-dialog custom properties. The under
+      card re-points <code>--side-dialog-inset</code> to 36px, which the lego
+      animates, so it slides left and peeks out by 20px — the peek is the
+      difference between the two insets, and it has to stay under the lego's
+      24px body padding or the strip shows the first sliver of every label
+      instead of the card's own edge. The top card sets
+      <code>--side-dialog-backdrop-bg: transparent</code>, so the page dims once
+      instead of twice — a second scrim makes the under card read as disabled
+      rather than as a card behind. Both classes come off when the top card
+      closes.
+    </p>
+    <p>
+      That second one has to be the component token and not
+      <code>--color-backdrop</code>. The lego reads
+      <code>var(--side-dialog-backdrop-bg, var(--color-backdrop, …))</code>, and
+      <code>component-tokens.css</code> already sets the component token at
+      <code>:root</code> from the generic one — so the substitution has happened
+      by the time the value reaches a panel, and the generic token has nothing
+      left to redirect.
+    </p>
+    <p>
+      Escape unwinds one level at a time, and that falls out of the lego rather
+      than needing code: it binds Escape to its own panel's
+      <code>keydown</code>, not to the document, and focus moves into whichever
+      card opened last. The same is true of the backdrop — the top card's
+      transparent scrim still sits above the under card's, so an outside click
+      closes one level.
+    </p>
+    <p>
+      The URL carries the record and not the depth. Beacon's drawers are not
+      addressable at all; a link that reopened someone else's half-filled edit
+      form would be a worse contract than no link.
+    </p>
+    <p>
+      Widths match at 520px. A wider top card would cover the peek entirely and
+      the two would read as one panel that changed its mind.
+    </p>
+  </Section>
+
+  <Section id="density" title="Density">
+    <p>
+      The panel runs at beacon-design's drawer scale — a
+      <code>--type-size-400</code> name, 15px values, 14px labels — set once as
+      a block of <code>--record-*</code> custom properties on the two slot
+      scopes. Every record component inside reads them, so a component nested
+      three deep picks up the scale without a <code>density</code> prop in three
+      signatures.
+    </p>
+    <p>
+      The name takes Inter semibold rather than a smaller Crimson Pro. The
+      display serif is the page title's voice, one level up on the same screen,
+      and a second serif line inside a drawer over that page competes with it
+      instead of sitting under it.
+    </p>
+  </Section>
+
   <Section id="behavior" title="Behaviour the lego already handles">
     <p>
       Focus moves into the panel on open and is restored on close, Tab wraps
@@ -106,7 +172,7 @@ const hooks = [
   </Section>
 
   <BcaUserPanel />
-  <BcaUserEditDialog />
+  <BcaUserEditPanel />
   <esa-snackbar-container id="app-toasts"></esa-snackbar-container>
 </ComponentDoc>
 

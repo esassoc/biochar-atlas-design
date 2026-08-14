@@ -19,13 +19,22 @@ interface Props {
   crumbs?: EsaBreadcrumbItem[];
   /** Drives the avatar's initials. Omit to drop the mark entirely. */
   avatarName?: string;
+  /** Mark size. `md` inside the panel, where `lg` outweighs a 20px name. */
+  avatarSize?: 'sm' | 'md' | 'lg';
   /**
    * Heading level. h1 on a page; h2 inside the slide-in panel, where the page
    * already owns the h1 and the panel is a section of it.
    */
   as?: 'h1' | 'h2';
 }
-const { name, context, crumbs, avatarName, as: Heading = 'h1' } = Astro.props as Props;
+const {
+  name,
+  context,
+  crumbs,
+  avatarName,
+  avatarSize = 'lg',
+  as: Heading = 'h1',
+} = Astro.props as Props;
 const hasChips = Astro.slots.has('chips');
 const hasActions = Astro.slots.has('actions');
 ---
@@ -52,7 +61,7 @@ const hasActions = Astro.slots.has('actions');
 
   <div class="bca-record-header__bar">
     <div class="bca-record-header__identity">
-      {avatarName && <EsaAvatar name={avatarName} size="lg" />}
+      {avatarName && <EsaAvatar name={avatarName} size={avatarSize} />}
       <div class="bca-record-header__titles">
         <Heading class="bca-record-header__name">{name}</Heading>
         {context && <p class="bca-record-header__context">{context}</p>}
@@ -90,28 +99,34 @@ const hasActions = Astro.slots.has('actions');
   .bca-record-header__identity {
     display: flex;
     align-items: flex-start;
-    gap: var(--spacing-400, 1rem);
+    gap: var(--record-identity-gap, var(--spacing-400, 1rem));
     min-width: 0;
   }
 
   .bca-record-header__titles {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-200, 0.5rem);
+    gap: var(--record-title-gap, var(--spacing-200, 0.5rem));
     min-width: 0;
   }
 
-  /* Family and weight declared rather than inherited. The theme's Crimson Pro
-     Light rule is scoped to `h1`, and this renders an h2 inside the slide-in
-     panel — so relying on inheritance would give the panel Inter bold and the
-     page a light serif for the same component. Light is stated here, which is
-     the opposite of the trap NEEDS.md records: the problem is a rule pinning
-     600, not a rule pinning the intent. */
+  /* Family, size and weight all declared rather than inherited, and all three
+     overridable through --record-name-*.
+
+     Declared because the theme's Crimson Pro Light rule is scoped to `h1` and
+     this renders an h2 inside the panel, so inheritance would give the panel
+     Inter bold and a page a light serif for the same component.
+
+     Overridable because the panel wants a different answer, not a smaller one:
+     the display serif is the PAGE title's voice — bca-page-header owns it, one
+     level up on the same screen — and a second Crimson Pro line inside a drawer
+     over that page reads as a competing title rather than a subordinate one.
+     The panel takes Inter semibold at Beacon's drawer size. */
   .bca-record-header__name {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: var(--type-size-600, 1.875rem);
-    font-weight: var(--font-weight-light, 300);
+    font-family: var(--record-name-family, var(--font-display));
+    font-size: var(--record-name-size, var(--type-size-600, 1.875rem));
+    font-weight: var(--record-name-weight, var(--font-weight-light, 300));
     letter-spacing: -0.005em;
     line-height: 1.15;
     color: var(--color-text-primary, #21201c);
@@ -119,7 +134,7 @@ const hasActions = Astro.slots.has('actions');
 
   .bca-record-header__context {
     margin: 0;
-    font-size: 1.0625rem;
+    font-size: var(--record-context-size, 1.0625rem);
     line-height: 1.4;
     color: var(--color-text-secondary, #474540);
   }

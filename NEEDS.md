@@ -274,11 +274,34 @@ radius.**
 
 The carve-out is scoped, not general. It travels with the grid module — cells,
 column headers, the control strip above and the count strip below, because he
-called the chunkiness out across all three — and stops there. A record opened
-from the grid returns to the app scale. The floor still holds for every other
-surface, and the four sub-16px fixes in the theme (`--form-font-size-md`,
-esa-pill / esa-badge, the two snackbar labels) stand: he approved those the
-same day, in the same message.
+called the chunkiness out across all three. The floor still holds for every
+other surface, and the four sub-16px fixes in the theme (`--form-font-size-md`,
+esa-pill / esa-badge, the two snackbar labels) stand: he approved those the same
+day, in the same message.
+
+**Widened the same day to include the record panel.** The first pass read the
+carve-out narrowly and returned the record to the app scale; Andy looked at the
+panel over the finished grid and asked for type down throughout it, "the header
+especially, but also the body". So the boundary is not "the grid" but **the
+dense data surfaces** — the grid, and the record panel that reads out of a row.
+The panel runs beacon-design's drawer scale verbatim: a `--type-size-400` name
+(20px), 15px values, 14px labels, 13px chips. The 16px floor still governs page
+content, which is why `bca-page-header` above it is untouched at 36px.
+
+### Columns fill the grid — Andy, 2026-08-14
+Fixed `width` left the six columns stopping two-thirds across with a dead band
+beside "Last active". The house default in `bca-grid.ts` is now `flex: 1` with a
+`minWidth`, and pages set a flex WEIGHT per column; the weights are the old
+widths carried across, so the resting layout is the approved one and only the
+surplus moved.
+
+`flex` rather than `sizeColumnsToFit()`, on two counts. It is declarative — AG
+Grid re-solves on container resize with no `gridSizeChanged` handler, so there
+is nothing to thrash. And it survives a manual drag: `sizeColumnsToFit()` bound
+to a resize event snaps every column back and silently undoes the resize the
+user just made. Measured at 1600px the six columns sum to 1194 against a 1196px
+wrapper; at 760px they hold their floors and the grid scrolls instead of
+crushing an email to five characters.
 
 ### The header is a brand slab — Andy, 2026-08-14
 Also a reversal. The header first shipped as the panel's own surface with dark
@@ -299,9 +322,11 @@ fix.
 `/admin/users/{id}` is deleted. The record opens as `esa-side-dialog` over the
 list, so the grid keeps its scroll, sort and filter state.
 
-- **Width 520px.** Beacon's split across 31 call sites is 520 for a read-only
-  dossier and 640 for a write surface. This one reads; the two editable fields
-  open a separate `esa-dialog` on top.
+- **Width 520px, and the edit panel matches it.** Beacon's split across 31 call
+  sites is 520 for a read-only dossier and 640 for a write surface, but the
+  stack overrides that: the under card peeks by SLIDING, so a wider top card
+  covers the peek entirely and the two read as one panel that changed its mind.
+  permit-tracking uses 640 for both drawers for the same reason.
 - **z-index must be raised on the element.** `esa-side-dialog` is a CUSTOM
   overlay, not a native `<dialog>` — no top layer, and DOM order will not save
   it. This shell's topbar is 1100 and its nav flyout 1200, so the panel runs
@@ -322,14 +347,66 @@ list, so the grid keeps its scroll, sort and filter state.
   `.footer:not(:has(*))` then collapses an empty bar while the button falls into
   the body. This shipped wrong on the first pass and was caught in a screenshot,
   not in the source.
-- **Saving raises an event, it does not write the DOM.** `bca-user-edit-dialog`
-  dispatches `bca:user-updated`; the panel and the grid both listen. That is
-  what makes it impossible for the open record and the row underneath it to
-  disagree — and the grid needs `getRowId` set, or the update has to rebuild
-  `rowData` and loses sort, filter and scroll position.
+- **Saving raises an event, it does not write the DOM.** `bca-user-edit-panel`
+  dispatches `bca:user-updated` carrying the whole person; the panel and the
+  grid both listen and each takes the fields it renders. That is what makes it
+  impossible for the open record and the row underneath it to disagree — and
+  the grid needs `getRowId` set, or the update has to rebuild `rowData` and
+  loses sort, filter and scroll position.
 - **Role and Status are chips in the identity band and plain values in the
   Access group.** They used to be chips in both. In 520px the same chip twice
   reads as the panel emphasising something.
+- **Density is a block of `--record-*` custom properties, not a prop.** Set once
+  on the two slot scopes and inherited by `bca-record-header`,
+  `bca-field-group` and `bca-field`, so a component nested three deep picks up
+  the panel scale without the same value appearing in three signatures.
+- **The panel's name is Inter semibold, not a smaller Crimson Pro.** The display
+  serif is the PAGE title's voice, and `bca-page-header` owns it one level up on
+  the same screen. A second serif line inside a drawer over that page competes
+  with the title instead of sitting under it. One display face per surface.
+
+### The edit surface is a stacked panel, not a modal — Andy, 2026-08-14
+"Get rid of that modal, which looks busted." A centred `esa-dialog` over a
+right-hand drawer put two overlay grammars on one screen for one record.
+`bca-user-edit-dialog` is deleted; `bca-user-edit-panel` is a second
+`esa-side-dialog` that stacks. Mechanics ported from beacon-design's
+`prototypes/permit-tracking.astro` (segment dossier → permit editor), which is
+the same shape.
+
+- **Two knobs, both esa-side-dialog custom properties.** The under card
+  re-points `--side-dialog-inset` (the lego animates it and explicitly supports
+  a host changing it while open); the top card kills its own backdrop.
+- **The peek is the DIFFERENCE between the two insets, and it must stay under
+  24px.** That is the lego's header / body / footer padding. Beacon's 44px
+  against a default 16 exposes 28px, so the last 4px are the first sliver of
+  every label — a column of clipped glyph fragments down the left edge, which
+  reads as a rendering fault rather than as a card behind. This spoke uses
+  **36px, a 20px peek**, which lands entirely inside the padding so the strip is
+  the card's own surface and its rounded corner. permit-tracking has the same
+  28px overhang today; it is masked there by the backdrop bug below.
+- **It has to be `--side-dialog-backdrop-bg`, not `--color-backdrop`.** See the
+  hub-gaps section — this one is a token-architecture trap, and Beacon is
+  currently on the wrong side of it.
+- **z-index above the record panel:** `--z-modal: 1340; --z-modal-backdrop:
+  1310` against the record's 1300 / 1250.
+- **Escape unwinds one level, for free.** The lego binds Escape to its own
+  panel's `keydown` rather than to the document, and focus moves into whichever
+  card opened last — so nothing had to be written to keep the two from
+  collapsing together. The same is true of the backdrop: the top card's
+  transparent scrim still sits above the under card's, so an outside click
+  closes one level. Verified over CDP.
+- **The URL carries the record, never the depth.** `?user=` does not change when
+  the editor opens. Beacon's drawers are not addressable at all; a link that
+  reopened someone else's half-filled edit form is a worse contract than no
+  link.
+- **All six editable fields, not the two the modal showed.** Name, email, job
+  title, organization, role, status. `id`, `memberSince`, `lastActive` and
+  `invitedBy` stay read-only in the panel underneath rather than appearing as
+  disabled inputs — a disabled control invites a click and answers with nothing,
+  where a value on the record behind reads as what it is. This **reverses** the
+  first pass's "scoped to what an administrator owns" argument: it was about who
+  owns the fact, but this is an admin console with no directory behind it, so
+  the fields have nowhere else to be edited.
 
 ### Colour marks the exception, not the value
 Andy asked whether cell status chips should be coloured by status. They are,
@@ -369,15 +446,15 @@ in a cell and in the record.
   three tones in both. **Hub gap:** the legos that appear in data grids across
   every spoke — pill, badge, icon — need Lit twins, or the hub needs a
   documented "grid cell" CSS layer.
-- **The edit dialog is scoped to what an administrator owns.** Role and status
-  only. Name, email, organization and job title belong to the person and arrive
-  from the directory; an admin editing them would be changing a fact about a
-  colleague rather than a permission.
 - **No Deactivated row in the fixture.** Nobody on the real project team has
   been deactivated, and inventing a person to demonstrate a state would put an
-  unmodeled name in the data. The state is reachable through the edit dialog
+  unmodeled name in the data. The state is reachable through the edit panel
   instead. If the grid needs to show it at rest, that is a fixture decision for
   Andy, not one to make quietly.
+- **Myles Gray, not Miles.** ABI's Executive Director. Corrected 2026-08-14 in
+  the display name, the email local part AND the record `id` — the id is the
+  `?user=` slug, so leaving it would keep the misspelling in the one place a
+  reader actually sees it.
 
 ## The admin page-title treatment (2026-08-14)
 `bca-page-header` is the pattern every admin page uses — not a one-off on Users.
@@ -501,6 +578,31 @@ they inherit the face at all. Making Light stick everywhere is a heading pass
 over the components, not a token change.
 
 ## Hub gaps found while building (candidates to promote)
+- **A component token set at `:root` from a generic one kills the generic one's
+  reach.** `esa-side-dialog` reads
+  `var(--side-dialog-backdrop-bg, var(--color-backdrop, rgba(0,0,0,.5)))`, which
+  reads as "set either". It is not. `component-tokens.css` line 417 declares
+  `--side-dialog-backdrop-bg: var(--color-backdrop, …)` at `:root`, so the
+  substitution happens ONCE, there, and the concrete colour is what inherits
+  down. By the time it reaches a panel there is no fallback chain left to
+  redirect, and setting `--color-backdrop` on the element does nothing at all.
+  Measured: the backdrop stayed `rgba(0,0,0,.5)` with the override applied and
+  no error anywhere. **This is not local to side-dialog** — `--dialog-backdrop-bg`
+  and `--confirm-dialog-backdrop-bg` are declared the same way, so the same trap
+  is set on three components. **beacon-design is on the wrong side of it
+  today:** `prototypes/permit-tracking.astro` sets `--color-backdrop:
+  transparent` on its stacked editor and loads the same token file, so its stack
+  double-dims. **Hub fix:** leave a component token undeclared when its only
+  value is the generic fallback, or document that the component token is the
+  only per-element lever. The generic-token fallback in the component's own CSS
+  is a promise the token file breaks.
+- **`esa-avatar`'s initials and hue cannot be re-derived at runtime.** Both are
+  computed in the `.astro` frontmatter — first + last initial, and a string-hash
+  hue — so a surface that renames a record has to reimplement two functions to
+  keep the disc in step, and any drift between the two copies is invisible until
+  someone notices the wrong letters. `bca-user-panel` carries a copy for exactly
+  this. **Hub fix:** export both from a plain `.ts` module the `.astro` lego
+  imports, so a consumer can import the same two functions.
 - **`esa-page-header` cannot put a glyph on the title's line.** Its `icon` prop
   is EYEBROW-only (`{icon && <EsaIcon name={icon} size="sm" />}` inside the
   eyebrow `<p>`), its `title` is a string prop with no slot, and its two slots

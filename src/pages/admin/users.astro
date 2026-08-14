@@ -7,17 +7,17 @@ import AppShell from '../../layouts/AppShell.astro';
 import BcaPageHeader from '../../components/bca/bca-page-header.astro';
 import BcaUserGrid from '../../components/bca/bca-user-grid.astro';
 import BcaUserPanel from '../../components/bca/bca-user-panel.astro';
-import BcaUserEditDialog from '../../components/bca/bca-user-edit-dialog.astro';
+import BcaUserEditPanel from '../../components/bca/bca-user-edit-panel.astro';
 import EsaButton from '@esa/ecology/esa-button.astro';
 ---
 
 <!-- manifest:
-  layout: AppShell > stack(lg) spine       # Atlas app shell + sidenav
+  layout: AppShell > stack(lg) spine      # Atlas app shell + sidenav
   sections:
-    - page header  -> bca-page-header      # glyph, title, the Invite user action
-    - user list    -> bca-user-grid        # control strip, AG Grid, record count
-    - user record  -> bca-user-panel       # the slide-in record, ?user=<id>
-    - edit         -> bca-user-edit-dialog # role + status, the admin-owned pair
+    - page header  -> bca-page-header     # glyph, title, the Invite user action
+    - user list    -> bca-user-grid       # control strip, AG Grid, record count
+    - user record  -> bca-user-panel      # the slide-in record, ?user=<id>
+    - edit         -> bca-user-edit-panel # the write surface, stacked over it
 -->
 
 <AppShell title="Users — Biochar Atlas" activeNavId="admin-users">
@@ -32,7 +32,7 @@ import EsaButton from '@esa/ecology/esa-button.astro';
   </div>
 
   <BcaUserPanel />
-  <BcaUserEditDialog />
+  <BcaUserEditPanel />
   <esa-snackbar-container id="app-toasts"></esa-snackbar-container>
 </AppShell>
 

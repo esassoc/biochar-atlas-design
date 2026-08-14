@@ -31,17 +31,24 @@ const display = value === null || value === undefined || value === '' ? '—' : 
     display: contents;
   }
 
+  /* Both sizes come through inherited custom properties rather than a prop.
+     A record surface sets its density once on the container — see the
+     --record-* block in bca-user-panel.astro — and every field inside picks it
+     up, including fields nested in components this one knows nothing about.
+     Threading a `density` prop through bca-field-group to reach here would put
+     the same value in three signatures. The fallbacks are the page scale. */
   .bca-field__label {
     margin: 0;
-    font-size: 1rem;
+    font-size: var(--record-label-size, 1rem);
     line-height: 1.5;
     color: var(--color-text-secondary, #474540);
   }
 
   .bca-field__value {
     margin: 0;
-    font-size: 1rem;
+    font-size: var(--record-value-size, 1rem);
     line-height: 1.5;
+    font-weight: var(--record-value-weight, 400);
     color: var(--color-text-primary, #21201c);
     min-width: 0;
     overflow-wrap: anywhere;
