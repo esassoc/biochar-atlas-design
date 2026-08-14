@@ -618,7 +618,8 @@
        worst adjacent pair       0.107  (deuteranopia, 2→3)
        closest pair, ANY two     0.036  (protanopia,   2 vs 4)
        scale ends, 1 vs 5        0.106  (protanopia)
-       worst step vs surface     0.034  (tritanopia, step 3 vs the track)
+       worst step vs surface     0.042  (tritanopia, step 3 vs the track,
+                                        after the track moved to neutral-5)
        lightness span            0.583  (L 0.318 → 0.901), NON-monotonic
        relative luminance        0.152 · 0.477 · 0.744 · 0.347 · 0.035
 
@@ -661,17 +662,18 @@
      ramp's anchor, not a spare red. This RETIRES the previous block's claim
      that the bar ramp "does not mint a private red": it does now, on purpose.
 
-     Step 3 against the track is the tight pair at 0.034 — above the floor,
-     not comfortably. The mechanism: #e7e579 sits at L 0.901 and the track at
-     L 0.898. In normal vision chroma separates them (C 0.131 vs 0.005); under
-     tritanopia the yellow's chroma collapses toward the neutral axis and
-     lightness, the fallback, carries nothing. The step's lightness is fixed,
-     so the track is the only movable side.
-     RECOMMENDED, NOT APPLIED — the track is settled separately and not ours
-     to move quietly: --bca-bar-track → --bca-neutral-5 (#d8d7d4) takes the
-     pair to 0.042 and stays inside the surface band (3–5). neutral-6 reaches
-     0.060 but draws an empty bar at border weight, which reads as
-     filled-with-grey rather than empty.
+     Step 3 against the track is the binding pair, and the track moved for it.
+     The mechanism: #e7e579 sits at L 0.901 and neutral-4 at L 0.898. In normal
+     vision chroma separates them (C 0.131 vs 0.005); under tritanopia the
+     yellow's chroma collapses toward the neutral axis and lightness, the
+     fallback, carries nothing. The step's lightness is fixed by the ramp, so
+     the track was the only movable side. Moved neutral-4 → neutral-5 (#dedddb
+     → #d8d7d4) 2026-08-14: the pair goes 0.034 → 0.042 and the track stays
+     inside the surface band. neutral-6 reaches 0.060 but IS the card border
+     (ΔE 0.000), so an empty bar would draw at border weight and read as
+     filled-with-grey rather than empty. neutral-5 sits 0.025 off the border —
+     distinct at rest, and 0.105 off the panel, so the track still reads as a
+     track.
 
      On sharing a screen with --bca-soh-*: this ramp overlaps the map ramp's
      gold band, where ramp 2 did not. Three pairs now sit under 0.075 —
@@ -685,7 +687,7 @@
   --bca-bar-3: #e7e579;  /* L 0.901  C 0.131  H 107.8 — the held peak; lightest step */
   --bca-bar-4: #77af1c;  /* L 0.689  C 0.176  H 129.6 */
   --bca-bar-5: #033e16;  /* L 0.318  C 0.088  H 148.4 — the sunk green */
-  --bca-bar-track: var(--bca-neutral-4);
+  --bca-bar-track: var(--bca-neutral-5);  /* moved up one step for step 3 — see above */
 
   /* ═══ RECOMMENDATION BADGES ═══════════════════════════════════════════
      Four categorical values, and they share a page with the map ramp — so

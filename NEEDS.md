@@ -170,16 +170,18 @@ else from them. Extending with lighter/darker steps is the agreement with ABI
   This **retires** the ramp-2 claim that the bar block "does not mint a private
   red": it does now, on purpose.
 
-  **Open recommendation, not applied — `--bca-bar-track`.** Step 3 clears the
-  track by only 0.034 (tritanopia). `#e7e579` sits at L 0.901 and the track at
-  L 0.898; in normal vision chroma separates them (C 0.131 vs 0.005), but
-  under tritanopia the yellow's chroma collapses toward the neutral axis and
-  lightness carries nothing. The step's lightness is fixed by the ramp, so the
-  track is the only movable side. Moving it to `--bca-neutral-5` (`#d8d7d4`)
-  takes the pair to 0.042 and stays inside the surface band (3–5);
-  `--bca-neutral-6` reaches 0.060 but draws an empty bar at border weight,
-  which reads as filled-with-grey. The track was settled separately and is not
-  changed here.
+  **The track moved for step 3, 2026-08-14.** `--bca-bar-track` goes
+  `--bca-neutral-4` → `--bca-neutral-5` (`#dedddb` → `#d8d7d4`), taking the
+  step-3 pair from 0.034 to 0.042 (tritanopia). The mechanism: `#e7e579` sits
+  at L 0.901 and neutral-4 at L 0.898; in normal vision chroma separates them
+  (C 0.131 vs 0.005), but under tritanopia the yellow's chroma collapses toward
+  the neutral axis and lightness carries nothing. The step's lightness is fixed
+  by the ramp, so the track was the only movable side. `--bca-neutral-6`
+  reaches 0.060 but IS the card border (ΔE 0.000), so an empty bar would draw
+  at border weight and read as filled-with-grey; neutral-5 sits 0.025 off the
+  border and 0.105 off the panel, so an empty track still reads as a track.
+  Step 3 vs the track remains the ramp's binding pair — anything that relights
+  either side re-opens this.
 
   Against the SOH map ramp, ramp 3 overlaps the gold band where ramp 2 did
   not: three pairs now under 0.075 (bar-2/soh-2 at 0.072, bar-3/soh-1 at
