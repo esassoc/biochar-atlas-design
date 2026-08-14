@@ -114,9 +114,35 @@ else from them. Extending with lighter/darker steps is the agreement with ABI
   proposal-era mock. Corrected 2026-08-13.
 - Functional scales: `--bca-soh-1..5` (the map's 5 discrete suitability
   classes, a Gold→Green path that clears worst-case colorblind ΔE 0.120 per
-  adjacent pair), `--bca-bar-1..5` (continuous 0–100, single-hue — the dev
-  guide's red→yellow→green collapses to ΔE 0.051 under deuteranopia), and
-  `--bca-badge-*` (4 recommendation values: one neutral fill, hue in the ink).
+  adjacent pair), `--bca-bar-1..5` (continuous 0–100 — conventional
+  red→yellow→green, ordered by LIGHTNESS), and `--bca-badge-*` (4
+  recommendation values: one neutral fill, hue in the ink).
+- **The bar ramp was reversed on 2026-08-14.** It first shipped single-hue
+  (cream→green, `#fceeda … #364500`), chosen because the dev guide's own
+  red→yellow→green screenshot collapses to ΔE 0.051 under deuteranopia. Andy
+  weighed that and took the conventional ramp anyway — same reasoning as the
+  status decision the day before: a red-to-green score bar is a convention the
+  user arrives already knowing. The single-hue path is not lost; it is in git
+  and measured above. What the reversal costs, measured: worst-case adjacent
+  pair 0.103 (deuteranopia) vs 0.141, and scale ends 0.433 (protanopia) vs
+  0.580 — down 27% and 25%, both still clearing the 0.020 perceptual floor by
+  5× and 21×. What it does not cost is the guide's actual failure: drawn
+  conventionally the ramp is non-monotonic in lightness (span 0.082), its
+  worst pair is 0.047 and steps 1 and 4 sit 0.023 apart under deuteranopia.
+  Carrying the order in lightness instead (L 0.807 → 0.322, no reversal, min
+  adjacent ΔL 0.102) makes this build 2.2× better adjacent and 9.2× better at
+  the ends, and greyscale-safe besides. The ABI palette has no red, so this
+  ramp is deliberately NOT brand-derived: steps 1/3/5 are the hub's Radix
+  `--color-red-7` / `--color-yellow-11` / `--color-green-12`, the same borrow
+  the status block makes; steps 2 and 4 are the two spoke literals, re-lit at
+  their family's own hue and chroma onto the lightness grid. **The score
+  numeral must always accompany the bar** — after this reversal, WCAG 1.4.1
+  is load-bearing, not belt-and-braces. Step 1 is red-7 rather than the wider
+  red-6 because red-6 sits ΔE 0.044 from `--bca-bar-track` under deuteranopia
+  and a low score would read as an empty bar; the track, not the chrome, is
+  the binding surface check (every step clears canvas, panel, sidenav and
+  topbar by ΔE ≥ 0.144). Nearest neighbour on the SOH map ramp is step 5 at
+  ΔE 0.075 — both dark greens, separated by hue (164° vs 122°) and by role.
 - Provenance separates by weight here and by SHAPE in the component — color is
   already spoken for by the rating classes.
 - **Tone inks and hovers are mapped, not inherited.** Our solids sit at step 11

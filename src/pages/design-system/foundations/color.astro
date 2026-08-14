@@ -73,11 +73,12 @@ const suitability = [
   { step: 'n/a', value: '#dedddb', token: 'bca-soh-nodata' },
 ];
 const bars = [
-  { step: '1', value: '#fceeda', token: 'bca-bar-1' },
-  { step: '2', value: '#ccbfa0', token: 'bca-bar-2' },
-  { step: '3', value: '#9a9369', token: 'bca-bar-3' },
-  { step: '4', value: '#686b36', token: 'bca-bar-4' },
-  { step: '5', value: '#364500', token: 'bca-bar-5' },
+  { step: '1', value: '#f4a9aa', token: 'bca-bar-1' },
+  { step: '2', value: '#e17e30', token: 'bca-bar-2' },
+  { step: '3', value: '#ab6400', token: 'bca-bar-3' },
+  { step: '4', value: '#165c3e', token: 'bca-bar-4' },
+  { step: '5', value: '#193b2d', token: 'bca-bar-5' },
+  { step: 'track', value: '#dedddb', token: 'bca-bar-track' },
 ];
 
 // Cartography + badge accents — single-purpose spoke tokens.
@@ -194,10 +195,22 @@ const accents = [
     </p>
     <ColorScale name="SOH-BC suitability — 5 discrete map classes" steps={suitability} />
     <p>
-      The <strong>bar</strong> scale is continuous 0–100 indicator scores, single-hue with
-      lightness doing the work. The developer guide's screenshots show a red→yellow→green
-      gradient; its two ends collapse to ΔE 0.051 under deuteranopia, which makes the two
-      readings that matter most the same color. This path holds 0.580 worst-case.
+      The <strong>bar</strong> scale is continuous 0–100 indicator scores: conventional
+      red→yellow→green, ordered by lightness rather than by hue. Under protanopia and
+      deuteranopia the red-to-green axis carries no information, so value does all the work —
+      lightness runs 0.807 down to 0.322 with no reversal, and relative luminance descends
+      0.505 → 0.035, which is what lets the ramp survive greyscale printing too. Worst-case
+      adjacent pair is ΔE 0.103 (deuteranopia) and the scale ends hold 0.433 (protanopia).
+      Drawn the way the developer guide screenshots it — saturated red, bright yellow, mid
+      green — the same ramp is non-monotonic, its worst pair measures 0.047, and steps 1 and 4
+      land 0.023 apart under deuteranopia.
+    </p>
+    <p>
+      Step 1 is Radix red-7 rather than the lighter red-6 because of the track it sits in:
+      red-6 measures ΔE 0.044 against <code>bca-bar-track</code> under deuteranopia, so a low
+      score would read as an empty bar. Steps 1, 3 and 5 are hub primitives; 2 and 4 are re-lit
+      onto the lightness grid where the primitive layer has no rung. <strong>The score numeral
+      always accompanies the bar</strong> — color is never the sole carrier (WCAG 1.4.1).
     </p>
     <ColorScale name="Indicator bars — continuous 0–100" steps={bars} />
   </Section>

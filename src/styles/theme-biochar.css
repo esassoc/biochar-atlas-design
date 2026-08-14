@@ -499,15 +499,73 @@
   --bca-soh-nodata: var(--bca-neutral-4);
 
   /* ═══ INDICATOR BARS — continuous 0–100 ═══════════════════════════════
-     Single-hue, lightness-carried. The developer guide's screenshots show a
-     red→yellow→green gradient (called "a rough idea" there); its two ends
-     collapse to ΔE 0.051 under deuteranopia — the two readings that matter
-     most become the same color. This path holds 0.580 worst-case. */
-  --bca-bar-1: #fceeda;
-  --bca-bar-2: #ccbfa0;
-  --bca-bar-3: #9a9369;
-  --bca-bar-4: #686b36;
-  --bca-bar-5: #364500;
+     Conventional red→yellow→green, ordered by LIGHTNESS. Andy chose this on
+     2026-08-14 over the colorblind-safer single-hue path that shipped first
+     (cream→green, worst-case adjacent ΔE 0.141) — the same call he made for
+     status on 2026-08-13: a red-to-green score bar is a convention users
+     arrive already knowing, and the ABI palette has no red to spell it with
+     (all nine chromatic brand colors sit at OKLCH hue 67–150 except Purple at
+     335; the 0–60 band is empty). So this ramp is deliberately NOT
+     brand-derived. Steps 1, 3 and 5 are the hub's own Radix primitives —
+     red-7, yellow-11, green-12 — the same borrow the status block makes, so
+     the theming contract holds: this block re-points SEMANTICS, it does not
+     mint a private red. Steps 2 and 4 are the two literals, each taken at its
+     family's own hue and chroma and re-lit onto the lightness grid, because
+     the primitive layer has no rung there.
+
+     What the reversal costs, measured (Machado 2009 CVD simulation, OKLab ΔE):
+
+       worst-case adjacent pair   0.103  (deuteranopia, 4→5)
+                                  0.105 protanopia · 0.109 tritanopia
+       scale ends, worst case     0.433  (protanopia)
+       lightness span             0.485  (L 0.807 → 0.322), strictly
+                                  monotonic, min adjacent ΔL 0.102
+
+     Against 0.141 / 0.580 for the single-hue path this replaces: adjacent
+     separation drops 27%, end separation 25%. Both still clear the 0.020
+     perceptual floor by 5× and 21×.
+
+     What it does NOT cost is the thing that made the guide's own screenshot
+     (p.37, described there as "a rough idea") unusable. Drawn conventionally
+     — saturated red, orange, bright yellow, mid green, dark green — that ramp
+     is non-monotonic in lightness (span 0.082, yellow being the LIGHTEST
+     step), its worst adjacent pair measures 0.047, its ends collapse to 0.047
+     under protanopia, and steps 1 and 4 land 0.023 apart under deuteranopia —
+     the same color. This ramp is 2.2× better adjacent and 9.2× better at the
+     ends because lightness, not hue, does the ordering: under protanopia and
+     deuteranopia the red→green axis carries no information at all, so hue is
+     decorative there and value is the whole signal. Relative luminance runs
+     0.505 → 0.311 → 0.178 → 0.082 → 0.035, so the ramp also survives
+     greyscale printing, which the guide's version does not.
+
+     Step 1 is red-7, not the lighter red-6, and the bar's own track is why.
+     A wider span (red-6 at L 0.857) measures better in isolation — 0.122
+     worst-case — but red-6 sits ΔE 0.044 from the track under deuteranopia,
+     so a low score reads as an EMPTY bar to the reader it most needs to
+     reach. Red-7 holds 0.091 there. The track pair is the binding surface
+     check, not the chrome: every step clears canvas, panel, sidenav and
+     topbar by ΔE ≥ 0.144.
+
+     Mitigation, and it is not optional: the score numeral must always
+     accompany the bar. Color is never the sole carrier of the score
+     (WCAG 1.4.1), and after this reversal that requirement is load-bearing
+     rather than belt-and-braces.
+
+     On sharing a screen with --bca-soh-*: the map ramp is a Gold→Green olive
+     path (hue 80–122) and this one runs red→orange→gold→blue-green (hue
+     18–165). Steps 1–2 are unambiguous — the map ramp has nothing in the
+     red/orange band. Step 5 is the near pair at ΔE 0.075: both are dark
+     greens, separated by hue (164° here vs 122° for brand Green) and by
+     context — the map ramp only ever paints polygons, this one only ever
+     fills a track. Step 3 is ΔE 0.021 from --bca-status-amber-11 and step 5
+     IS --color-green-12, which the theme already spells success with; both
+     are deliberate, and a mid score reading as the caution amber is the
+     reading we want. */
+  --bca-bar-1: var(--color-red-7);     /* #f4a9aa  L 0.807  C 0.089  H  18.3 */
+  --bca-bar-2: #e17e30;                /*          L 0.690  C 0.151  H  54.4 — orange-8's hue+chroma, re-lit */
+  --bca-bar-3: var(--color-yellow-11); /* #ab6400  L 0.571  C 0.129  H  63.9 */
+  --bca-bar-4: #165c3e;                /*          L 0.424  C 0.085  H 160.3 — green-11's hue, re-lit and re-chroma'd */
+  --bca-bar-5: var(--color-green-12);  /* #193b2d  L 0.322  C 0.048  H 164.5 */
   --bca-bar-track: var(--bca-neutral-4);
 
   /* ═══ RECOMMENDATION BADGES ═══════════════════════════════════════════
