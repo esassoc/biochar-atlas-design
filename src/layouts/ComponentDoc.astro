@@ -30,7 +30,11 @@ const importLine =
   <h1>{name}</h1>
   <p class="lede" set:html={summary} />
   <div class="meta-row">
-    <span class="pill pill--stable">Inherited</span>
+    {/* Plain pill, not the shell's `pill--stable`. That modifier tints itself
+        with the success tokens, which put a pale green fill behind a word that
+        states provenance rather than health — and pale green is not an accent
+        this brand uses. The status tints stay available for actual status. */}
+    <span class="pill">Inherited</span>
     <span class="pill">{type}</span>
     <code class="imp">{importLine}</code>
   </div>

@@ -289,6 +289,11 @@ over the components, not a token change.
   measure 2.18:1 against a light canvas — below WCAG 1.4.11's 3.0. Overridden
   here; the hub fix is for `component-tokens.css` to leave the focus ring
   chained to primary. (2.14:1 against the shell's current canvas.)
+- `@esa/docs` offers exactly one pill modifier, `pill--stable`, and it tints
+  itself with the success tokens — so a non-status label (provenance, kind,
+  version) either shouts status green or goes fully plain. This spoke's
+  "Inherited" pill went plain. Hub fix: a neutral emphasis modifier, or let the
+  pill take its tone as a prop.
 - `@esa/docs` DocsShell hardcodes `font-weight: 600` on `.article h1` and `h2`
   while reading `--font-display` for the family — so a brand can set the face
   but not the weight. Hub fix: read `--font-weight-*` tokens there too.
