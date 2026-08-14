@@ -158,13 +158,11 @@ at `/suitability-tool`, holding `bca-coming-soon`.
   sidenav. The disabled block MUST stay after the `.nav-section__header >
   .esa-icon:first-child` rule: both weigh 0,2,0, so source order is the only
   thing muting the icon, and that icon is the entire signal on the rail.
-- **Still hardcoded: `<nav class="side-nav collapsed">`.** The shell now ships
-  collapsed by default, which hides the lockup, the nav hierarchy and the
-  inert sections — everything this pass added. Flipping it means editing the
-  `.sidebar-toggle` button's class and aria state, which `check-component-first`
-  blocks as a styled `<button class=…>`; left for a call on whether that button
-  becomes `esa-icon-button` or takes a lego-check.
+- **The shell ships EXPANDED** as of 2026-08-13. It shipped collapsed first,
+  which hid the lockup, the nav hierarchy and the inert sections — everything
+  the pass had just added — behind a click.
 - The workflow stepper's own treatment remains out of scope — wireframe work.
+
 
 ## Heading weight is component-owned (follow-up)
 The theme declares Crimson Pro Light on `h1`, but the weight only lands where
@@ -183,6 +181,18 @@ over the components, not a token change.
   is a whole filter surface. Beacon built `BcnSearchTrigger`, cb-fish built
   `cbf-search-field`, and this spoke now has `bca-global-search`: three
   independent spokes solving the same shape, which is the promotion signal.
+- No `esa-*` lego is a **disclosure icon-button**, which is why the sidebar
+  toggle stays hand-rolled under a lego-check. `esa-icon-button` renders exactly
+  `<Tag class aria-label title><EsaIcon name size/></Tag>` with no rest-spread,
+  so it takes no `id` and — the load-bearing one — cannot carry `aria-expanded`.
+  A disclosure control has to ship its state in server-rendered markup, not
+  acquire it on first click. It also forwards no `paths` (so `panel-left`, which
+  is outside esa-icon's built-in registry, is unreachable) and exposes no hook on
+  its inner icon, which this control needs to mirror the glyph on state. Not a
+  spoke quirk: `beacon-design/src/layouts/AppShell.astro` ships the identical
+  hand-rolled button and reserves `EsaIconButton` for its plain admin link. The
+  reusable home is a hub-level `esa-disclosure-button` — icon-only,
+  `aria-expanded`, forwardable `paths`, class hook on the glyph.
 - `--focus-ring-color` is defined twice in `@esa/tokens` and the second one
   wins: `tokens.css` sets it to `--color-primary` (correct — it follows the
   theme), then `component-tokens.css` re-points it to `--color-border-focus`,

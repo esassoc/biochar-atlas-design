@@ -1,7 +1,7 @@
 ---
-// Biochar Atlas — Home. A mark-forward hub on warm paper: the leaf mark in
-// ABI Green, then the three layers of the repo — the App Shell and the Design
-// System (both live) and the Pattern Library (coming soon).
+// Biochar Atlas — Home. A mark-forward hub on warm paper: the ABI symbol,
+// then the three layers of the repo — the App Shell and the Design System
+// (both live) and the Pattern Library (coming soon).
 import BaseLayout from '../layouts/BaseLayout.astro';
 import EsaButton from '@esa/ecology/esa-button.astro';
 import { withBase } from '../lib/base';
@@ -10,7 +10,12 @@ import { withBase } from '../lib/base';
   <main class="home">
     <header class="hero">
       <div class="hero__mark">
-        <svg width="104" height="104" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+        <img
+          src={withBase('/abi-logo-symbol-alpha.png')}
+          width="1240"
+          height="1246"
+          alt=""
+        />
       </div>
       <h1 class="hero__title">Biochar Atlas</h1>
       <p class="hero__tagline">
@@ -39,7 +44,13 @@ import { withBase } from '../lib/base';
     </section>
 
     <footer class="home__foot">
-      <svg class="home__foot-mark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+      <img
+        class="home__foot-mark"
+        src={withBase('/abi-logo-symbol-alpha.png')}
+        width="1240"
+        height="1246"
+        alt=""
+      />
       <span>A spoke of the ESA Ecology design system</span>
     </footer>
   </main>
@@ -47,7 +58,7 @@ import { withBase } from '../lib/base';
   <style>
     .home { max-width: 1040px; margin: 0 auto; padding: 0 var(--spacing-500, 24px); }
 
-    /* ---- Hero — the leaf, big and ABI Green on warm paper ---- */
+    /* ---- Hero — the ABI symbol, big on warm paper ---- */
     .hero {
       display: flex;
       flex-direction: column;
@@ -56,14 +67,16 @@ import { withBase } from '../lib/base';
       padding: var(--spacing-900, 96px) 0 var(--spacing-800, 64px);
     }
     .hero__mark {
-      color: var(--color-primary, #364500);
       line-height: 0;
-      /* No tinted halo. Green at tint weight on this palette is a yellow-green
-         (#eef7dc) and reads as a highlighter smudge behind the mark; the
-         drop-shadow alone carries the depth. */
-      padding: var(--spacing-700, 48px);
-      margin: calc(-1 * var(--spacing-500, 24px)) 0 var(--spacing-400, 16px);
-      filter: drop-shadow(0 8px 24px color-mix(in srgb, var(--color-primary, #364500) 18%, transparent));
+      margin: 0 0 var(--spacing-500, 24px);
+    }
+    /* As issued: full color, no tint, no halo, no drop-shadow. The placeholder
+       leaf that stood here was monochrome line art and took a green shadow to
+       gain depth; the real mark supplies its own — Green dots around a Gold
+       center — and an effect layered under it reads as a smudge. */
+    .hero__mark img {
+      width: 104px;
+      height: auto;
     }
     .hero__title {
       margin: 0;
@@ -108,7 +121,7 @@ import { withBase } from '../lib/base';
     .layer--soon { background: var(--color-surface-sunken, #f3f1ea); }
     .layer__status {
       display: inline-flex; align-items: center; gap: var(--spacing-150, 6px);
-      font-size: 14px; font-weight: var(--font-weight-medium, 500);
+      font-size: 16px; font-weight: var(--font-weight-medium, 500);
     }
     .layer__status .dot { width: 8px; height: 8px; border-radius: 50%; }
     .layer__status--live { color: var(--color-success, #2e7d4f); }
@@ -140,9 +153,11 @@ import { withBase } from '../lib/base';
       padding: var(--spacing-500, 24px) 0 var(--spacing-800, 64px);
       border-top: 1px solid var(--color-border, #ddd9d0);
       color: var(--color-text-muted, #807c73);
-      font-size: 14px;
+      font-size: 16px;
     }
-    .home__foot-mark { color: var(--color-primary, #234a31); flex: none; }
+    /* 24px, not the 20px the line-art placeholder used: this mark is a cluster
+       of discrete dots and it silts up at the smaller size. */
+    .home__foot-mark { width: 24px; height: auto; flex: none; }
 
     @media (max-width: 720px) {
       .layers, .proto-list { grid-template-columns: 1fr; }

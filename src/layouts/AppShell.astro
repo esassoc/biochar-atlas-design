@@ -228,12 +228,27 @@ if (activeNavId) {
     <header class="topbar">
       <!-- Left: sidebar toggle -->
       <div class="topbar__left">
+        <!-- bcn-lego-checked: esa-icon-button cannot host this control, and the
+             reasons are structural rather than stylistic. It renders exactly
+             `<Tag class aria-label title><EsaIcon name size/></Tag>` with no
+             rest-spread, so (a) there is no `id` for the script's hook, (b) it
+             cannot carry `aria-expanded`, which a disclosure control must ship
+             in server-rendered markup rather than acquire on first click, (c) it
+             forwards no `paths`, and this glyph — Lucide `panel-left` — is not
+             in esa-icon's built-in registry, and (d) the icon mirrors on state
+             via .sidebar-toggle__icon, and the lego exposes no hook on its inner
+             icon. Beacon hit (c) for its ESA-Config control and hit ALL of these
+             for its own sidebar toggle: beacon-design/src/layouts/AppShell.astro
+             ships the identical hand-rolled button and reserves EsaIconButton
+             for its plain admin link. Checked Ecology + Beacon; the reusable
+             home for this is a hub-level esa-disclosure-button that does not
+             exist yet. Filed in NEEDS.md. -->
         <button
           type="button"
-          class="sidebar-toggle sidebar-toggle--collapsed"
+          class="sidebar-toggle"
           id="sidebar-toggle"
-          aria-label="Expand sidebar"
-          aria-expanded="false"
+          aria-label="Collapse sidebar"
+          aria-expanded="true"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -290,7 +305,10 @@ if (activeNavId) {
     <!-- ═══ BODY (sidenav + content) ═══ -->
     <div class="modern-layout__body">
       <!-- ─── side nav ─── -->
-      <nav class="side-nav collapsed" id="side-nav">
+      <!-- Expanded by default: the nav hierarchy, the Atlas lockup and the
+           inert roadmap sections are the demo. Collapsed-first hid all three
+           behind a click. -->
+      <nav class="side-nav" id="side-nav">
         <div class="sidebar-header">
           <a href={withBase('/')} class="brand" aria-label="Biochar Atlas home">
             <img
