@@ -19,8 +19,13 @@ interface Props {
   crumbs?: EsaBreadcrumbItem[];
   /** Drives the avatar's initials. Omit to drop the mark entirely. */
   avatarName?: string;
+  /**
+   * Heading level. h1 on a page; h2 inside the slide-in panel, where the page
+   * already owns the h1 and the panel is a section of it.
+   */
+  as?: 'h1' | 'h2';
 }
-const { name, context, crumbs, avatarName } = Astro.props as Props;
+const { name, context, crumbs, avatarName, as: Heading = 'h1' } = Astro.props as Props;
 const hasChips = Astro.slots.has('chips');
 const hasActions = Astro.slots.has('actions');
 ---
@@ -49,7 +54,7 @@ const hasActions = Astro.slots.has('actions');
     <div class="bca-record-header__identity">
       {avatarName && <EsaAvatar name={avatarName} size="lg" />}
       <div class="bca-record-header__titles">
-        <h1 class="bca-record-header__name">{name}</h1>
+        <Heading class="bca-record-header__name">{name}</Heading>
         {context && <p class="bca-record-header__context">{context}</p>}
         {hasChips && (
           <div class="cluster" data-gap="sm">
@@ -96,12 +101,18 @@ const hasActions = Astro.slots.has('actions');
     min-width: 0;
   }
 
-  /* No weight pinned here on purpose: that is what lets the theme's Crimson
-     Pro Light rule land on the name. Pinning 600 is how every other heading in
-     this spoke ends up semibold — see NEEDS.md. */
+  /* Family and weight declared rather than inherited. The theme's Crimson Pro
+     Light rule is scoped to `h1`, and this renders an h2 inside the slide-in
+     panel — so relying on inheritance would give the panel Inter bold and the
+     page a light serif for the same component. Light is stated here, which is
+     the opposite of the trap NEEDS.md records: the problem is a rule pinning
+     600, not a rule pinning the intent. */
   .bca-record-header__name {
     margin: 0;
+    font-family: var(--font-display);
     font-size: var(--type-size-600, 1.875rem);
+    font-weight: var(--font-weight-light, 300);
+    letter-spacing: -0.005em;
     line-height: 1.15;
     color: var(--color-text-primary, #21201c);
   }

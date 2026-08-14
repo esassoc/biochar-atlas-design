@@ -1,0 +1,110 @@
+---
+// bca-page-header — the page top for every admin surface: a glyph, the page
+// name, and the one or two actions that apply to the whole collection.
+//
+// Deliberately the SAME shape as bca-record-header one level down, so a list
+// and the record it opens read as a pair: mark on the left, name beside it,
+// actions right-aligned and top-aligned.
+import EsaIcon from '@esa/ecology/esa-icon.astro';
+
+interface Props {
+  /** The page name — the h1. */
+  title: string;
+  /** esa-icon registry name for the glyph left of the title. */
+  icon: string;
+  /** Inner SVG for a glyph the registry does not ship. */
+  iconPaths?: string;
+  /** One line under the title. Omit unless the page genuinely needs it. */
+  lede?: string;
+}
+const { title, icon, iconPaths, lede } = Astro.props as Props;
+const hasActions = Astro.slots.has('actions');
+---
+
+<!-- bcn-lego-checked: esa-page-header is the hub's page-top lego and it was
+     what this page used. It cannot carry this treatment: its `icon` prop is
+     EYEBROW-only (`{icon && <EsaIcon name={icon} size="sm" />}` inside the
+     eyebrow <p>), its title is a string prop with no slot, and its two slots
+     are "breadcrumbs" and "actions". There is no way to get a glyph onto the
+     h1's own line from outside the component. Beacon hit the same wall and
+     hand-rolled it too — its PageLayout puts <EsaIcon> INSIDE the <h1>.
+
+     So this hand-rolls the bar but reads esa-page-header's OWN public hooks
+     for every value it shares (--page-header-title-*, --page-header-gap,
+     --page-header-bar-gap). Re-point one of those in the theme and both
+     components move together; that is the only thing keeping them from
+     drifting. Hub fix: a `titleIcon` prop, or a "title" slot on
+     esa-page-header. Filed in NEEDS.md. -->
+
+<header class="bca-page-header">
+  <div class="bca-page-header__bar">
+    <div class="bca-page-header__titles">
+      <h1 class="bca-page-header__title">
+        <EsaIcon name={icon} size="lg" paths={iconPaths} />
+        <span>{title}</span>
+      </h1>
+      {lede && <p class="bca-page-header__lede">{lede}</p>}
+    </div>
+
+    {hasActions && (
+      <div class="cluster bca-page-header__actions" data-gap="sm">
+        <slot name="actions" />
+      </div>
+    )}
+  </div>
+</header>
+
+<style>
+  .bca-page-header__bar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--page-header-bar-gap, var(--spacing-500, 1.5rem));
+    flex-wrap: wrap;
+  }
+
+  .bca-page-header__titles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--page-header-gap, var(--spacing-200, 0.5rem));
+    min-width: 0;
+  }
+
+  /* One step up the scale from esa-page-header's default (--type-size-600) and
+     the weight left unpinned, which is what lets [data-theme=biochar] h1's
+     Crimson Pro Light land — see theme-biochar.css, where a rule that pins 600
+     is exactly how a heading ends up semibold in this spoke. */
+  .bca-page-header__title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-300, 0.75rem);
+    margin: 0;
+    font-family: var(--page-header-title-font, var(--font-display));
+    font-size: var(--page-header-title-size, var(--type-size-700, 2.25rem));
+    line-height: 1.1;
+    color: var(--page-header-title-color, var(--color-text-primary, #21201c));
+  }
+
+  /* Brand Green rather than the title's own ink. A 2px-stroke Lucide glyph at
+     cap height carries far more mass than Crimson Pro Light does at the same
+     colour, so matching the ink makes the icon the loudest thing in the row.
+     Green measures L 0.364 against the ink's 0.243 — a real value step back —
+     while still holding 10.00:1 on the panel. It also reads as identity rather
+     than emphasis, which is what a page glyph is for. */
+  .bca-page-header__title :global(.esa-icon) {
+    color: var(--color-primary, #364500);
+    flex-shrink: 0;
+  }
+
+  .bca-page-header__lede {
+    margin: 0;
+    font-size: var(--page-header-lede-size, var(--type-size-300, 1.125rem));
+    color: var(--page-header-lede-color, var(--color-text-secondary, #474540));
+  }
+
+  /* Top-aligned with the title rather than centred on the bar, so the actions
+     do not drift when a lede lands. */
+  .bca-page-header__actions {
+    padding-top: var(--spacing-150, 0.375rem);
+  }
+</style>

@@ -1,0 +1,231 @@
+---
+// bca-user-panel — the user record as a slide-in panel over the Users grid,
+// replacing the /admin/users/{id} page it used to be.
+//
+// Every record is server-rendered and hidden; opening one unhides it. That is
+// Beacon's pattern (BcnProjectDataPanel) and it is what keeps the Astro
+// components in play — bca-record-header, bca-field-group and bca-field render
+// exactly as they did on the page, so the move cost no markup.
+//
+// Open state lives in the URL as `?user=<id>` — pushState on open, stripped on
+// close, honoured on load and on popstate — so a record stays linkable after
+// losing its own route. The contract is ported from beacon-design's
+// BcnProjectDataPanel, including the two parts that are easy to miss: the
+// `push` flag so a history-driven open does not re-push, and the re-entrancy
+// guard so popstate → close() does not push a second entry.
+import BcaRecordHeader from './bca-record-header.astro';
+import BcaFieldGroup from './bca-field-group.astro';
+import BcaField from './bca-field.astro';
+import BcaStatusChip from './bca-status-chip.astro';
+import EsaButton from '@esa/ecology/esa-button.astro';
+import { users, usersById, formatDate } from '../../data/users';
+---
+
+<!-- bcn-lego-checked: esa-side-dialog IS the lego and it is doing the work —
+     the slide, the backdrop, the focus move and restore, the focus trap, the
+     Escape and backdrop dismissal, role="dialog" and aria-modal. Nothing here
+     re-implements any of it. What this file adds is the three things the lego
+     leaves to its host: which record is showing, the URL contract, and the
+     z-index that clears this shell's topbar (1100) and nav flyout (1200) —
+     esa-side-dialog is a CUSTOM overlay, not a native <dialog>, so it has no
+     top layer and DOM order will not save it.
+
+     Width is 520px: Beacon's own split is 520 for a read-only dossier and 640
+     for a write surface, and this one reads — the two editable fields open a
+     separate esa-dialog on top. -->
+
+<esa-side-dialog
+  id="users-record-panel"
+  position="right"
+  style="--_width: 520px; --z-modal: 1300; --z-modal-backdrop: 1250;"
+>
+  <div slot="header" class="bca-user-panel__heads">
+    {users.map((user) => (
+      <div class="bca-user-panel__head" data-user-head={user.id} data-user-scope={user.id} hidden>
+        <BcaRecordHeader
+          as="h2"
+          name={user.name}
+          context={`${user.title} · ${user.org}`}
+          avatarName={user.name}
+        >
+          <Fragment slot="chips">
+            <BcaStatusChip value={user.status} field="status" />
+            <BcaStatusChip value={user.role} field="role" tone="plain" />
+          </Fragment>
+        </BcaRecordHeader>
+      </div>
+    ))}
+  </div>
+
+  {users.map((user) => {
+    const invitedBy = usersById[user.invitedBy];
+    return (
+      <div
+        class="bca-user-panel__body stack"
+        data-gap="lg"
+        data-user-body={user.id}
+        data-user-scope={user.id}
+        hidden
+      >
+        <BcaFieldGroup title="Account" flush>
+          <BcaField label="Email">
+            <a href={`mailto:${user.email}`}>{user.email}</a>
+          </BcaField>
+          <BcaField label="User ID" value={user.id} mono />
+          <BcaField label="Member since" value={formatDate(user.memberSince)} />
+          <BcaField label="Invited by">
+            {invitedBy && invitedBy.id !== user.id ? (
+              <a href={`?user=${invitedBy.id}`} data-opens-user={invitedBy.id}>{invitedBy.name}</a>
+            ) : (
+              'Created at project setup'
+            )}
+          </BcaField>
+        </BcaFieldGroup>
+
+        {/* Role and status are chips in the identity band directly above, so
+            here they are plain values. Repeating the same chip twice in 520px
+            makes the panel look like it is emphasising something. */}
+        <BcaFieldGroup title="Access" flush>
+          <BcaField label="Role">
+            <span data-user-field="role">{user.role}</span>
+          </BcaField>
+          <BcaField label="Status">
+            <span data-user-field="status">{user.status}</span>
+          </BcaField>
+          <BcaField label="Last active" value={formatDate(user.lastActive)} />
+        </BcaFieldGroup>
+
+        <BcaFieldGroup title="Organization" flush>
+          <BcaField label="Organization" value={user.org} />
+          <BcaField label="Job title" value={user.title} />
+        </BcaFieldGroup>
+      </div>
+    );
+  })}
+
+  <!-- A real element carries slot="footer", not a <Fragment>: esa-side-dialog
+       is a web component, so the slot has to survive into the DOM, and Astro's
+       Fragment unwraps before it gets there. The lego collapses its footer bar
+       via `.footer:not(:has(*))`, so getting this wrong renders an empty rule
+       above the panel's bottom edge and drops the button into the body — which
+       is exactly what it did on the first pass. -->
+  <div slot="footer" class="bca-user-panel__foot">
+    <EsaButton id="users-record-panel-edit" color="primary" icon="pencil" data-opens-user-edit>
+      Edit user
+    </EsaButton>
+  </div>
+</esa-side-dialog>
+
+<script>
+  import '@esa/ecology/esa-side-dialog';
+
+  type Panel = HTMLElement & { open: boolean; heading: string; show(): void; close(): void };
+
+  const panel = document.getElementById('users-record-panel') as Panel | null;
+  const editBtn = document.getElementById('users-record-panel-edit');
+
+  if (panel) {
+    const heads = [...document.querySelectorAll<HTMLElement>('[data-user-head]')];
+    const bodies = [...document.querySelectorAll<HTMLElement>('[data-user-body]')];
+    const nameOf = (id: string) =>
+      document.querySelector<HTMLElement>(`[data-user-head="${id}"] h2`)?.textContent?.trim() ?? '';
+
+    // Guards the one re-entrancy the URL contract has: popstate calls close(),
+    // close() fires the lego's `close` event, and that handler would push a
+    // second history entry for a navigation the user already made.
+    let syncingHistory = false;
+    let openId: string | null = null;
+
+    function openUser(id: string, push = true): void {
+      const body = bodies.find((b) => b.dataset.userBody === id);
+      if (!body) return;
+      heads.forEach((h) => (h.hidden = h.dataset.userHead !== id));
+      bodies.forEach((b) => (b.hidden = b !== body));
+      openId = id;
+      // The lego uses `heading` as its aria-label even when a header is
+      // slotted, so it has to be set regardless of what is visible.
+      panel!.heading = nameOf(id);
+      editBtn?.setAttribute('data-user-id', id);
+      panel!.show();
+      if (push) history.pushState({ user: id }, '', `?user=${id}`);
+    }
+
+    // Escape, the backdrop and the ✕ all funnel through this one event.
+    panel.addEventListener('close', () => {
+      openId = null;
+      if (!syncingHistory && new URLSearchParams(location.search).has('user')) {
+        history.pushState({}, '', location.pathname);
+      }
+    });
+
+    window.addEventListener('popstate', () => {
+      const id = new URLSearchParams(location.search).get('user');
+      syncingHistory = true;
+      if (id) openUser(id, false);
+      else panel.close();
+      syncingHistory = false;
+    });
+
+    // Any real anchor pointing at a record opens the panel instead of
+    // navigating — the grid's name cells and the "Invited by" link. They stay
+    // real hrefs so copy-link and middle-click still work.
+    document.addEventListener('click', (e) => {
+      const link = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>('a[href*="?user="]');
+      if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      const id = new URLSearchParams(link.search).get('user');
+      if (!id) return;
+      e.preventDefault();
+      openUser(id);
+    });
+
+    // A row click anywhere opens the record — Beacon's uniform grid gesture.
+    document.addEventListener('bca:user-row-clicked', (e) => {
+      openUser((e as CustomEvent<{ id: string }>).detail.id);
+    });
+
+    // The edit dialog saves; the open record and the grid both re-read it.
+    document.addEventListener('bca:user-updated', (e) => {
+      const { id, role, status } = (e as CustomEvent<{ id: string; role: string; status: string }>).detail;
+      // Kept in step with the TONES map in bca-status-chip.astro.
+      const toneOf = (v: string) =>
+        ({ active: 'quiet', invited: 'notice', deactivated: 'muted' })[v.toLowerCase()] ?? 'plain';
+
+      document.querySelectorAll<HTMLElement>(`[data-user-scope="${id}"]`).forEach((scope) => {
+        scope.querySelectorAll<HTMLElement>('[data-user-field]').forEach((el) => {
+          const value = el.dataset.userField === 'role' ? role : status;
+          const label = el.querySelector<HTMLElement>('.esa-pill__label');
+          if (label) label.textContent = value;
+          else el.textContent = value;
+          // A status chip's tone is derived from its value, so it has to be
+          // recomputed here or a deactivated account keeps the live treatment.
+          if (el.dataset.userField === 'status' && el.classList.contains('bca-status-chip')) {
+            el.dataset.tone = toneOf(status);
+          }
+        });
+      });
+    });
+
+    const initial = new URLSearchParams(location.search).get('user');
+    if (initial) openUser(initial, false);
+
+    // Exposed for the grid, which needs to know whether a row is the open one.
+    (window as unknown as { bcaOpenUser?: () => string | null }).bcaOpenUser = () => openId;
+  }
+</script>
+
+<style>
+  /* The lego's header slot is a single row; the hidden siblings must not
+     reserve space in it. */
+  .bca-user-panel__heads > [hidden] {
+    display: none;
+  }
+  .bca-user-panel__body[hidden] {
+    display: none;
+  }
+
+  /* The identity band inside a 520px panel: the avatar and name sit tighter
+     than they do on a full page, and the chips wrap under rather than beside. */
+  .bca-user-panel__head {
+    padding-right: var(--spacing-500, 1.5rem);
+  }
+</style>

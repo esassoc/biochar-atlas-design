@@ -464,10 +464,6 @@
      all, which is the one thing a token cannot reach; see the rule below the
      token block.
 
-     esa-avatar derives its background from an hsl() hash of the person's
-     name, which sprays arbitrary hues through a controlled palette. Pointed
-     at the pairing the topbar avatar already hand-rolls: brand Gold with
-     Green initials at 6.54:1. Never white on Gold, which is 1.60:1. */
      The border moves up one rung, from --color-border-light to --color-border.
      The pill's fill is the sunken neutral, which sits ΔE 0.0623 from the panel
      and 0.0414 from the canvas — visible on both — but only 0.0123 from the
@@ -476,7 +472,12 @@
      shape, so it has to be the rung that reads: neutral-6 measures 0.0681
      against the fill where neutral-5 measures less. Same resolution as the
      panel/white seam in the chrome block — declare it border-carried rather
-     than hunting a fill that clears everything. */
+     than hunting a fill that clears everything.
+
+     esa-avatar derives its background from an hsl() hash of the person's
+     name, which sprays arbitrary hues through a controlled palette. Pointed
+     at the pairing the topbar avatar already hand-rolls: brand Gold with
+     Green initials at 6.54:1. Never white on Gold, which is 1.60:1. */
   --pill-radius: var(--radius-100);
   --pill-border-color: var(--color-border);
   --avatar-bg: var(--bca-brand-gold);

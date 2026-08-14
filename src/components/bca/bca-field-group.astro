@@ -1,6 +1,6 @@
 ---
-// bca-field-group — one titled group of read-only fields on a record page.
-// A card holding a definition list; bca-field renders each row.
+// bca-field-group — one titled group of read-only fields on a record surface.
+// A definition list under a heading; bca-field renders each row.
 import EsaCard from '@esa/ecology/esa-card.astro';
 
 // No icon prop, deliberately. esa-card takes one, but a glyph beside "Account"
@@ -9,20 +9,31 @@ import EsaCard from '@esa/ecology/esa-card.astro';
 // attention the values want.
 interface Props {
   title: string;
+  /**
+   * Drops the card. For a group inside a container that already draws its own
+   * frame — the slide-in panel, where three stacked outlined cards inside a
+   * bordered 520px drawer is four nested rectangles for one record.
+   */
+  flush?: boolean;
 }
-const { title } = Astro.props as Props;
+const { title, flush = false } = Astro.props as Props;
 ---
 
-<EsaCard title={title} variant="outlined">
-  <dl class="bca-field-group">
-    <slot />
-  </dl>
-</EsaCard>
+{flush ? (
+  <section class="bca-field-group__flush">
+    <h3 class="bca-field-group__title">{title}</h3>
+    <dl class="bca-field-group"><slot /></dl>
+  </section>
+) : (
+  <EsaCard title={title} variant="outlined">
+    <dl class="bca-field-group"><slot /></dl>
+  </EsaCard>
+)}
 
 <style>
   /* A two-column grid rather than a float or a flex row per field: it makes
      every value in the group share one left edge, which is the whole reason a
-     record page reads faster than the same facts in prose. */
+     record surface reads faster than the same facts in prose. */
   .bca-field-group {
     display: grid;
     grid-template-columns: minmax(7rem, max-content) minmax(0, 1fr);
@@ -36,5 +47,24 @@ const { title } = Astro.props as Props;
       grid-template-columns: minmax(0, 1fr);
       gap: var(--spacing-300, 0.75rem);
     }
+  }
+
+  /* Flush variant. The heading copies esa-card's own title rule verbatim —
+     --type-size-250 at 600 in the inherited ink — rather than inventing a
+     second heading scale, so a group reads identically whether or not it is
+     carded. No uppercase, no letter-spacing: that treatment is the ornamental
+     micro-label the design principles ban, and the word "Account" does not
+     need help being read. */
+  .bca-field-group__flush {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-300, 0.75rem);
+  }
+  .bca-field-group__title {
+    margin: 0;
+    font-family: var(--font-sans, Inter, system-ui, sans-serif);
+    font-size: var(--type-size-250, 1.0625rem);
+    font-weight: 600;
+    color: var(--color-text-primary, #21201c);
   }
 </style>

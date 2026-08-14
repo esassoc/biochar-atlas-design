@@ -1,30 +1,39 @@
 ---
-// Admin › Users — the list. The house grid pattern this app reuses for every
-// collection: a page header carrying the one create action, a searchable
-// AG Grid, and a record-count strip.
+// Admin › Users — the list, and the record. The house pattern this app reuses
+// for every collection: a page header carrying the one create action, a
+// searchable AG Grid, and the record itself as a slide-in panel over it rather
+// than a page you navigate away to.
 import AppShell from '../../layouts/AppShell.astro';
-import EsaPageHeader from '@esa/ecology/esa-page-header.astro';
-import EsaButton from '@esa/ecology/esa-button.astro';
+import BcaPageHeader from '../../components/bca/bca-page-header.astro';
 import BcaUserGrid from '../../components/bca/bca-user-grid.astro';
+import BcaUserPanel from '../../components/bca/bca-user-panel.astro';
+import BcaUserEditDialog from '../../components/bca/bca-user-edit-dialog.astro';
+import EsaButton from '@esa/ecology/esa-button.astro';
 ---
 
 <!-- manifest:
   layout: AppShell > stack(lg) spine       # Atlas app shell + sidenav
   sections:
-    - page header -> esa-page-header       # title + the Invite user action
-    - user list   -> bca-user-grid         # toolbar, AG Grid, record count
+    - page header  -> bca-page-header      # glyph, title, the Invite user action
+    - user list    -> bca-user-grid        # control strip, AG Grid, record count
+    - user record  -> bca-user-panel       # the slide-in record, ?user=<id>
+    - edit         -> bca-user-edit-dialog # role + status, the admin-owned pair
 -->
 
 <AppShell title="Users — Biochar Atlas" activeNavId="admin-users">
   <div class="page stack" data-gap="lg">
-    <EsaPageHeader title="Users">
+    <BcaPageHeader title="Users" icon="users">
       <Fragment slot="actions">
         <EsaButton color="primary" icon="plus">Invite user</EsaButton>
       </Fragment>
-    </EsaPageHeader>
+    </BcaPageHeader>
 
     <BcaUserGrid />
   </div>
+
+  <BcaUserPanel />
+  <BcaUserEditDialog />
+  <esa-snackbar-container id="app-toasts"></esa-snackbar-container>
 </AppShell>
 
 <style>

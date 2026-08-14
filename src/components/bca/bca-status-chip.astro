@@ -1,36 +1,52 @@
 ---
 // bca-status-chip — a lifecycle value (Active / Invited / Deactivated) as a
-// quiet chip. The Astro-side twin of the chip the Users grid draws in a cell.
+// chip. The Astro-side twin of the chip the Users grid draws in a cell, and it
+// follows the same editorial rule: colour only what deviates.
 //
-// Thin on purpose: esa-pill IS the chip, and the theme already points its
-// radius, border and font size where this spoke wants them. What this adds is
-// (a) `removable={false}`, because a status is not something you take off a
-// record, (b) the muted treatment for an inert account, and (c) a stable hook
-// the record page's edit dialog can find and update in place.
+// "Active" is most of the list, so tinting it makes a green column that carries
+// no decision. "Invited" is the one value asking someone to do something, so it
+// is the only tinted chip. "Deactivated" recedes — an inert account is an end
+// state, not an error, which is why nothing here is red.
+//
+// Thin on purpose: esa-pill IS the chip and the theme already points its radius,
+// border and font size where this spoke wants them. The tone rides on the
+// lego's OWN public hooks, so nothing about esa-pill is restyled.
 import EsaPill from '@esa/ecology/esa-pill.astro';
 
 interface Props {
   value: string;
   /** Marks the record's own field this chip shows, e.g. "status" or "role". */
   field?: string;
-  /** Quiets the chip — for a value that means the record is inert. */
-  muted?: boolean;
+  /**
+   * Overrides the tone the value would pick. `plain` is for a categorical
+   * value like a role, which is not a status and must not borrow one's colour.
+   */
+  tone?: 'auto' | 'plain';
 }
-const { value, field, muted = false } = Astro.props as Props;
+const { value, field, tone = 'auto' } = Astro.props as Props;
+
+// Kept in step with `statusTones` in bca-user-grid.astro — same three values,
+// same three decisions.
+const TONES: Record<string, string> = {
+  active: 'quiet',
+  invited: 'notice',
+  deactivated: 'muted',
+};
+const resolved = tone === 'plain' ? 'plain' : (TONES[value.toLowerCase()] ?? 'plain');
 ---
 
-<!-- bcn-lego-checked: nothing is reinvented here — esa-pill renders the chip
-     and the theme points --pill-radius / --pill-border-color / font-size at
-     this spoke's values. The wrapper exists for two things the lego cannot
-     carry: it forwards no arbitrary attributes, so `data-user-field` (the hook
-     the edit dialog updates in place) has nowhere to land, and its variants
-     are semantic tones with no neutral-muted option for an inert record. Both
-     ride on the wrapper, and the muted case is expressed by re-pointing the
-     lego's OWN public hooks rather than by restyling it. Checked esa-badge
-     (13px hardcode, tinted variants only, radius-full hardcode) and
-     esa-chip-group (a selection control, not a display value). -->
+<!-- bcn-lego-checked: nothing is reinvented here — esa-pill renders the chip and
+     the theme points --pill-radius / --pill-border-color / font-size at this
+     spoke's values. The wrapper exists for two things the lego cannot carry: it
+     forwards no arbitrary attributes, so `data-user-field` (the hook the edit
+     dialog updates in place) has nowhere to land, and its variants are semantic
+     tones with no quiet or notice option. Both ride on the wrapper, and every
+     tone is expressed by re-pointing the lego's OWN public hooks rather than by
+     restyling it. Checked esa-badge (13px hardcode, tinted variants only,
+     radius-full hardcode) and esa-chip-group (a selection control, not a
+     display value). -->
 
-<span class="bca-status-chip" data-user-field={field} data-muted={muted ? '' : undefined}>
+<span class="bca-status-chip" data-user-field={field} data-tone={resolved}>
   <EsaPill label={value} removable={false} size="md" />
 </span>
 
@@ -38,10 +54,35 @@ const { value, field, muted = false } = Astro.props as Props;
   .bca-status-chip {
     display: inline-flex;
   }
-  /* 6.10:1 on the panel — quiet, comfortably over 4.5. The fill drops out so
-     an inert account reads as an outline where a live one reads as a solid. */
-  .bca-status-chip[data-muted] {
-    --pill-text-color: var(--color-text-tertiary, #615f5a);
+
+  /* Quiet: the value is the norm. No fill, hairline only — it reads as a fact
+     rather than a flag. */
+  .bca-status-chip[data-tone='quiet'] {
     --pill-bg: transparent;
+    --pill-text-color: var(--color-text-primary, #21201c);
+    --pill-border-color: var(--bca-status-green-11, #177c52);
+  }
+
+  /* Notice: the one value that wants someone to act. The same amber and the
+     same 16% / 70% mix the grid chip uses, so a status reads identically in a
+     cell and in the record. The mixed ink resolves to #7d4b08 and the fill to
+     #ece1cf on the panel: 5.63:1 there, 5.23:1 on the grid's zebra row and
+     4.91:1 on a hovered row — that last one is the binding case, and it is the
+     reason the ink mixes toward the body colour rather than staying at amber-11
+     (which measures 3.61:1 on the same fill). */
+  .bca-status-chip[data-tone='notice'] {
+    --pill-bg: color-mix(in srgb, var(--bca-status-amber-11, #a45e00) 16%, transparent);
+    --pill-text-color: color-mix(
+      in srgb,
+      var(--bca-status-amber-11, #a45e00) 70%,
+      var(--color-text-primary, #21201c)
+    );
+    --pill-border-color: color-mix(in srgb, var(--bca-status-amber-11, #a45e00) 40%, transparent);
+  }
+
+  /* Muted: an inert account. 6.10:1 on the panel — quiet, comfortably over 4.5. */
+  .bca-status-chip[data-tone='muted'] {
+    --pill-bg: transparent;
+    --pill-text-color: var(--color-text-tertiary, #615f5a);
   }
 </style>

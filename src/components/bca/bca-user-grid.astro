@@ -1,18 +1,17 @@
 ---
-// bca-user-grid — the Users list section: search + clear-filters toolbar, the
-// AG Grid itself, and the download + record-count strip welded under it.
+// bca-user-grid — the Users list section: a carded control strip, the AG Grid
+// itself, and the download + record-count strip welded under it.
 //
 // The composition is Beacon's house grid page (beacon-design's
-// data-catalog-actions.astro), which is the reference implementation for this
-// pattern across ESA. What differs is the palette and the type scale — see the
-// divergence note on `atlasTheme` in src/lib/bca-grid.ts.
+// monitoring/compliance-observations.astro, its most recent), down to the
+// numbers: a bordered .bcn-filterbar equivalent above, a brand-slab header,
+// 44px rows at 13px, and a welded footer with tabular counts.
 //
 // Rows cross the SSR→client boundary through a JSON payload island rather than
 // a serialized prop: the grid is created in a client script, and this keeps the
 // fixture in one place with the markup that consumes it.
 import EsaButton from '@esa/ecology/esa-button.astro';
 import { users } from '../../data/users';
-import { withBase } from '../../lib/base';
 
 const rows = users.map((u) => ({
   id: u.id,
@@ -23,45 +22,40 @@ const rows = users.map((u) => ({
   status: u.status,
   lastActive: u.lastActive,
 }));
-
-const payload = { rows, detailBase: withBase('/admin/users') };
 ---
 
 <!-- bcn-lego-checked: the interactive parts here ARE legos — esa-button for
      every control, esa-text-field for the search. Two things are hand-rolled,
      for two different reasons.
 
-     (1) The three-band frame: a toolbar row, an AG Grid host div, and a
+     (1) The three-band frame: a control strip, an AG Grid host div, and a
      record-count strip. No esa-* lego is a data-grid host — AG Grid needs a
-     bare element it owns outright — and esa-card would draw a second border
-     and radius around a grid that already draws its own wrapper. Checked
-     Beacon: beacon-design's grid pages hand-roll the identical .grid-header /
-     .tracker-grid / .table-footer trio, and Beacon prod wraps it in an Angular
+     bare element it owns outright — and esa-card would draw a second border and
+     radius around a grid that already draws its own wrapper. Checked Beacon:
+     beacon-design's grid pages hand-roll the identical .bcn-filterbar /
+     grid host / .table-footer trio, and Beacon prod wraps it in an Angular
      `beacon-grid` component, which is what this file is for this spoke.
 
-     (2) The status chip inside a cell. esa-pill IS the right lego for this
-     shape and the record page uses it — but .astro legos are COMPILE-TIME,
-     and their CSS is Astro-scoped to a `data-astro-cid` attribute. A cell
-     renderer builds its node at runtime with document.createElement, so it can
-     never carry that attribute and would render completely unstyled. Nor is
-     the Lit tier an escape: there is no esa-pill web component. So the chip is
-     reimplemented here in :global CSS reading esa-pill's OWN public hooks
-     (--pill-bg / --pill-border-color / --pill-radius), which is the only thing
-     keeping the two from drifting. Beacon hit this exactly and resolved it the
-     same way. Filed in NEEDS.md. -->
+     (2) The status chip inside a cell. esa-pill IS the chip and the panel uses
+     it — but .astro legos are COMPILE-TIME and their CSS is Astro-scoped to a
+     `data-astro-cid` attribute. A cell renderer builds its node at runtime with
+     document.createElement, so it can never carry that attribute and would
+     render unstyled. Nor is the Lit tier an escape: there is no esa-pill web
+     component. So the chip is reimplemented here in :global CSS. Beacon hit
+     this exactly and resolved it the same way. Filed in NEEDS.md. -->
 
 <section class="bca-user-grid">
-  <div class="bca-user-grid__toolbar">
+  <div class="bca-user-grid__controls">
     <div class="bca-user-grid__search">
-      <esa-text-field id="users-search" placeholder="Search users…" size="md"></esa-text-field>
+      <esa-text-field id="users-search" placeholder="Search users…" size="sm"></esa-text-field>
     </div>
-    <EsaButton id="users-clear" color="ghost" appearance="outline">Clear filters</EsaButton>
+    <EsaButton id="users-clear" color="ghost" appearance="outline" size="sm">Clear filters</EsaButton>
   </div>
 
   <div id="users-grid" class="bca-user-grid__host"></div>
 
   <div class="bca-user-grid__foot">
-    <EsaButton id="users-download" color="ghost" appearance="outline" icon="download">
+    <EsaButton id="users-download" color="ghost" appearance="outline" size="sm" icon="download">
       Download as CSV
     </EsaButton>
     <p class="bca-user-grid__count">
@@ -69,13 +63,13 @@ const payload = { rows, detailBase: withBase('/admin/users') };
     </p>
   </div>
 
-  <script type="application/json" id="users-grid-data" set:html={JSON.stringify(payload)}></script>
+  <script type="application/json" id="users-grid-data" set:html={JSON.stringify({ rows })}></script>
 </section>
 
 <script>
   import { createGrid, ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
   import type { GridApi, GridOptions, ColDef } from 'ag-grid-community';
-  import { atlasTheme, statusChipRenderer, makeLinkRenderer } from '../../lib/bca-grid';
+  import { atlasTheme, makeStatusChipRenderer, makeLinkRenderer } from '../../lib/bca-grid';
   import '@esa/ecology/esa-text-field';
 
   ModuleRegistry.registerModules([AllCommunityModule]);
@@ -93,10 +87,7 @@ const payload = { rows, detailBase: withBase('/admin/users') };
   const host = document.getElementById('users-grid');
   const payloadEl = document.getElementById('users-grid-data');
   if (host && payloadEl) {
-    const { rows, detailBase } = JSON.parse(payloadEl.textContent!) as {
-      rows: UserRow[];
-      detailBase: string;
-    };
+    const { rows } = JSON.parse(payloadEl.textContent!) as { rows: UserRow[] };
 
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     // An account that has never signed in has no last-active date. The em dash
@@ -107,27 +98,41 @@ const payload = { rows, detailBase: withBase('/admin/users') };
       return `${d} ${months[m - 1]} ${y}`;
     };
 
+    // Colour only what deviates. "Active" is 8 of 10 rows — tinting the norm
+    // makes a green column that carries no decision, which is the classic
+    // dashboard failure. "Invited" is the one value that wants someone to do
+    // something, so it is the only tinted chip on the page and the eye lands on
+    // it directly. "Deactivated" recedes: an inert account is an end state, not
+    // an error, which is also why nothing here is red — no user status is a
+    // failure, and spending the danger colour on one would leave nothing to
+    // spell an actual failure with.
+    const statusTones = {
+      active: { chip: '#177c52', quiet: true }, // --bca-status-green-11
+      invited: { chip: '#a45e00' }, //             --bca-status-amber-11, tinted
+      deactivated: { chip: '#898780', quiet: true }, // --bca-neutral-9
+    };
+
     const columnDefs: ColDef<UserRow>[] = [
       {
         field: 'name',
         headerName: 'Name',
-        width: 240,
-        cellRenderer: makeLinkRenderer({ href: (d) => `${detailBase}/${d.id}` }),
+        width: 210,
+        cellRenderer: makeLinkRenderer({ href: (d) => `?user=${d.id}` }),
       },
-      { field: 'email', headerName: 'Email', width: 330 },
-      { field: 'org', headerName: 'Organization', width: 160 },
-      { field: 'role', headerName: 'Role', width: 170 },
+      { field: 'email', headerName: 'Email', width: 290 },
+      { field: 'org', headerName: 'Organization', width: 140 },
+      { field: 'role', headerName: 'Role', width: 150 },
       {
         field: 'status',
         headerName: 'Status',
-        width: 150,
-        cellRenderer: statusChipRenderer,
+        width: 140,
+        cellRenderer: makeStatusChipRenderer(statusTones),
         cellClass: 'bca-grid-chip-cell',
       },
       {
         field: 'lastActive',
         headerName: 'Last active',
-        width: 160,
+        width: 140,
         valueFormatter: (p) => asDate(p.value),
       },
     ];
@@ -146,6 +151,9 @@ const payload = { rows, detailBase: withBase('/admin/users') };
       theme: atlasTheme,
       rowData: rows,
       columnDefs,
+      // Stable row ids so a saved edit can find its node instead of rebuilding
+      // the whole rowData and losing sort, filter and scroll position.
+      getRowId: (p) => p.data.id,
       defaultColDef: {
         sortable: true,
         resizable: true,
@@ -157,9 +165,33 @@ const payload = { rows, detailBase: withBase('/admin/users') };
       tooltipShowMode: 'whenTruncated',
       onFirstDataRendered: updateCounts,
       onFilterChanged: updateCounts,
+      // A click anywhere in the row opens the record — Beacon's uniform grid
+      // gesture. The name cell's anchor is left alone so copy-link still gets a
+      // real URL; the panel's own delegated handler catches that one.
+      onRowClicked: (e) => {
+        if ((e.event?.target as HTMLElement | undefined)?.closest('a')) return;
+        if (e.data) {
+          document.dispatchEvent(
+            new CustomEvent('bca:user-row-clicked', { detail: { id: e.data.id } }),
+          );
+        }
+      },
     };
 
     const api: GridApi<UserRow> = createGrid(host, gridOptions);
+
+    // The panel's edit dialog saved. Re-read the row so the grid cannot
+    // contradict the record open on top of it.
+    document.addEventListener('bca:user-updated', (e) => {
+      const { id, role, status } = (e as CustomEvent<{ id: string; role: string; status: string }>).detail;
+      const node = api.getRowNode(id) ?? null;
+      const row = rows.find((r) => r.id === id);
+      if (!row) return;
+      row.role = role;
+      row.status = status;
+      if (node) node.setData({ ...row });
+      else api.applyTransaction({ update: [row] });
+    });
 
     // esa-text-field fires a composed `change` carrying detail.value on every
     // keystroke, so the quick filter tracks typing without a debounce.
@@ -186,19 +218,38 @@ const payload = { rows, detailBase: withBase('/admin/users') };
     flex-direction: column;
   }
 
-  .bca-user-grid__toolbar {
+  /* The control strip is a container, not loose controls above a table:
+     Beacon's .bcn-filterbar, same border, same 12px/16px padding, same 16px
+     gap to the grid. It reads as one grouped strip rather than a search box
+     and a button that happen to share a line. */
+  .bca-user-grid__controls {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-400, 1rem);
-    margin-bottom: var(--spacing-300, 0.75rem);
+    gap: var(--spacing-300, 0.75rem);
+    flex-wrap: wrap;
+    padding: var(--spacing-300, 0.75rem) var(--spacing-400, 1rem);
+    margin-bottom: var(--spacing-400, 1rem);
+    background: var(--color-surface, #fafaf7);
+    border: 1px solid var(--color-border, #d0cfcc);
+    border-radius: var(--radius-200, 0.5rem);
   }
   .bca-user-grid__search {
-    flex: 0 1 360px;
-    min-width: 240px;
+    flex: 0 1 320px;
+    min-width: 220px;
   }
   .bca-user-grid__search :global(esa-text-field) {
     display: block;
+  }
+
+  /* The grid module runs at the dense scale — Andy's 2026-08-14 carve-out from
+     the 16px floor, which covers the cells, the header, this strip and the
+     footer. The floor still holds everywhere else on the page. */
+  .bca-user-grid__controls :global(.esa-button__native),
+  .bca-user-grid__foot :global(.esa-button__native) {
+    font-size: 0.8125rem;
+  }
+  .bca-user-grid__controls :global(esa-text-field) {
+    --form-font-size-sm: 0.8125rem;
   }
 
   /* The grid owns the vertical space the shell's content region leaves after
@@ -207,7 +258,7 @@ const payload = { rows, detailBase: withBase('/admin/users') };
   .bca-user-grid__host {
     width: 100%;
     height: calc(100vh - 400px);
-    min-height: 360px;
+    min-height: 340px;
   }
 
   /* Welded under the grid: the grid's own bottom corners are squared to meet
@@ -218,48 +269,57 @@ const payload = { rows, detailBase: withBase('/admin/users') };
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-400, 1rem);
-    padding: var(--spacing-250, 0.625rem) var(--spacing-400, 1rem);
-    background: var(--color-surface, #fafaf7);
+    padding: var(--spacing-200, 0.5rem) var(--spacing-400, 1rem);
+    background: var(--color-background, #f4f3ee);
     border: 1px solid var(--color-border, #d0cfcc);
     border-top: 0;
-    border-radius: 0 0 var(--radius-200, 6px) var(--radius-200, 6px);
+    border-radius: 0 0 var(--radius-100, 0.25rem) var(--radius-100, 0.25rem);
   }
   .bca-user-grid__count {
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.8125rem;
     color: var(--color-text-secondary, #474540);
     font-variant-numeric: tabular-nums;
   }
 
-  /* ── Cells AG Grid injects, which land outside Astro's style scope ──────
-     Every value below reads esa-pill's own public hook, so the chip in a cell
-     and the chip on the record page cannot drift apart.
-
-     Deliberately one fill and one hairline for all three values, with the
-     label carrying the meaning. Tinting per value would put a third color
-     system on a page that already has brand chrome and a purple link column,
-     and these are lifecycle facts rather than severities — an invited account
-     is not a warning. Deactivated is the exception: it reads muted because the
-     account is genuinely inert. */
+  /* ── Cells AG Grid injects, which land outside Astro's style scope ────── */
   .bca-user-grid :global(.ag-cell.bca-grid-chip-cell) {
     display: flex;
     align-items: center;
   }
+  /* Beacon's chip geometry exactly: a squared 4px badge rather than a pill,
+     1px/8px padding, a 7px dot. The tinted case mixes the tone at 16% for the
+     fill and 70% against the body ink for the label — the mix is what keeps it
+     legible without picking a second hex per status. Measured on the amber:
+     5.63:1 on the panel, 5.23:1 on the zebra row, 4.91:1 on a hovered row. The
+     hovered row is the binding case; amber-11 unmixed would be 3.61:1 there. */
   .bca-user-grid :global(.bca-grid-chip) {
     display: inline-flex;
     align-items: center;
-    padding: 2px var(--spacing-250, 0.625rem);
-    border: 1px solid var(--pill-border-color, var(--color-border, #d0cfcc));
-    border-radius: var(--pill-radius, 4px);
-    background: var(--pill-bg, var(--color-surface-sunken, #e8e5de));
-    color: var(--pill-text-color, var(--color-text-primary, #21201c));
-    font-size: 1rem;
+    gap: var(--spacing-150, 0.375rem);
+    padding: 1px var(--spacing-200, 0.5rem);
+    border-radius: var(--radius-100, 0.25rem);
+    font-size: 0.8125rem;
     line-height: 1.5;
+    font-weight: var(--font-weight-semibold, 600);
     white-space: nowrap;
+    background: color-mix(in srgb, var(--_chip, #898780) 16%, transparent);
+    color: color-mix(in srgb, var(--_chip, #898780) 70%, var(--color-text-primary, #21201c));
   }
-  .bca-user-grid :global(.bca-grid-chip[data-status='deactivated']) {
-    color: var(--color-text-tertiary, #615f5a);
+  /* The quiet case: the dot alone carries the hue. Used for the values that are
+     the norm and the end state, so the tinted chip is the only one that pulls. */
+  .bca-user-grid :global(.bca-grid-chip[data-quiet]) {
     background: transparent;
+    color: var(--color-text-secondary, #474540);
+    font-weight: var(--font-weight-regular, 400);
+    padding-inline: 0;
+  }
+  .bca-user-grid :global(.bca-grid-chip__dot) {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--_chip, #898780);
+    flex-shrink: 0;
   }
 
   /* The name column. Purple links are the brand guide's own call for links on
@@ -271,5 +331,9 @@ const payload = { rows, detailBase: withBase('/admin/users') };
   }
   .bca-user-grid :global(.bca-grid-name:hover) {
     color: var(--color-text-link-hover, #36082f);
+  }
+  /* The whole row is a target, so say so. */
+  .bca-user-grid :global(.ag-row) {
+    cursor: pointer;
   }
 </style>
