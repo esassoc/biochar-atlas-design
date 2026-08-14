@@ -236,6 +236,22 @@ const accents = [
       borders and icon-only controls come from Green or Purple.
     </p>
     <p class="note">
+      <strong>Every solid fill takes a white label.</strong> A tone in the hub is three values —
+      a fill, an ink for that fill, and a hover fill — and this theme moves its solids from
+      step 9 to step 11, dark enough to carry white. Mapping only the fill left the hub's dark
+      inks on our dark fills: secondary 2.06:1, success 2.11:1, warning 2.26:1. White clears
+      every one — secondary and info 5.88, success 5.20, warning 5.02, danger 5.29,
+      primary 10.46 — so no fill had to move.
+    </p>
+    <p class="note">
+      <strong>Hovers stay in their family.</strong> Unmapped, four tones jumped to a hub color
+      on hover — success to lime, warning to bright amber, info to blue. Each is now the OKLab
+      midpoint of its own family's step 11 and step 12: success <code>#1b5b3f</code>, warning
+      <code>#78491c</code>, danger <code>#97212a</code>, info <code>#43412f</code>. The midpoint
+      rather than step 12 because <code>esa-badge</code>'s dot variant fills from the hover
+      token, and at step 12 an 8px dot stops reading as green, amber or red.
+    </p>
+    <p class="note">
       <strong>Focus rings are re-pointed.</strong> <code>@esa/tokens</code> defines
       <code>--focus-ring-color</code> twice, and the later one wins:
       <code>component-tokens.css</code> chains it to <code>--color-grass-8</code> (#65ba74),

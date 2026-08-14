@@ -266,8 +266,46 @@
   --color-primary-active:  var(--bca-green-11);
   --color-primary-subtle:  var(--bca-green-3);
   --color-primary-border:  var(--bca-green-7);
+  --color-primary-strong:  var(--bca-green-9);   /* 10.46 on panel — see -strong note */
   --color-secondary:       var(--bca-sage-11);
   --color-secondary-hover: var(--bca-brand-sage-dark);
+  --color-secondary-strong: var(--bca-sage-12);  /* 15.70 on panel, same ink as info */
+
+  /* ═══ TONE INKS AND HOVERS ════════════════════════════════════════════
+     Everything below exists because a tone in the hub is THREE values — a
+     fill, an ink to put on that fill, and a hover fill — and remapping only
+     the fill leaves the other two pointing at the hub's own palette. Every
+     one of these was measured on the rendered docs page, not reasoned about.
+
+     The inks. Our solids sit at step 11, chosen in the STATUS block below to
+     carry white at ~5:1; the hub's solids sit at step 9 and are bright, so
+     its inks are dark. Unmapped, our dark fills got the hub's dark inks:
+     secondary 2.06, success 2.11, badge warning 2.26, button warning 3.24 —
+     all failures, and the exact "muddy label" Andy caught. White fixes every
+     one because the fills were already selected for it: secondary and info
+     5.88, success 5.20, warning 5.02, danger 5.29, primary 10.46. No fill
+     needed changing.
+
+     The hovers. Unmapped, four tones jumped to a hub color on hover —
+     success to lime #b0e64c (white on it: 1.47), warning to #ffba18 (1.71),
+     danger to #dc3e42, and info to BLUE #0588f0, which is nowhere in this
+     palette. Each hover is now the OKLab midpoint of its own family's step 11
+     and step 12. The midpoint rather than step 12 because esa-badge's DOT
+     variant fills itself from the -hover token, not from the solid: at step
+     12 the dots go near-black and stop reading as green/amber/red at 8px.
+     The midpoint darkens the button visibly (ΔE 0.10–0.13 from the solid)
+     while leaving the dot in its family. White on the hover fills runs
+     7.59–10.32, so the label gets safer while the pointer is down, and the
+     dots clear 1.4.11 against the panel at 7.25–7.82. */
+  --color-secondary-on-fill: var(--color-text-inverse);
+  --color-success-on-fill:   var(--color-text-inverse);
+  --color-warning-on-fill:   var(--color-text-inverse);  /* esa-badge's hook */
+  --button-on-warning:       var(--color-text-inverse);  /* esa-button's hook, same job */
+
+  --color-success-hover: #1b5b3f;  /* mid(status-green-11, -12), L 0.521 → 0.421 */
+  --color-warning-hover: #78491c;  /* mid(status-amber-11, -12), L 0.550 → 0.451 */
+  --color-danger-hover:  #97212a;  /* mid(status-red-11,   -12), L 0.554 → 0.446 */
+  --color-info-hover:    #43412f;  /* mid(sage-11,         -12), L 0.504 → 0.372 */
 
   /* ═══ TEXT ════════════════════════════════════════════════════════════
      Measured on the worst light surface in the shell, which is the topbar
@@ -425,7 +463,7 @@
      hierarchy at this data density needs a mid weight too, so 500 and 600 are
      loaded and mapped — an extension, same as the color ramps. */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'Roboto Mono', ui-monospace, monospace;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   /* --font-display is the hub's own hook (DocsShell's .article h1 reads it and
      falls back to --font-sans). Wiring it here is what gets the brand headline
      face onto documentation page titles with no fork. */

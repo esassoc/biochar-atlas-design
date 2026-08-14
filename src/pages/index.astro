@@ -1,9 +1,8 @@
 ---
 // Biochar Atlas — Home. A mark-forward hub on warm paper: the ABI symbol,
-// then the three layers of the repo — the App Shell and the Design System
-// (both live) and the Pattern Library (coming soon).
+// then the two layers of the repo — the App Shell (the suitability tool's
+// frame) and the Design System, both live.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import EsaButton from '@esa/ecology/esa-button.astro';
 import { withBase } from '../lib/base';
 ---
 <BaseLayout title="Biochar Atlas — Design & Prototypes">
@@ -22,24 +21,21 @@ import { withBase } from '../lib/base';
         Design spoke for the Biochar Suitability Tool — the app shell, tokens,
         and components on the ESA Ecology hub.
       </p>
-      <EsaButton class="hero__cta" href={withBase('/suitability-tool')} color="primary" size="lg">
-        Open the app shell
-      </EsaButton>
     </header>
 
     <section class="layers" aria-label="Layers">
+      <a class="layer" href={withBase('/suitability-tool')}>
+        <span class="layer__status layer__status--live"><span class="dot"></span>Live</span>
+        <h2 class="layer__title">App Shell</h2>
+        <p class="layer__body">The application frame — sidebar navigation across the eight Atlas modules, topbar search and account, and the workspace the suitability workflow renders into.</p>
+        <span class="layer__go">Open the app shell<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+      </a>
+
       <a class="layer" href={withBase('/design-system')}>
         <span class="layer__status layer__status--live"><span class="dot"></span>Live</span>
         <h2 class="layer__title">Design System</h2>
         <p class="layer__body">The brand layer — the ABI palette extended into 12-step ramps, warm neutral chrome on the palette's own hue, and Inter with Crimson Pro headlines over the inherited Ecology components.</p>
         <span class="layer__go">Open the design system<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
-      </a>
-
-      <a class="layer layer--soon" href={withBase('/patterns')}>
-        <span class="layer__status layer__status--soon"><span class="dot"></span>Coming soon</span>
-        <h2 class="layer__title">Pattern Library</h2>
-        <p class="layer__body">Composed, multi-component patterns — the suitability workflow shell, score &amp; rationale displays, soil context panels — assembled from the system.</p>
-        <span class="layer__go">Preview<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
       </a>
     </section>
 
@@ -94,7 +90,6 @@ import { withBase } from '../lib/base';
       line-height: 1.6;
       color: var(--color-text-secondary, #54514a);
     }
-    .hero__cta { margin-top: var(--spacing-600, 32px); }
 
     /* ---- Layer cards ---- */
     .layers {
@@ -118,7 +113,6 @@ import { withBase } from '../lib/base';
       box-shadow: 0 12px 32px color-mix(in srgb, var(--color-primary, #234a31) 12%, transparent);
       transform: translateY(-2px);
     }
-    .layer--soon { background: var(--color-surface-sunken, #f3f1ea); }
     .layer__status {
       display: inline-flex; align-items: center; gap: var(--spacing-150, 6px);
       font-size: 16px; font-weight: var(--font-weight-medium, 500);
@@ -126,8 +120,6 @@ import { withBase } from '../lib/base';
     .layer__status .dot { width: 8px; height: 8px; border-radius: 50%; }
     .layer__status--live { color: var(--color-success, #2e7d4f); }
     .layer__status--live .dot { background: var(--color-success, #2e7d4f); }
-    .layer__status--soon { color: var(--color-text-muted, #807c73); }
-    .layer__status--soon .dot { background: var(--color-secondary, #4e7d52); }
     .layer__title {
       margin: var(--spacing-300, 12px) 0 var(--spacing-200, 8px);
       font-size: var(--type-size-600, 2rem);
@@ -145,7 +137,6 @@ import { withBase } from '../lib/base';
     }
     .layer__go svg { transition: transform 0.14s ease; }
     .layer:hover .layer__go svg { transform: translateX(3px); }
-    .layer--soon .layer__go { color: var(--color-text-muted, #807c73); }
 
     /* ---- Footer ---- */
     .home__foot {

@@ -119,7 +119,18 @@ else from them. Extending with lighter/darker steps is the agreement with ABI
   `--bca-badge-*` (4 recommendation values: one neutral fill, hue in the ink).
 - Provenance separates by weight here and by SHAPE in the component — color is
   already spoken for by the rating classes.
-- Type: Inter (300–700) + Crimson Pro Light on page titles; Roboto Mono for
+- **Tone inks and hovers are mapped, not inherited.** Our solids sit at step 11
+  so they can carry white; the hub's sit at 9 and carry dark ink. Mapping only
+  the fill shipped the hub's dark inks on our dark fills — secondary 2.06:1,
+  success 2.11:1, badge warning 2.26:1, button warning 3.24:1, every one a
+  failure and the "muddy label" Andy caught. `--color-{secondary,success,
+  warning}-on-fill` and `--button-on-warning` are now white, which clears all
+  of them (5.02–5.88, primary 10.46) with no fill moved. `--color-{success,
+  warning,danger,info}-hover` are the OKLab midpoint of each family's steps 11
+  and 12 — unmapped they jumped to hub lime, hub amber and, for info, BLUE.
+  `--color-{primary,secondary}-strong` were leaking a hub green (`#2a7e3b`)
+  into outline and soft buttons; they are ABI Green and sage/12 now.
+- Type: Inter (300–700) + Crimson Pro Light on page titles; JetBrains Mono for
   data values. Sentence case, never Title Case. `--font-display` is the hub's
   own hook, so DocsShell page titles pick the face up with no fork.
 - Compatibility block at the end of the theme re-points the old `--bca-*`
@@ -242,6 +253,28 @@ over the components, not a token change.
   hand-rolled button and reserves `EsaIconButton` for its plain admin link. The
   reusable home is a hub-level `esa-disclosure-button` — icon-only,
   `aria-expanded`, forwardable `paths`, class hook on the glyph.
+- **A tone is three tokens, and only the fill is documented as one.** Remapping
+  `--color-success` (or secondary, warning, danger, info) leaves
+  `--color-{tone}-on-fill` and `--color-{tone}-hover` pointing at the hub's own
+  palette, and both are silent failures: the ink because it still renders (just
+  at 2.06–2.26:1 on our darker fills), the hover because nothing is wrong until
+  the pointer lands and a success button turns lime, or an info button turns
+  blue. A spoke that remaps a tone MUST map all three, and the hub should say
+  so — or better, derive the ink from the fill. Also note the two components
+  disagree on the warning hook: `esa-badge` reads `--color-warning-on-fill`,
+  `esa-button` reads `--button-on-warning`. This spoke defines both.
+- **`esa-badge`'s dot variant fills from the HOVER token**
+  (`.esa-badge--dot.esa-badge--success { --_badge-bg: var(--color-success-hover) }`),
+  which conflates an interaction state with a status solid. It means a spoke
+  cannot choose a properly dark hover without darkening its status dots to
+  match — the reason this theme's hovers are the 11/12 midpoint rather than
+  step 12. The dot should read a solid of its own (`--color-{tone}` or a
+  dedicated `--color-{tone}-dot`).
+- **DocsShell's brand-mark slot is 30px; its own lettered square is 26px.**
+  Swapping a real logomark in via the slot therefore reflows the brand row —
+  in a 264px sidebar it wrapped both "Biochar Atlas" and the "Design System"
+  tag onto second lines (51.2px tall against 25.6px). The slot should default
+  to the same footprint as the mark it replaces. Overridden here at 26px.
 - `--focus-ring-color` is defined twice in `@esa/tokens` and the second one
   wins: `tokens.css` sets it to `--color-primary` (correct — it follows the
   theme), then `component-tokens.css` re-points it to `--color-border-focus`,
