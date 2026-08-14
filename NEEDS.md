@@ -184,21 +184,40 @@ Deleted: both prototype pages, `bca-assessment-report`,
 `ds-nav.ts`, `scripts/fetch-parcels.mjs`, and the `leaflet` /`@types/leaflet`
 dependencies with their Vite `optimizeDeps` workaround. One shell page survives
 at `/suitability-tool`, holding `bca-coming-soon`.
-- **"Atlas" IS the logotype.** The institute logotype was dropped from the
-  sidenav entirely (Andy, 2026-08-13, reversing the composition shipped hours
-  earlier); the lockup is now the issued symbol at 36px beside "Atlas" at 30px,
-  Crimson Pro Light in ABI Green. Horizontal rather than stacked: the header has
-  ~72px of vertical room and stacking pushes the first nav row down, and laid
-  out this way the collapse is honest — the word drops and the mark does not
-  move. 36px is the same size in both states and is also the floor; below ~32px
-  the gold star and the cutouts close into a blob. The institute keeps its
-  credit in the img `alt`. `bca-coming-soon` still repeats the relationship on
-  the canvas.
-- **Phase 2 pills are gone.** Those four sections render inert instead —
-  header only, no chevron, no sublist, `--color-text-muted` at 5.38:1 on the
-  sidenav. The disabled block MUST stay after the `.nav-section__header >
-  .esa-icon:first-child` rule: both weigh 0,2,0, so source order is the only
-  thing muting the icon, and that icon is the entire signal on the rail.
+- **The product logotype is "Biochar Atlas"** (Andy, 2026-08-14). This
+  REVERSES the 2026-08-13 call recorded here as *"'Atlas' IS the logotype"* —
+  the argument then was that the issued ABI mark already sets "American
+  Biochar Institute", so "Biochar" appeared twice in one lockup a few
+  centimetres apart. Andy weighed that and took the full product name anyway.
+  What survives the reversal: the institute logotype stays dropped, the mark
+  holds at 36px in both states (its floor — below ~32px the gold star and the
+  cutouts close into a blob), the pair stays horizontal rather than stacked
+  (the header has ~72px of vertical room, and horizontal is what makes the
+  collapse honest — the word drops, the mark does not move), and the institute
+  keeps its credit in the img `alt`.
+
+  What moved: the wordmark comes down from 30px to **24px**. Not a fit
+  problem — measured, "Biochar Atlas" in Crimson Pro Light is 155.2px at 30px
+  against 246px of usable width (340 nav − 32 header padding − 16 brand
+  padding − 36 mark − 10 gap), so 30px fits with 91px to spare. It is a
+  proportion problem: at 30px the word runs 4.3× the mark's own width and the
+  symbol reads as a bullet in front of a headline. The mark cannot meet it
+  halfway, so the type is the only side with room to give; at 24px the word is
+  124.2px, 3.5× the mark. `bca-coming-soon` repeats the relationship on the
+  canvas and came down proportionally, 28px → 22px.
+- **The nav is pruned to what is real** (Andy, 2026-08-14) — the Suitability
+  Tool, About, Admin. This retires the roadmap-preview idea entirely, along
+  with its two prior treatments: the "Phase 2" tag pills (2026-08-13) and the
+  inert muted sections that replaced them the same day. Both the
+  `.nav-section__header--disabled` block (and the source-order note that
+  guarded it against the `.esa-icon:first-child` rule) and the
+  `.nav-sublink--disabled` block are deleted, as are the `disabled` fields on
+  `NavSection` and `NavItem`. Suitability became a `link` section rather than
+  an accordion — one destination behind a chevron is a disclosure that
+  discloses nothing — which added `NavSection.href` and a
+  `.nav-section--active .nav-section__header--link` rule so a link section can
+  take the same active tint a sublink does. `activeNavId` now also opens the
+  section holding the match, unless `expandedSections` says otherwise.
 - **The shell ships EXPANDED** as of 2026-08-13. It shipped collapsed first,
   which hid the lockup, the nav hierarchy and the inert sections — everything
   the pass had just added — behind a click.

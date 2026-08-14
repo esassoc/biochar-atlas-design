@@ -7,12 +7,13 @@
 // Biochar changes vs Beacon:
 //   - Tokens: every --bcn-* swapped for semantic (--color-*) or spoke (--bca-*)
 //     tokens from theme-biochar.css, always with literal fallbacks.
-//   - Sidebar header: the issued ABI brand mark over the product wordmark —
-//     institute lockup + "Atlas" when expanded, the symbol alone on the
-//     collapsed rail. Beacon's project-switcher is dropped.
-//   - Nav: data-driven NavSections. The four planned Atlas modules are TOP-LEVEL
-//     sections rendered inert — muted, no chevron, no sublist — so the roadmap
-//     stays visible without competing with the one live section.
+//   - Sidebar header: the issued ABI symbol beside the product wordmark —
+//     "Biochar Atlas" when expanded, the symbol alone on the collapsed rail.
+//     Beacon's project-switcher is dropped.
+//   - Nav: data-driven NavSections, pruned to what is real — the Suitability
+//     Tool, About and Admin. The Phase 2 roadmap sections were removed
+//     outright (Andy, 2026-08-14); a nav that previews unbuilt modules was
+//     reading as an app with dead links.
 //   - Topbar: sidebar toggle on the left, global search in the center, a simple
 //     user menu (Profile / Sign out) on the right. No page heading, no badges.
 import BaseLayout from './BaseLayout.astro';
@@ -27,8 +28,6 @@ interface NavItem {
   /** Real route (already withBase'd). Defaults to the `#id` stub when absent. */
   href?: string;
   active?: boolean;
-  /** Ghosted roadmap item — muted, not-allowed cursor, no navigation. */
-  disabled?: boolean;
 }
 interface NavSection {
   id: string;
@@ -37,17 +36,13 @@ interface NavSection {
   /** Inline Lucide path markup for glyphs not in esa-icon's registry. */
   iconPaths?: string;
   items?: NavItem[];
-  /** Single-link section (no sublist). */
+  /** Single-link section (no sublist) — the header IS the link. */
   link?: boolean;
+  /** Destination for a `link` section (already withBase'd). */
+  href?: string;
   expanded?: boolean;
   active?: boolean;
   dividerAfter?: boolean;
-  /**
-   * Whole section is inert: the header renders muted with no chevron and does
-   * not open. `items` stay in the data as the roadmap record — flipping this
-   * flag is what renders them.
-   */
-  disabled?: boolean;
 }
 interface Props {
   title?: string;
@@ -63,13 +58,6 @@ const LUCIDE = {
   // section icons
   'map-pinned':
     '<path d="M18 8c0 3.613-3.869 7.429-5.393 8.795a1 1 0 0 1-1.214 0C9.87 15.429 6 11.613 6 8a6 6 0 0 1 12 0"/><circle cx="12" cy="8" r="2"/><path d="M8.714 14h-3.71a1 1 0 0 0-.948.683l-2.004 6A1 1 0 0 0 3 22h18a1 1 0 0 0 .948-1.316l-2-6a1 1 0 0 0-.949-.684h-3.712"/>',
-  // Atlas-module sections (database lives in esa-icon's registry)
-  store:
-    '<path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/>',
-  'book-open':
-    '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
-  'clipboard-check':
-    '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
   // About section
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   // user menu
@@ -82,72 +70,20 @@ const {
   title = 'Biochar Suitability Tool',
   activeNavId,
   expandedSections,
-  // Default nav: the live Suitability section, then the four planned Atlas
-  // modules as inert top-level sections, then About and Admin. The roadmap is
-  // deliberately visible but unopenable — no pill says so, the muted header and
-  // the missing chevron do.
+  // Default nav — only what is real: the Suitability Tool, About, Admin.
+  // The Suitability Tool is a single link rather than a section because it has
+  // exactly one destination; a chevron over a one-item list is a disclosure
+  // that discloses nothing.
   navSections = [
     {
-      id: 'suitability',
-      title: 'Suitability',
+      id: 'suitability-tool',
+      title: 'Suitability Tool',
       icon: 'map-pinned',
       iconPaths: LUCIDE['map-pinned'],
-      expanded: true,
+      link: true,
+      href: withBase('/suitability-tool'),
+      active: true,
       dividerAfter: true,
-      items: [
-        { id: 'suitability-tool', label: 'Suitability Tool', href: withBase('/suitability-tool'), active: true },
-        { id: 'scenario-comparison', label: 'Scenario Comparison', disabled: true },
-        { id: 'saved-assessments', label: 'Saved Assessments', disabled: true },
-        { id: 'cps-336-calculator', label: 'CPS 336 Calculator', disabled: true },
-      ],
-    },
-    {
-      id: 'sourcing',
-      title: 'Sourcing',
-      icon: 'store',
-      iconPaths: LUCIDE['store'],
-      disabled: true,
-      items: [
-        { id: 'find-suppliers', label: 'Find Suppliers', disabled: true },
-        { id: 'compare-materials', label: 'Compare Materials', disabled: true },
-        { id: 'supplier-directory', label: 'Supplier Directory', disabled: true },
-      ],
-    },
-    {
-      id: 'learning-center',
-      title: 'Learning Center',
-      icon: 'book-open',
-      iconPaths: LUCIDE['book-open'],
-      disabled: true,
-      items: [
-        { id: 'biochar-basics', label: 'Biochar Basics', disabled: true },
-        { id: 'fact-sheets-videos', label: 'Fact Sheets & Videos', disabled: true },
-        { id: 'training-ceus', label: 'Training & CEUs', disabled: true },
-      ],
-    },
-    {
-      id: 'nrcs-implementation',
-      title: 'NRCS Implementation',
-      icon: 'clipboard-check',
-      iconPaths: LUCIDE['clipboard-check'],
-      disabled: true,
-      items: [
-        { id: 'practice-planning', label: 'Practice Planning (CPS 336)', disabled: true },
-        { id: 'cost-payment-estimator', label: 'Cost & Payment Estimator', disabled: true },
-        { id: 'monitoring-risk', label: 'Monitoring & Risk Guidance', disabled: true },
-      ],
-    },
-    {
-      id: 'deployment-database',
-      title: 'Deployment Database',
-      icon: 'database',
-      disabled: true,
-      dividerAfter: true,
-      items: [
-        { id: 'field-trials', label: 'Field Trials', disabled: true },
-        { id: 'outcomes-explorer', label: 'Outcomes Explorer', disabled: true },
-        { id: 'submit-trial-data', label: 'Submit Trial Data', disabled: true },
-      ],
     },
     {
       id: 'about',
@@ -166,6 +102,7 @@ const {
       icon: 'settings',
       expanded: false,
       items: [
+        { id: 'admin-users', label: 'Users', href: withBase('/admin/users') },
         { id: 'admin-catalog', label: 'Biochar Catalog', href: '#' },
         { id: 'datasets-refresh', label: 'Datasets & Refresh', href: '#' },
         { id: 'algorithm-versions', label: 'Algorithm Versions', href: '#' },
@@ -181,16 +118,20 @@ if (expandedSections) {
   }
 }
 
-// Per-page nav highlight — activeNavId beats the static default (Suitability Tool).
-// Disabled (roadmap) items never highlight.
+// Per-page nav highlight — activeNavId beats the static default (Suitability
+// Tool). A `link` section matches on its own id, since it has no sublist.
+// Matching a sublink also OPENS its section: an active row inside a collapsed
+// accordion is a highlight nobody can see. An explicit `expandedSections`
+// still wins, so a page can override.
 if (activeNavId) {
   for (const section of navSections) {
-    let hit = false;
+    let hit = section.link === true && section.id === activeNavId;
     for (const item of section.items ?? []) {
-      item.active = !item.disabled && item.id === activeNavId;
+      item.active = item.id === activeNavId;
       if (item.active) hit = true;
     }
     section.active = hit;
+    if (hit && !expandedSections) section.expanded = true;
   }
 }
 ---
@@ -283,7 +224,7 @@ if (activeNavId) {
            behind a click. -->
       <nav class="side-nav" id="side-nav">
         <div class="sidebar-header">
-          <a href={withBase('/')} class="brand" aria-label="Atlas — American Biochar Institute">
+          <a href={withBase('/')} class="brand" aria-label="Biochar Atlas — American Biochar Institute">
             <img
               class="brand__logo brand__logo--symbol"
               src={withBase('/abi-logo-symbol-alpha.png')}
@@ -291,7 +232,7 @@ if (activeNavId) {
               height="1246"
               alt="American Biochar Institute"
             />
-            <span class="brand__product">Atlas</span>
+            <span class="brand__product">Biochar Atlas</span>
           </a>
         </div>
 
@@ -299,20 +240,9 @@ if (activeNavId) {
           {
             navSections.map((section) => (
               <>
-                {section.disabled ? (
-                  <div class="nav-section">
-                    <div class="nav-section__header nav-section__header--disabled" aria-disabled="true">
-                      <EsaIcon
-                        name={section.icon}
-                        size="sm"
-                        paths={section.iconPaths ?? LUCIDE[section.icon as keyof typeof LUCIDE]}
-                      />
-                      <span class="nav-section__title">{section.title}</span>
-                    </div>
-                  </div>
-                ) : section.link ? (
+                {section.link ? (
                   <div class:list={['nav-section', { 'nav-section--active': section.active }]}>
-                    <a href={`#${section.id}`} class="nav-section__header nav-section__header--link">
+                    <a href={section.href ?? `#${section.id}`} class="nav-section__header nav-section__header--link">
                       <EsaIcon
                         name={section.icon}
                         size="sm"
@@ -343,15 +273,9 @@ if (activeNavId) {
                     <ul class="nav-section__items">
                       {section.items?.map((item) => (
                         <li class="nav-item">
-                          {item.disabled ? (
-                            <span class="nav-sublink nav-sublink--disabled" aria-disabled="true">
-                              <span class="nav-sublink__label">{item.label}</span>
-                            </span>
-                          ) : (
-                            <a href={item.href ?? `#${item.id}`} class:list={['nav-sublink', { active: item.active }]}>
-                              <span class="nav-sublink__label">{item.label}</span>
-                            </a>
-                          )}
+                          <a href={item.href ?? `#${item.id}`} class:list={['nav-sublink', { active: item.active }]}>
+                            <span class="nav-sublink__label">{item.label}</span>
+                          </a>
                         </li>
                       ))}
                     </ul>
@@ -752,8 +676,10 @@ if (activeNavId) {
   }
 
   /* Brand — the symbol beside the product wordmark, one lockup.
-     The institute logotype is gone (Andy, 2026-08-13): "Atlas" IS the
-     logotype here. Side by side rather than stacked for two reasons. The
+     The institute logotype is gone (Andy, 2026-08-13); the product name is
+     the logotype here, and it is "Biochar Atlas" (Andy, 2026-08-14, reversing
+     the "Atlas" alone shipped the day before). Side by side rather than
+     stacked for two reasons. The
      header has ~72px of vertical room and Crimson Pro at display scale is a
      wide, low word, so stacking would push the first nav row down the rail.
      And laid out horizontally the collapse is honest — the word drops away
@@ -787,25 +713,38 @@ if (activeNavId) {
   .brand__logo--symbol {
     width: 36px;
   }
-  /* The product name — now the logotype, not a subtitle under one. Crimson Pro
+  /* The product name — the logotype, not a subtitle under one. Crimson Pro
      Light in ABI Green, the same treatment bca-coming-soon gives it, so the
-     lockup reads the same in the chrome and on the canvas. 30px against the
-     36px mark: the word leads and the symbol reads as the mark before it. */
+     lockup reads the same in the chrome and on the canvas.
+
+     24px, down from the 30px "Atlas" alone carried (Andy, 2026-08-14).
+
+     Not a fit problem — measured, "Biochar Atlas" in Crimson Pro Light is
+     155.2px at 30px against 246px of usable width (340 nav − 32 header
+     padding − 16 brand padding − 36 mark − 10 gap), so 30px fits with 91px to
+     spare. It is a proportion problem: at 30px the word runs 4.3× the mark's
+     own width and the symbol reads as a bullet in front of a headline. The
+     mark cannot meet it halfway — 36px is its floor, below which the gold
+     star and the cutouts close into a blob — so the type is the only side
+     with room to give. At 24px the word measures 124.2px, 3.5× the mark, and
+     the pair reads as a mark with a name rather than a name with a mark. */
   .brand__product {
     font-family: var(--font-display, 'Crimson Pro', Georgia, serif);
     font-weight: var(--font-weight-light, 300);
-    font-size: 1.875rem; /* 30px */
+    font-size: 1.5rem; /* 24px */
     line-height: 1;
     color: var(--color-primary, #364500);
+    white-space: nowrap;
   }
   .side-nav.collapsed .brand {
     justify-content: center;
     padding: var(--spacing-200, 0.5rem) 0;
     width: 100%;
   }
-  /* The 72px rail leaves 56px of usable width. "Atlas" scaled to fit lands
-     under the 16px type floor, so the rail carries the symbol alone and the
-     product name comes back the moment the rail expands. */
+  /* The 72px rail leaves 56px of usable width. "Biochar Atlas" scaled to fit
+     lands far under the 16px type floor, so the rail carries the symbol alone
+     and the product name comes back the moment the rail expands. The mark does
+     not move between the two states — only the word leaves. */
   .side-nav.collapsed .brand__product {
     display: none;
   }
@@ -901,27 +840,13 @@ if (activeNavId) {
     transform: rotate(-90deg);
   }
 
-  /* Phase 2 sections. The roadmap stays legible in the nav, but the header does
-     not open and does not respond — muted label, muted icon, no chevron, no
-     hover. That absence is the statement; a pill saying the same thing beside
-     it would be the label repeating the treatment.
-
-     Must sit AFTER the icon rule above: both selectors weigh 0,2,0, so source
-     order is the only thing deciding the icon color, and placing this block
-     earlier silently left the icons at full strength — which is the whole
-     signal on the collapsed rail. */
-  .nav-section__header--disabled,
-  .nav-section__header--disabled:hover {
-    color: var(--color-text-muted, #807c73);
-    background: transparent;
-    /* Default, not not-allowed (Andy, 2026-08-13). These sections are not
-       refusing an action, they are roadmap — the muting already says so, and
-       the crossed-circle reads as an error. */
-    cursor: default;
-  }
-  .nav-section__header--disabled > :global(.esa-icon:first-child),
-  .nav-section__header--disabled:hover > :global(.esa-icon:first-child) {
-    color: var(--color-text-muted, #807c73);
+  /* A `link` section IS the page when it is active, so it takes the same
+     treatment a sublink does — the active tint plus the Green label. Section
+     headers are already semibold, so weight is doing its part for free. */
+  .nav-section--active .nav-section__header--link,
+  .nav-section--active .nav-section__header--link:hover {
+    background: var(--_nav-active-bg, #d6dccc);
+    color: var(--_nav-active-ink, #364500);
   }
 
   /* title spans flex between icon and chevron */
@@ -1094,15 +1019,4 @@ if (activeNavId) {
     background: var(--_nav-active-bg, #d6dccc);
     color: var(--_nav-active-ink, #364500);
   }
-
-  /* Ghosted roadmap items */
-  .nav-sublink--disabled {
-    color: var(--color-text-muted, #807c73);
-    cursor: default;
-  }
-  .nav-sublink--disabled:hover {
-    background: transparent;
-    color: var(--color-text-muted, #807c73);
-  }
-
 </style>

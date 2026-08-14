@@ -4,11 +4,10 @@
 // wordmark, then the module name and its status.
 //
 // The lockup relationship is the same one the sidenav uses — the issued ABI
-// mark carries the institute, "Atlas" carries the product, and the two stack,
-// with "Atlas" in the brand headline face and ABI Green so it reads as a
-// wordmark rather than a caption. The sidenav takes the horizontal mark
-// because it has 156px of width; a centered composition takes the square
-// symbol.
+// mark carries the institute, "Biochar Atlas" carries the product, and the two
+// stack, with the name in the brand headline face and ABI Green so it reads as
+// a wordmark rather than a caption. The sidenav lays the pair side by side
+// because it has the width; a centered canvas stacks them.
 import { withBase } from '../../lib/base';
 
 interface Props {
@@ -35,7 +34,7 @@ const { moduleName, status = 'Coming soon' } = Astro.props;
       height="1246"
       alt="American Biochar Institute"
     />
-    <p class="bca-coming-soon__product">Atlas</p>
+    <p class="bca-coming-soon__product">Biochar Atlas</p>
   </div>
 
   <h1 class="bca-coming-soon__module">{moduleName}</h1>
@@ -71,11 +70,16 @@ const { moduleName, status = 'Coming soon' } = Astro.props;
     height: auto;
   }
 
+  /* 22px, down from 28px when the word was "Atlas" alone (Andy, 2026-08-14).
+     Unlike the sidenav there is no width constraint here — the reduction is
+     proportional, so the canvas lockup stays a smaller echo of the same
+     relationship rather than a second, larger wordmark competing with the
+     module title below it. */
   .bca-coming-soon__product {
     margin: 0;
     font-family: var(--font-display, 'Crimson Pro', Georgia, serif);
     font-weight: var(--font-weight-light, 300);
-    font-size: 1.75rem; /* 28px */
+    font-size: 1.375rem; /* 22px */
     line-height: 1.1;
     color: var(--color-primary, #364500);
   }
