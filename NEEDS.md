@@ -19,12 +19,12 @@ else from them. Extending with lighter/darker steps is the agreement with ABI
   which is why the active nav item is a solid fill and not a wash) and buys the
   first primary border in this palette that clears WCAG 1.4.11 — green/7 at
   3.06 on canvas, 3.25 on the panel, against green/6's 1.47.
-- **Chrome is a tinted shell** — four surfaces on ONE hue (OKLCH 106.6°, the
-  Sage family), stepped in lightness with chroma tapering as they lighten.
+- **Chrome is a tinted shell** — four surfaces in the Sage family (OKLCH hue
+  97–107°), stepped in lightness with chroma tapering as they lighten.
   Chosen by Andy 2026-08-13 from four lightness ladders; the shipped one is
   "Sage Light 2", the third-lightest.
 
-      topbar   #eaeae2      sidenav  #edece5      canvas  #f4f3ee
+      topbar   #e6e5dd      sidenav  #edece5      canvas  #f4f3ee
       panel    #fafaf7      seam     #deddd4
 
   This SUPERSEDES the neutral-ramp chrome (topbar `#ffffff` · canvas `#f6f5f4`
@@ -36,8 +36,16 @@ else from them. Extending with lighter/darker steps is the agreement with ABI
   from the Ash sidebar and the sidebar sat 0.0783 from the white workflow
   panel — the two hardest seams in the app, about four times the 0.020
   visible-edge floor, and the reason the shell read as cut in half. Tinting
-  collapses the topbar seam to 0.0073 and halves the panel seam to 0.0427. The
+  collapses the topbar seam to 0.0215 and halves the panel seam to 0.0427. The
   panel cannot come down further and stay legible at table density.
+
+  The topbar seam landed at 0.0073 first — one continuous frame, deliberately
+  sub-floor. Andy asked for "just a tick" of separation the same day, so the
+  bar moved down the Sage ladder to `#e6e5dd`, the exact OKLab midpoint of
+  sage/4 and sage/5. That is a real rung of the ramp, not a value reverse-
+  engineered from a target: sage/4 itself reads at 0.0094 (invisible) and
+  sage/5 at 0.0310 (a band across the top). It also puts the bar on the ramp's
+  own hue, 100.8°, rather than the 106.6° the interpolated value carried.
 
   Two crossings, both resolved in the application rather than shipped quietly:
   the panel could not clear the canvas AND white at once (0.036 of lightness

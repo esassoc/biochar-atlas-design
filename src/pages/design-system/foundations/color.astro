@@ -42,9 +42,9 @@ const roles = [
   { token: 'color-success', value: '#177c52', note: 'Positive — suitable, saved, complete. Conventional green, deliberately not a brand color.' },
   { token: 'color-warning', value: '#a45e00', note: 'Caution. Conventional amber at text/icon weight — the brand’s own Gold is 2.07:1 and cannot carry a state.' },
   { token: 'color-danger', value: '#cd2a30', note: 'Negative. Conventional red. Status is functional convention; brand color carries identity.' },
-  { token: 'color-text-primary', value: '#21201c', note: 'Body text. 15.59:1 on the panel, 13.48:1 on the topbar — the shell’s darkest surface.' },
+  { token: 'color-text-primary', value: '#21201c', note: 'Body text. 15.59:1 on the panel, 12.90:1 on the topbar — the shell’s darkest surface.' },
   { token: 'color-text-secondary', value: '#474540', note: 'Supporting text — brand Grey, doing real work.' },
-  { token: 'color-text-muted', value: '#615f5a', note: 'Meta text. The palette floor: 5.27:1 on the topbar, and anything lighter fails AA there.' },
+  { token: 'color-text-muted', value: '#615f5a', note: 'Meta text. The palette floor: 5.05:1 on the topbar, and anything lighter fails AA there.' },
   { token: 'color-text-link', value: '#45173d', note: 'Purple on light, jade on dark — per the brand guide.' },
   { token: 'color-border', value: '#d0cfcc', note: 'Hairline dividers inside content (neutral/6). The shell’s own seams use bca-chrome-seam.' },
   { token: 'color-surface', value: '#fafaf7', note: 'Cards, the workflow panel, and floating map controls. Near-white for table legibility, tinted just enough to hold an edge against the canvas (ΔE 0.0209).' },
@@ -52,10 +52,10 @@ const roles = [
   { token: 'color-surface-sunken', value: '#e8e5de', note: 'Control wells, hover fills and status pills. Brand Ash exactly. No longer the sidebar — see the chrome tokens below.' },
 ];
 
-// The app shell. Four surfaces on one hue, stepped in lightness with chroma
-// tapering as they lighten. Chosen by Andy 2026-08-13.
+// The app shell. Four surfaces in the Sage family, stepped in lightness with
+// chroma tapering as they lighten. Chosen by Andy 2026-08-13.
 const chrome = [
-  { token: 'bca-chrome-topbar', value: '#eaeae2', note: 'Topbar. The darkest of the four, and only just — ΔE 0.0073 from the sidenav, so the two read as one frame.' },
+  { token: 'bca-chrome-topbar', value: '#e6e5dd', note: 'Topbar. The darkest of the four by one tick — ΔE 0.0215 from the sidenav, just over the 0.020 floor. The midpoint of sage/4 and sage/5, so it is a rung of the ramp rather than a value picked to hit a number.' },
   { token: 'bca-chrome-sidenav', value: '#edece5', note: 'App navigation. Sits ΔE 0.0427 from the workflow panel, down from 0.0783 when both this and the topbar were untinted.' },
   { token: 'color-background', value: '#f4f3ee', note: 'Canvas. ΔE 0.0218 from the sidenav.' },
   { token: 'color-surface', value: '#fafaf7', note: 'Panel and cards. ΔE 0.0209 from the canvas.' },

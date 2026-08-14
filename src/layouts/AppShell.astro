@@ -485,11 +485,12 @@ if (activeNavId) {
      topbar
      ═══════════════════════════════════════════════════════════════════ */
   .topbar {
-    /* Darkest of the four shell surfaces, and only just: it sits ΔE 0.0073
-       from the sidenav, so the two read as one continuous frame around the
-       work. That seam was 0.0783 when the topbar was white, which is what
-       made the old shell feel cut in half. */
-    --_topbar-bg: var(--bca-chrome-topbar, #eaeae2);
+    /* Darkest of the four shell surfaces, by one tick: ΔE 0.0215 from the
+       sidenav, just over the 0.020 visible-edge floor. The bar is its own
+       plane, but the two still share the Sage cast, so the shell reads as one
+       frame with a lid rather than the two unrelated regions it was at 0.0783
+       when the topbar was white. */
+    --_topbar-bg: var(--bca-chrome-topbar, #e6e5dd);
 
     position: fixed;
     top: 0;

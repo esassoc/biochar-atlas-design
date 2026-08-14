@@ -180,7 +180,7 @@
   --bca-purple-13: #36082f;
 
   /* ═══ CHROME ══════════════════════════════════════════════════════════
-     A tinted shell: four surfaces on ONE hue (OKLCH 106.6°, the Sage family),
+     A tinted shell: four surfaces in the Sage family (OKLCH hue 97–107°),
      stepped in lightness, with chroma tapering as they lighten so the tint
      stays even instead of going chalky at the top. Chosen by Andy 2026-08-13
      from four lightness ladders; this is the third-lightest ("Sage Light 2").
@@ -188,12 +188,12 @@
      The problem it solves is measurable. Shipped, the white topbar sat ΔE
      0.0783 from the Ash sidebar and the sidebar sat 0.0783 from the white
      workflow panel — the two hardest seams in the app, about four times the
-     0.020 visible-edge floor. Tinting collapses the topbar seam to 0.0073 and
+     0.020 visible-edge floor. Tinting collapses the topbar seam to 0.0215 and
      the panel seam to 0.0427. The panel cannot come down further and stay
      legible at table density, so that seam is halved, not erased.
 
      Adjacencies as shipped (OKLab ΔE, floor 0.020):
-       topbar → sidenav  0.0073   one frame, deliberately continuous
+       topbar → sidenav  0.0215   its own region, one tick down (was 0.0073)
        sidenav → panel   0.0427   the tool page's real seam (was 0.0783)
        sidenav → canvas  0.0218   report and landing pages
        canvas → panel    0.0209   every card on a report page
@@ -213,14 +213,23 @@
 
      The neutral ramp keeps borders, text, wells and disabled states. Only the
      four shell surfaces moved onto the Sage hue. */
-  --bca-chrome-topbar:  #eaeae2;  /* L 0.935 */
+  /* The topbar is its own region, not a continuation of the sidenav (Andy,
+     2026-08-13 — "just a tick" darker). It is the exact OKLab midpoint of
+     sage-4 (#eae9e1) and sage-5 (#e3e2d9), so it is a real rung of the Sage
+     ladder rather than a value picked to hit a number, and it sits on the
+     ramp's own hue (100.8°) instead of the 106.6° the interpolated value had.
+     ΔE 0.0215 from the sidenav: over the 0.020 floor and barely — the bar
+     reads as a distinct plane without becoming a band across the top.
+     sage-4 itself lands at 0.0094 (invisible) and sage-5 at 0.0310 (a band). */
+  --bca-chrome-topbar:  #e6e5dd;  /* L 0.922 */
   --bca-chrome-sidenav: #edece5;  /* L 0.943 */
   /* The shell's hairline. It carries the sidenav/basemap seam outright: on the
      report and landing layouts the sidenav meets basemap land at ΔE 0.0170,
      under the 0.020 floor, so those two edges are the border and nothing else.
      The tool page is unaffected — there the sidenav's neighbour is the panel
      (0.0427). Anything that puts the sidenav against the map without this
-     border loses the edge. */
+     border loses the edge. It still carries the topbar's own bottom edge at
+     ΔE 0.0247 — the darker bar closes on the seam but does not swallow it. */
   --bca-chrome-seam:    #deddd4;  /* L 0.896 — vs sidenav ΔE 0.0462 */
 
   --color-surface:          #fafaf7;  /* L 0.985 — cards, workflow panel, map controls */
@@ -242,14 +251,14 @@
 
      -subtle is a near-neutral tint (the cost of anchoring at 9), so it holds
      only on the two light surfaces: ΔE 0.0334 on canvas and 0.0540 on the
-     panel, but 0.0062 on the topbar and 0.0126 on the sidenav — i.e. it
+     panel, but 0.0123 on the topbar and 0.0126 on the sidenav — i.e. it
      disappears into the shell's darker half. Use it for callout fills on
      canvas and panel; never as a state on chrome. That is why the active nav
      item is a solid fill (AppShell) and not a wash.
 
      -border is the first primary border in this palette that is legitimate as
      a non-text indicator: 3.06 on canvas and 3.25 on the panel, clearing WCAG
-     1.4.11. It is 2.81/2.87 on topbar and sidenav, which is fine because form
+     1.4.11. It is 2.69/2.87 on topbar and sidenav, which is fine because form
      fields live on the panel and on cards, not in the chrome. The step it
      replaced (green-6) measured 1.47 and never cleared anywhere. */
   --color-primary:         var(--bca-green-9);
@@ -262,7 +271,7 @@
 
   /* ═══ TEXT ════════════════════════════════════════════════════════════
      Measured on the worst light surface in the shell, which is the topbar
-     (#eaeae2): primary 13.48 · secondary 7.92 · tertiary 5.27. On the panel,
+     (#e6e5dd): primary 12.90 · secondary 7.58 · tertiary 5.05. On the panel,
      the lightest, they run 15.59 / 9.16 / 6.10. Muted deliberately collapses
      onto tertiary — anything lighter on this hue falls under 4.5:1 against the
      topbar, so the palette has no room for a fourth text weight. Data-dense
@@ -276,7 +285,7 @@
   --color-text-tertiary:  var(--bca-neutral-11);
   --color-text-muted:     var(--bca-neutral-11);
   --color-text-inverse:   #ffffff;
-  /* Disabled: 3.44 on the panel down to 2.97 on the topbar. WCAG exempts
+  /* Disabled: 3.44 on the panel down to 2.84 on the topbar. WCAG exempts
      inactive controls from contrast, and the ghosted Phase 2 nav items are the
      main consumer, but it is under 3.0 on the shell's darkest surface — do not
      borrow this token for anything that is merely quiet rather than disabled. */
