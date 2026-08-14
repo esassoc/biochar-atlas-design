@@ -310,14 +310,7 @@ if (activeNavId) {
            behind a click. -->
       <nav class="side-nav" id="side-nav">
         <div class="sidebar-header">
-          <a href={withBase('/')} class="brand" aria-label="Biochar Atlas home">
-            <img
-              class="brand__logo brand__logo--lockup"
-              src={withBase('/abi-logo-stacked-alpha.png')}
-              width="3157"
-              height="1286"
-              alt="American Biochar Institute"
-            />
+          <a href={withBase('/')} class="brand" aria-label="Atlas — American Biochar Institute">
             <img
               class="brand__logo brand__logo--symbol"
               src={withBase('/abi-logo-symbol-alpha.png')}
@@ -371,6 +364,9 @@ if (activeNavId) {
                       <span class="nav-section__title">{section.title}</span>
                       <EsaIcon name="chevron-down" size="sm" />
                     </button>
+                    <div class="nav-flyout">
+                    <div class="nav-flyout__panel">
+                    <span class="nav-flyout__title">{section.title}</span>
                     <ul class="nav-section__items">
                       {section.items?.map((item) => (
                         <li class="nav-item">
@@ -400,6 +396,8 @@ if (activeNavId) {
                         </li>
                       ))}
                     </ul>
+                    </div>
+                    </div>
                   </div>
                 )}
                 {section.dividerAfter && <hr class="nav-divider" aria-hidden="true" />}
@@ -439,6 +437,27 @@ if (activeNavId) {
       if (!section) return;
       const nowCollapsed = section.classList.toggle('nav-section--collapsed');
       btn.setAttribute('aria-expanded', String(!nowCollapsed));
+    });
+  });
+
+  // Keep aria-expanded honest for the collapsed-rail flyouts. CSS does the
+  // showing (:hover / :focus-within), which a static attribute cannot describe,
+  // so the same header button that reports the accordion state when the rail is
+  // open reports the flyout state when it is closed. Only aria-expanded is set:
+  // aria-haspopup would advertise a menu widget, and these are plain links with
+  // no menu-item keyboard model behind them.
+  document.querySelectorAll<HTMLElement>('.nav-section').forEach((section) => {
+    const btn = section.querySelector<HTMLElement>('.nav-section__header');
+    if (!btn || !section.querySelector('.nav-flyout')) return;
+    const sync = (open: boolean) => {
+      if (!sideNav?.classList.contains('collapsed')) return;
+      btn.setAttribute('aria-expanded', String(open));
+    };
+    section.addEventListener('mouseenter', () => sync(true));
+    section.addEventListener('mouseleave', () => sync(false));
+    section.addEventListener('focusin', () => sync(true));
+    section.addEventListener('focusout', (e) => {
+      if (!section.contains(e.relatedTarget as Node)) sync(false);
     });
   });
 
@@ -510,13 +529,20 @@ if (activeNavId) {
        when the topbar was white. */
     --_topbar-bg: var(--bca-chrome-topbar, #e6e5dd);
 
+    /* The topbar's own bottom edge runs one rung darker than the shell seam —
+       sage-7, where every other chrome border is #deddd4. Under a bar that is
+       now its own plane, the shared seam went soft: it reads ΔE 0.0247 against
+       the topbar where sage-7 reads 0.0684. Scoped here deliberately; the
+       sidenav's right edge and the panels keep --_chrome-border. */
+    --_topbar-border: var(--bca-sage-7, #d0cfc4);
+
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     height: var(--_topbar-h, 56px);
     background: var(--_topbar-bg, #f3f1ea);
-    border-bottom: 1px solid var(--_chrome-border, #ddd9d0);
+    border-bottom: 1px solid var(--_topbar-border, #d0cfc4);
     z-index: 1100;
 
     display: grid;
@@ -614,15 +640,19 @@ if (activeNavId) {
     width: 32px;
     height: 32px;
     border-radius: var(--radius-full, 9999px);
-    background: var(--bca-green-100, #e2ecda);
-    color: var(--color-primary, #234a31);
-    border: 2px solid var(--bca-green-200, #c8dabe);
-    font-size: 0.75rem;
+    /* Brand Gold, filled (Andy, 2026-08-13). Dark initials, never white:
+       white on Gold is 1.60:1, Green on Gold is 6.54:1. No ring — the disc
+       sits ΔE 0.1416 from the topbar, seven times the visible-edge floor, so
+       it holds its own edge, and the old green ring was doing that job for a
+       fill that could not. */
+    background: var(--bca-brand-gold, #ffc261);
+    color: var(--color-primary, #364500);
+    font-size: 0.875rem;
     font-weight: var(--font-weight-semibold, 600);
-    transition: border-color 150ms ease;
+    transition: box-shadow 150ms ease;
   }
   .user-trigger:hover .user-trigger__avatar {
-    border-color: var(--color-primary, #234a31);
+    box-shadow: 0 0 0 2px var(--bca-gold-10, #ca8c02);
   }
   .user-trigger__name {
     font-size: 0.875rem;
@@ -701,15 +731,41 @@ if (activeNavId) {
   .side-nav {
     --_sidenav-bg: var(--bca-chrome-sidenav, #edece5);
     --_nav-hover-bg: var(--color-active-overlay, rgba(0, 0, 0, 0.04));
-    /* Solid, not a tint. --color-primary-subtle sits ΔE 0.0126 from this
-       sidenav — the same color — so a wash reads as no state at all. The solid
-       fill is 8.83:1 against the sidenav, which clears WCAG 1.4.11 outright. */
-    --_nav-active-bg: var(--color-primary, #364500);
+
+    /* ── The active-item treatment. Two tokens; swap the pair. ──────────
+       SHIPPED: green-4 wash + Green label, semibold (Andy asked for quieter
+       than the solid slab, 2026-08-13). green-4 sits ΔE 0.0583 from the
+       sidenav — roughly 3x the 0.020 visible-edge floor, so the row reads as
+       filled — and Green on it measures 7.45:1.
+
+       Read the trade honestly. The slab it replaces was 8.83:1 against the
+       sidenav, so the FILL ALONE cleared WCAG 1.4.11 as a non-text state
+       indicator. No tint can: green-7 is the first step over 3:1 (2.87, still
+       short) and it is far too dark to carry Green text. So the state now
+       rests on three changes together — fill, label color, and weight — which
+       satisfies 1.4.1 (it is not color alone) and keeps label contrast high,
+       but the fill by itself is no longer a 3:1 indicator. That is what
+       "quieter" costs here.
+
+       ALTERNATES — replace the two lines below, nothing else moves:
+         More presence, same idea:
+           --_nav-active-bg:  var(--bca-green-5);   (dE 0.1227, ink 6.06:1)
+           --_nav-active-ink: var(--color-primary);
+         Brand accent, warm:
+           --_nav-active-bg:  var(--bca-gold-5);    (dE 0.0612, ink 8.31:1)
+           --_nav-active-ink: var(--color-primary);
+         Gold is the only other hue in the mark, so it reads instantly — but it
+         is the one move that puts a second hue in a monochrome rail, and gold
+         carries no meaning elsewhere in this system yet.
+         Back to the slab: --_nav-active-bg: var(--color-primary) +
+         --_nav-active-ink: var(--color-text-inverse).
+       green-3 is not an option in any of these: at dE 0.0126 it is the sidenav. */
+    --_nav-active-bg: var(--bca-green-4, #d6dccc);
     /* Stays primary: this also colors .nav-section__header hover and active
        text, which sit directly on the sidenav. Inverting it here would blank
        those labels. The label ON the solid fill uses --_nav-active-ink. */
     --_nav-active-color: var(--color-primary, #364500);
-    --_nav-active-ink: var(--color-text-inverse, #ffffff);
+    --_nav-active-ink: var(--color-primary, #364500);
 
     width: var(--_sidenav-w, 300px);
     height: 100%;
@@ -736,12 +792,19 @@ if (activeNavId) {
     padding: var(--spacing-300, 0.75rem) var(--spacing-200, 0.5rem);
   }
 
-  /* Brand — the institute mark over the product wordmark */
+  /* Brand — the symbol beside the product wordmark, one lockup.
+     The institute logotype is gone (Andy, 2026-08-13): "Atlas" IS the
+     logotype here. Side by side rather than stacked for two reasons. The
+     header has ~72px of vertical room and Crimson Pro at display scale is a
+     wide, low word, so stacking would push the first nav row down the rail.
+     And laid out horizontally the collapse is honest — the word drops away
+     and the symbol stays exactly where it was, rather than the pair
+     reflowing. The institute keeps its credit in the img alt. */
   .brand {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-200, 0.5rem);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-250, 0.625rem);
     padding: var(--spacing-200, 0.5rem);
     border-radius: var(--radius-200, 0.5rem);
     text-decoration: none;
@@ -758,37 +821,28 @@ if (activeNavId) {
     flex-shrink: 0;
     height: auto;
   }
-  .brand__logo--lockup {
-    width: 156px;
-  }
-  /* 36px, not the 28px the old leaf glyph used: the symbol is a dense cluster
+  /* 36px in BOTH states, so the mark does not resize when the rail collapses —
+     only the word leaves. It is also the floor: the symbol is a dense cluster
      with fine negative space, and below ~32px the gold star and the cutouts
-     close up into a blob. Still clears the 56px the collapsed rail leaves. */
+     close up into a blob. */
   .brand__logo--symbol {
-    display: none;
     width: 36px;
   }
-  /* The product name, sitting under the institute mark and left-aligned to its
-     edge. Crimson Pro in ABI Green — the same treatment bca-coming-soon gives
-     it, so the lockup reads the same wherever it appears. No rule between the
-     two: the change of face, scale and color is the level shift. */
+  /* The product name — now the logotype, not a subtitle under one. Crimson Pro
+     Light in ABI Green, the same treatment bca-coming-soon gives it, so the
+     lockup reads the same in the chrome and on the canvas. 30px against the
+     36px mark: the word leads and the symbol reads as the mark before it. */
   .brand__product {
     font-family: var(--font-display, 'Crimson Pro', Georgia, serif);
     font-weight: var(--font-weight-light, 300);
-    font-size: 1.375rem; /* 22px */
+    font-size: 1.875rem; /* 30px */
     line-height: 1;
     color: var(--color-primary, #364500);
   }
   .side-nav.collapsed .brand {
-    align-items: center;
+    justify-content: center;
     padding: var(--spacing-200, 0.5rem) 0;
     width: 100%;
-  }
-  .side-nav.collapsed .brand__logo--lockup {
-    display: none;
-  }
-  .side-nav.collapsed .brand__logo--symbol {
-    display: block;
   }
   /* The 72px rail leaves 56px of usable width. "Atlas" scaled to fit lands
      under the 16px type floor, so the rail carries the symbol alone and the
@@ -812,8 +866,14 @@ if (activeNavId) {
   .main-nav::-webkit-scrollbar {
     display: none;
   }
+  /* overflow must go fully visible on the rail, not just overflow-x: a box
+     with `overflow-y: auto` computes a `visible` overflow-x to `auto` as well,
+     so the declaration above does NOT let the flyout escape — it would be
+     clipped at the rail's edge. Seven icon rows never need to scroll at 72px,
+     so the rail gives up scrolling to gain the overhang. */
   .side-nav.collapsed .main-nav {
     padding: 0 var(--spacing-200, 0.5rem);
+    overflow: visible;
   }
 
   .nav-section {
@@ -895,7 +955,10 @@ if (activeNavId) {
   .nav-section__header--disabled:hover {
     color: var(--color-text-muted, #807c73);
     background: transparent;
-    cursor: not-allowed;
+    /* Default, not not-allowed (Andy, 2026-08-13). These sections are not
+       refusing an action, they are roadmap — the muting already says so, and
+       the crossed-circle reads as an error. */
+    cursor: default;
   }
   .nav-section__header--disabled > :global(.esa-icon:first-child),
   .nav-section__header--disabled:hover > :global(.esa-icon:first-child) {
@@ -935,8 +998,85 @@ if (activeNavId) {
     max-height: 0;
     opacity: 0;
   }
-  .side-nav.collapsed .nav-section__items {
+
+  /* ── Collapsed-rail flyouts ──────────────────────────────────────────
+     On the 72px rail a section's sublinks move into a floating panel beside
+     the icon. Expanded, both wrappers are `display: contents`, so the <ul>
+     stays a direct flex child of .nav-section and the accordion above is
+     untouched — this whole block only exists inside .side-nav.collapsed.
+
+     bcn-lego-checked: nothing in the hub does a rail flyout. esa-sidebar-nav
+     — the closest thing, an entire sidebar nav — resolves the same problem
+     with `:host([collapsed]) .children { display: none }`, i.e. it drops the
+     children rather than relocating them. esa-nav-dropdown is a <details>
+     panel that opens BELOW its trigger (top: 100%, left: 0) off a labelled
+     icon-link with a chevron: wrong axis, wrong trigger. esa-popover is
+     closest mechanically (position="right", hover trigger, Esc + outside
+     click) but renders role="dialog" and pins itself to `top: 50%;
+     translateY(-50%)`, both inside shadow DOM and therefore unreachable — a
+     submenu of links is not a dialog, and a 4-item panel centred on a 44px
+     icon row hangs above and below it. Checked Ecology + Beacon; the reusable
+     home is a hub-level rail flyout. Filed in NEEDS.md. */
+  .nav-flyout,
+  .nav-flyout__panel {
+    display: contents;
+  }
+  .nav-flyout__title {
     display: none;
+  }
+
+  .side-nav.collapsed .nav-flyout {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    z-index: 1000;
+    /* Transparent, and the reason the flyout is two elements: the pointer has
+       to cross this gap to reach the panel, so the gap belongs INSIDE the
+       hover target rather than between the icon and the panel. Measured from
+       the section, not the rail — .main-nav's 8px padding means the panel
+       lands ~8px short of where this number suggests. */
+    padding-left: var(--spacing-500, 1.5rem);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 120ms ease, visibility 120ms;
+  }
+  /* :focus-within is what makes this keyboard-reachable. The links are
+     visibility:hidden and therefore untabbable until the panel opens — but
+     focusing the section's own header (which is always visible) opens it,
+     and from there the links are in the tab order. Tabbing off the last one
+     drops focus out of the section and closes it. */
+  .side-nav.collapsed .nav-section:hover .nav-flyout,
+  .side-nav.collapsed .nav-section:focus-within .nav-flyout {
+    visibility: visible;
+    opacity: 1;
+  }
+  .side-nav.collapsed .nav-flyout__panel {
+    display: block;
+    min-width: 208px;
+    padding: var(--spacing-200, 0.5rem);
+    background: var(--color-surface, #fafaf7);
+    border: 1px solid var(--_chrome-border, #deddd4);
+    border-radius: var(--radius-200, 0.5rem);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  }
+  /* The rail has no room for the section title, so the panel carries it —
+     otherwise the flyout is a list of links with nothing naming the group. */
+  .side-nav.collapsed .nav-flyout__title {
+    display: block;
+    padding: var(--spacing-150, 0.375rem) var(--spacing-200, 0.5rem);
+    font-size: 1rem;
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--color-text-primary, #21201c);
+  }
+  /* The accordion's own collapsed state must not follow the items into the
+     panel — inside a flyout the list is always open. */
+  .side-nav.collapsed .nav-flyout .nav-section__items {
+    max-height: none;
+    opacity: 1;
+  }
+  .side-nav.collapsed .nav-flyout .nav-item {
+    padding-left: 0;
   }
 
   /* Indent is shallower than Beacon's 2.5rem — items carry their own icons
@@ -977,21 +1117,30 @@ if (activeNavId) {
     background: var(--_nav-hover-bg, rgba(0, 0, 0, 0.04));
     color: var(--color-text-primary, #33312a);
   }
-  /* Active = solid primary fill + semibold + inverse text (no left-border
-     indicator). Label on the fill is 10.46:1. */
+  /* Active = tint fill + Green label + semibold (no left-border indicator).
+     All three change together; see the token block on .side-nav for why the
+     fill alone is no longer doing the work. */
   .nav-sublink.active {
-    background: var(--_nav-active-bg, #364500);
-    color: var(--_nav-active-ink, #fff);
+    background: var(--_nav-active-bg, #d6dccc);
+    color: var(--_nav-active-ink, #364500);
     font-weight: var(--font-weight-semibold, 600);
   }
   .nav-sublink.active :global(.esa-icon) {
-    color: var(--_nav-active-ink, #fff);
+    color: var(--_nav-active-ink, #364500);
+  }
+  /* Pins the active row against hover. `.nav-sublink.active` and
+     `.nav-sublink:hover` both weigh 0,2,0, so today the active rule wins only
+     because it happens to come later — this states the intent instead of
+     depending on that. */
+  .nav-sublink.active:hover {
+    background: var(--_nav-active-bg, #d6dccc);
+    color: var(--_nav-active-ink, #364500);
   }
 
   /* Ghosted roadmap items */
   .nav-sublink--disabled {
     color: var(--color-text-muted, #807c73);
-    cursor: not-allowed;
+    cursor: default;
   }
   .nav-sublink--disabled :global(.esa-icon) {
     color: var(--color-text-muted, #807c73);

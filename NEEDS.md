@@ -147,12 +147,16 @@ Deleted: both prototype pages, `bca-assessment-report`,
 `ds-nav.ts`, `scripts/fetch-parcels.mjs`, and the `leaflet` /`@types/leaflet`
 dependencies with their Vite `optimizeDeps` workaround. One shell page survives
 at `/suitability-tool`, holding `bca-coming-soon`.
-- **The product name now has a home.** The sidenav lockup is the issued ABI
-  mark over "Atlas" in Crimson Pro Light / ABI Green, left-aligned to the mark's
-  edge with no rule between them. `bca-coming-soon` repeats the relationship
-  with the square symbol so the lockup reads the same in both places. On the
-  72px rail the wordmark drops: scaled to fit 56px it lands under the 16px type
-  floor, and the symbol carries identity there.
+- **"Atlas" IS the logotype.** The institute logotype was dropped from the
+  sidenav entirely (Andy, 2026-08-13, reversing the composition shipped hours
+  earlier); the lockup is now the issued symbol at 36px beside "Atlas" at 30px,
+  Crimson Pro Light in ABI Green. Horizontal rather than stacked: the header has
+  ~72px of vertical room and stacking pushes the first nav row down, and laid
+  out this way the collapse is honest — the word drops and the mark does not
+  move. 36px is the same size in both states and is also the floor; below ~32px
+  the gold star and the cutouts close into a blob. The institute keeps its
+  credit in the img `alt`. `bca-coming-soon` still repeats the relationship on
+  the canvas.
 - **Phase 2 pills are gone.** Those four sections render inert instead —
   header only, no chevron, no sublist, `--color-text-muted` at 5.38:1 on the
   sidenav. The disabled block MUST stay after the `.nav-section__header >
@@ -161,6 +165,30 @@ at `/suitability-tool`, holding `bca-coming-soon`.
 - **The shell ships EXPANDED** as of 2026-08-13. It shipped collapsed first,
   which hid the lockup, the nav hierarchy and the inert sections — everything
   the pass had just added — behind a click.
+- **The active nav item is a tint, not a slab** (Andy: the solid green was
+  overwhelming). green-4 wash + Green label + semibold. Both halves are tokens
+  on `.side-nav` — `--_nav-active-bg` / `--_nav-active-ink` — and the block
+  above them carries two documented alternates (green-5 for more presence,
+  gold-5 for the warm/brand-accent read) as a two-line swap. The trade is
+  written down there and is worth knowing before touching it: the old slab was
+  8.83:1 against the sidenav, so the FILL ALONE satisfied WCAG 1.4.11. No tint
+  can — green-7 is the first step near 3:1 and it is far too dark to carry
+  Green text — so the state now rests on fill + color + weight together.
+- **Collapsed-rail flyouts.** A section's sublinks move into a floating panel
+  beside the rail on hover or focus. Two traps are load-bearing:
+  `.main-nav` had `overflow-y: auto; overflow-x: visible`, and a box with
+  `overflow-y: auto` computes `visible` to `auto` — the flyout was clipped at
+  the rail edge until the rail got `overflow: visible` outright. And the
+  panel is revealed with `visibility`, not `display`, specifically so
+  `:focus-within` on the always-visible section header opens it and puts the
+  links in the tab order.
+- **The topbar's bottom edge has its own token**, `--_topbar-border` at sage-7
+  — one rung darker than `--bca-chrome-seam`, which every other chrome border
+  still uses. Under a topbar that is now its own plane the shared seam read
+  soft (ΔE 0.0247 against the bar; sage-7 reads 0.0684).
+- **The user avatar is filled brand Gold with Green initials** (6.54:1). Never
+  white on gold — that is 1.60:1. The ring is gone; the disc sits ΔE 0.1416
+  from the topbar and holds its own edge.
 - The workflow stepper's own treatment remains out of scope — wireframe work.
 
 
@@ -181,6 +209,18 @@ over the components, not a token change.
   is a whole filter surface. Beacon built `BcnSearchTrigger`, cb-fish built
   `cbf-search-field`, and this spoke now has `bca-global-search`: three
   independent spokes solving the same shape, which is the promotion signal.
+- No `esa-*` lego is a **collapsed-rail flyout** — a section's sublinks in a
+  panel beside a narrow icon rail. `esa-sidebar-nav`, an entire sidebar nav and
+  therefore the component that should own this, answers the same problem with
+  `:host([collapsed]) .children { display: none }` — it drops the children
+  instead of relocating them. `esa-nav-dropdown` is a `<details>` that opens
+  BELOW its trigger (`top: 100%; left: 0`) from a labelled icon-link with a
+  chevron: wrong axis, wrong trigger. `esa-popover` is closest mechanically
+  (`position="right"`, hover trigger, Esc + outside-click) but renders
+  `role="dialog"` and pins itself `top: 50%; translateY(-50%)`, both inside
+  shadow DOM and so unreachable — a submenu of links is not a dialog, and a
+  four-item panel centred on a 44px icon row hangs above and below it. Built
+  here as `.nav-flyout`.
 - No `esa-*` lego is a **disclosure icon-button**, which is why the sidebar
   toggle stays hand-rolled under a lego-check. `esa-icon-button` renders exactly
   `<Tag class aria-label title><EsaIcon name size/></Tag>` with no rest-spread,
