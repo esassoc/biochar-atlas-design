@@ -270,11 +270,17 @@ over the components, not a token change.
   match — the reason this theme's hovers are the 11/12 midpoint rather than
   step 12. The dot should read a solid of its own (`--color-{tone}` or a
   dedicated `--color-{tone}-dot`).
-- **DocsShell's brand-mark slot is 30px; its own lettered square is 26px.**
-  Swapping a real logomark in via the slot therefore reflows the brand row —
-  in a 264px sidebar it wrapped both "Biochar Atlas" and the "Design System"
-  tag onto second lines (51.2px tall against 25.6px). The slot should default
-  to the same footprint as the mark it replaces. Overridden here at 26px.
+- **DocsShell's brand row has no text wrapper, so name and tag can only sit
+  side by side.** It emits three flat flex children — mark, `<b>` name,
+  `.ver` tag — and in a 264px sidebar they compete for one line: with a real
+  logomark in the slot, "Biochar Atlas" and "Design System" both wrapped
+  (51.2px tall against 25.6px). A spoke that wants the conventional two-line
+  lockup has to re-lay the whole row as a grid from outside and place each
+  child by hand, which is what this one does. Hub fix: wrap name + tag in a
+  `.brand-text` span (or take a `brandStack` prop) so the stack is a one-line
+  spoke override. Related: the slot is 30px while the lettered square it
+  replaces is 26px, so any swapped-in mark changes the row's height too — the
+  slot should default to the mark's own footprint.
 - `--focus-ring-color` is defined twice in `@esa/tokens` and the second one
   wins: `tokens.css` sets it to `--color-primary` (correct — it follows the
   theme), then `component-tokens.css` re-points it to `--color-border-focus`,

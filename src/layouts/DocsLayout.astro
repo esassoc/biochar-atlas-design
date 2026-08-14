@@ -55,12 +55,42 @@ const { title = 'Biochar Atlas — Design System', activeHref = '' } = Astro.pro
 <style>
   .brand-mark-img { width: 100%; height: auto; display: block; }
 
-  /* DocsShell sizes its lettered square at 26px but the brand-mark slot at 30px,
-     and those four pixels are the difference between "Biochar Atlas · Design
-     System" sitting on one line each and both of them wrapping in a 264px
-     sidebar. Measured: 51.2px tall at 30, 25.6px at 26. */
-  :global(.brand .brand-mark-slot) {
-    width: 26px;
-    height: 26px;
+  /* DocsShell emits the brand row as three flat flex siblings — mark, name,
+     tag — so name and tag compete for one line and both wrap in a 264px
+     sidebar. There is no text wrapper to target, so the row gets re-laid as a
+     two-column grid from here: the mark spans both rows and centers against
+     them, and name over tag becomes the second column's stack. Descendant
+     selectors keep these above the hub's single-class rules regardless of
+     bundle order. */
+  :global(.sidebar .brand) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-content: center;
+    /* The shell's `gap` shorthand sets both axes; left alone its 10px lands
+       between the two lines and they stop reading as one lockup. */
+    row-gap: 0;
+    column-gap: var(--spacing-250, 0.625rem);
+  }
+  /* 32px is the floor the app shell states for this mark: below it the gold
+     star and the cutouts close into a blob. Stacking the text is what buys the
+     room to hold that floor — the previous fix shrank the mark to 26px to stop
+     the wrap. */
+  :global(.sidebar .brand .brand-mark-slot) {
+    grid-row: 1 / span 2;
+    align-self: center;
+    width: 32px;
+    height: 32px;
+  }
+  /* Both lines tighten from the shell's 1.6 body leading: at 1.6 the stack is
+     44.8px in a 56px row and crowds the divider. */
+  :global(.sidebar .brand b) {
+    grid-column: 2;
+    align-self: end;
+    line-height: 1.2;
+  }
+  :global(.sidebar .brand .ver) {
+    grid-column: 2;
+    align-self: start;
+    line-height: 1.3;
   }
 </style>
