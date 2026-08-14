@@ -1,0 +1,123 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Api from '@esa/docs/Api.astro';
+import EsaButton from '@esa/ecology/esa-button.astro';
+import BcaUserPanel from '../../../components/bca/bca-user-panel.astro';
+import BcaUserEditDialog from '../../../components/bca/bca-user-edit-dialog.astro';
+import { users } from '../../../data/users';
+
+const demo = users.slice(0, 3);
+
+const legoApi = [
+  { name: 'open', type: 'boolean', default: 'false', description: 'Reflected. Prefer show() / close() — they run the animation and the focus handling.' },
+  { name: 'heading', type: 'string', default: "''", description: 'Renders as the panel title, and is the aria-label. Set it even when you slot a header, or the panel loses its accessible name.' },
+  { name: 'position', type: "'left' | 'right'", default: "'right'", description: 'Which edge it enters from.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '320 / 400 / 520px. Override --_width directly for anything else.' },
+  { name: 'show-close-button', type: 'boolean', default: 'true', description: 'The ✕ in the header.' },
+  { name: 'close', type: 'CustomEvent', description: 'Fires on ✕, Escape and backdrop click alike — one handler covers all three. There is no matching open event.' },
+];
+
+const hooks = [
+  { name: '--_width', type: 'length', default: 'per size', description: 'The one to set. 520px for a read-only record, 640px for a write surface — Beacon’s split, and this spoke follows it.' },
+  { name: '--z-modal / --z-modal-backdrop', type: 'number', default: '400 / 300', description: 'Must be raised above the app shell. esa-side-dialog is a custom overlay, not a native <dialog>, so it has no top layer and DOM order will not save it. This shell’s topbar is 1100 and its nav flyout 1200, so the panel runs at 1300 / 1250.' },
+  { name: '--side-dialog-inset', type: 'length', default: '16px', description: 'The gap on all four sides. It is a floating panel rather than a drawer flush to the edge.' },
+];
+---
+<ComponentDoc
+  name="Record panel"
+  category="Patterns"
+  slug="bca-user-panel"
+  type=".astro"
+  origin="spoke"
+  summary="A record read as a slide-in panel over the list it came from, rather than a page you navigate away to. Wraps the hub's <code>esa-side-dialog</code> and adds the three things it leaves to its host: which record is showing, the URL contract, and the z-index."
+>
+  <Section id="preview" title="Preview">
+    <p>
+      Opening a record does not leave the list. The panel overlays the grid at
+      520px with a scrim behind it; the grid keeps its scroll position, its
+      sort and its filters, which is the whole reason for the pattern.
+    </p>
+    <div class="cluster" data-gap="sm">
+      {demo.map((u) => (
+        <EsaButton color="secondary" appearance="outline" data-ds-open-user={u.id}>{u.name}</EsaButton>
+      ))}
+    </div>
+  </Section>
+
+  <Section id="url" title="The URL contract">
+    <p>
+      A record that loses its own route must not lose its link. Open state lives
+      in <code>?user=&lt;id&gt;</code> — pushed on open, stripped on close,
+      honoured on load and on <code>popstate</code>. Escape then Back reopens
+      the record you just closed, and a pasted URL lands with the panel already
+      open.
+    </p>
+    <p>
+      Two parts are easy to leave out and both are load-bearing. Opens driven by
+      history pass <code>push: false</code>, or every Back press adds an entry.
+      And <code>popstate</code> → <code>close()</code> fires the lego's
+      <code>close</code> event, whose handler would push a second entry for a
+      navigation the user already made — so a re-entrancy flag guards it.
+    </p>
+    <p>
+      Triggers stay real anchors carrying <code>href="?user=&lt;id&gt;"</code>
+      with the left click intercepted. That is what makes the link genuinely
+      shareable rather than a click handler wearing an underline.
+    </p>
+  </Section>
+
+  <Section id="anatomy" title="Anatomy">
+    <p>
+      Every record is server-rendered into the panel and hidden; opening one
+      unhides it. Nothing is built at runtime, so the same
+      <code>bca-record-header</code>, <code>bca-field-group</code> and
+      <code>bca-field</code> the record page used render unchanged.
+    </p>
+    <p>
+      The identity band goes in the <code>header</code> slot, the field groups
+      in the default slot at their flush variant — three outlined cards inside a
+      bordered 520px drawer is four nested rectangles for one record — and the
+      record's actions in the <code>footer</code> slot. That slot has to sit on
+      a real element, not an Astro <code>&lt;Fragment&gt;</code>: the Fragment
+      unwraps before the DOM, the attribute is lost, and the lego's
+      <code>.footer:not(:has(*))</code> rule then collapses an empty bar while
+      the button falls into the body.
+    </p>
+  </Section>
+
+  <Section id="behavior" title="Behaviour the lego already handles">
+    <p>
+      Focus moves into the panel on open and is restored on close, Tab wraps
+      inside it, and ✕ / Escape / backdrop all resolve to one <code>close</code>
+      event. It carries <code>role="dialog"</code> and
+      <code>aria-modal="true"</code>. It does <em>not</em> apply
+      <code>inert</code> to the page behind — the trap is JS, not native — so
+      background content stays in the accessibility tree.
+    </p>
+  </Section>
+
+  <Section id="api" title="API">
+    <h3>esa-side-dialog</h3>
+    <Api props={legoApi} />
+
+    <h3>CSS hooks</h3>
+    <Api props={hooks} />
+  </Section>
+
+  <BcaUserPanel />
+  <BcaUserEditDialog />
+  <esa-snackbar-container id="app-toasts"></esa-snackbar-container>
+</ComponentDoc>
+
+<script>
+  // The panel's own delegated handler listens for anchors; these demo triggers
+  // are buttons, so they use the same row-click event the grid dispatches.
+  document.querySelectorAll<HTMLElement>('[data-ds-open-user]').forEach((el) =>
+    el.addEventListener('click', () => {
+      document.dispatchEvent(
+        new CustomEvent('bca:user-row-clicked', { detail: { id: el.dataset.dsOpenUser } }),
+      );
+    }),
+  );
+</script>

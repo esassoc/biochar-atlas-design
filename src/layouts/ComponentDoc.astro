@@ -12,15 +12,22 @@ interface Props {
   slug: string;          // component basename, e.g. "esa-button"
   type: '.astro' | 'wc'; // .astro template vs Lit web component
   summary: string;
+  /**
+   * Where the component comes from. Inherited components are the hub's,
+   * documented here wearing the Atlas skin; spoke components are this repo's
+   * own and are imported by path.
+   */
+  origin?: 'inherited' | 'spoke';
 }
-const { name, category, slug, type, summary } = Astro.props;
+const { name, category, slug, type, summary, origin = 'inherited' } = Astro.props;
 
 const activeHref = `/design-system/components/${slug}`;
 const pascal = slug.split('-').map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+const source = origin === 'spoke' ? `../../components/bca/${slug}.astro` : `@esa/ecology/${slug}`;
 const importLine =
   type === '.astro'
-    ? `import ${pascal} from '@esa/ecology/${slug}.astro';`
-    : `import '@esa/ecology/${slug}';`;
+    ? `import ${pascal} from '${origin === 'spoke' ? source : `${source}.astro`}';`
+    : `import '${source}';`;
 ---
 <DocsLayout title={`${name} — Biochar Atlas`} activeHref={activeHref}>
   <nav class="crumbs">
@@ -34,7 +41,7 @@ const importLine =
         with the success tokens, which put a pale green fill behind a word that
         states provenance rather than health — and pale green is not an accent
         this brand uses. The status tints stay available for actual status. */}
-    <span class="pill">Inherited</span>
+    <span class="pill">{origin === 'spoke' ? 'Spoke' : 'Inherited'}</span>
     <span class="pill">{type}</span>
     <code class="imp">{importLine}</code>
   </div>

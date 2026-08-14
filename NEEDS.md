@@ -250,69 +250,148 @@ consistent with the 2026-08-13 status decision.
   colouring a button by status describes an outcome before it has happened.
   The same reasoning changed the Snackbar page's variant triggers to neutral.
 
-## The house grid and record page (2026-08-14)
-The Admin › Users prototype establishes the two page shapes this app reuses for
-every collection: `/admin/users` (AG Grid list) and `/admin/users/{id}` (record
-page). `src/lib/bca-grid.ts` is the shared theme + renderers, a palette-swapped
-port of `beacon-design/src/lib/beacon-grid.ts`.
+## The house grid and record surface (2026-08-14, revised same day)
+The Admin › Users prototype establishes the shapes this app reuses for every
+collection. It changed once already: it shipped as a list page plus a
+`/admin/users/{id}` record page, and Andy reviewed it and reversed three
+things. Both states are in git; what follows is the current one, with the
+reversals named so the earlier reasoning is not re-derived from scratch.
 
+`src/lib/bca-grid.ts` is the shared theme + renderers, a palette-swapped port
+of `beacon-design/src/lib/beacon-grid.ts`. Documented live at
+`/design-system/components/bca-user-grid` and `/bca-user-panel` — both pages
+mount the SHIPPED components, not copies, so the docs cannot drift from the app.
+
+### The 16px floor does not apply to a data grid — Andy, 2026-08-14
+**This is an explicit override and it must not be "fixed" back.** The grid
+first shipped at 16px cells in 48px rows, with the reasoning that this spoke
+sets a design system rather than mirroring a shipped one. Andy saw it and said
+"don't like the chunkiness here" — take it to Beacon's actual numbers. It now
+runs Beacon's verbatim: **13px cells and header, 44px rows, 48px header, 4px
+radius.**
+
+The carve-out is scoped, not general. It travels with the grid module — cells,
+column headers, the control strip above and the count strip below, because he
+called the chunkiness out across all three — and stops there. A record opened
+from the grid returns to the app scale. The floor still holds for every other
+surface, and the four sub-16px fixes in the theme (`--form-font-size-md`,
+esa-pill / esa-badge, the two snackbar labels) stand: he approved those the
+same day, in the same message.
+
+### The header is a brand slab — Andy, 2026-08-14
+Also a reversal. The header first shipped as the panel's own surface with dark
+semibold labels and a hairline, on the argument that a solid `#364500` band
+undoes the 2026-08-13 chrome decision (the Sage-Light-2 ladder exists because
+Andy called the untinted shell "too stark"), and that Beacon reached the same
+answer in `settingsEsaTheme` for the same reason. He read that and chose
+Beacon's slab anyway. `headerBackgroundColor: '#364500'` with white labels at
+**10.46:1**, and Beacon's `rgba(255,255,255,0.2)` resize handles, which are
+legible on a dark slab where `--color-border` is not.
+
+The wrapper border is Beacon's treatment unchanged. It does not fight at the
+seam, so nothing was solved there — the instruction was to fix a seam conflict
+in the border rather than by lightening the slab, and there was no conflict to
+fix.
+
+### The record is a panel, not a page — Andy, 2026-08-14
+`/admin/users/{id}` is deleted. The record opens as `esa-side-dialog` over the
+list, so the grid keeps its scroll, sort and filter state.
+
+- **Width 520px.** Beacon's split across 31 call sites is 520 for a read-only
+  dossier and 640 for a write surface. This one reads; the two editable fields
+  open a separate `esa-dialog` on top.
+- **z-index must be raised on the element.** `esa-side-dialog` is a CUSTOM
+  overlay, not a native `<dialog>` — no top layer, and DOM order will not save
+  it. This shell's topbar is 1100 and its nav flyout 1200, so the panel runs
+  `--z-modal: 1300; --z-modal-backdrop: 1250`.
+- **`?user=<id>` is the whole routing story**, ported from beacon-design's
+  `BcnProjectDataPanel`, which is the only bidirectional contract in either
+  Beacon repo. pushState on open, stripped on close, honoured on load and on
+  `popstate`. Two parts are easy to omit and both are load-bearing: a `push`
+  flag so a history-driven open does not re-push, and a re-entrancy guard,
+  because `popstate` → `close()` fires the lego's `close` event whose handler
+  would push a second entry. Triggers stay real `<a href="?user=…">` with only
+  the left click intercepted, so copy-link and middle-click work.
+- **Every record is server-rendered and hidden.** Opening one unhides it. That
+  is what let `bca-record-header`, `bca-field-group` and `bca-field` survive the
+  move unchanged — nothing is built at runtime.
+- **`slot="footer"` must sit on a real element, never an Astro `<Fragment>`.**
+  The Fragment unwraps before the DOM and the attribute is lost; the lego's
+  `.footer:not(:has(*))` then collapses an empty bar while the button falls into
+  the body. This shipped wrong on the first pass and was caught in a screenshot,
+  not in the source.
+- **Saving raises an event, it does not write the DOM.** `bca-user-edit-dialog`
+  dispatches `bca:user-updated`; the panel and the grid both listen. That is
+  what makes it impossible for the open record and the row underneath it to
+  disagree — and the grid needs `getRowId` set, or the update has to rebuild
+  `rowData` and loses sort, filter and scroll position.
+- **Role and Status are chips in the identity band and plain values in the
+  Access group.** They used to be chips in both. In 520px the same chip twice
+  reads as the panel emphasising something.
+
+### Colour marks the exception, not the value
+Andy asked whether cell status chips should be coloured by status. They are,
+but only where the colour buys a decision. **Invited** is the one value asking
+someone to act, so it is the only chip with a fill. **Active** is eight of ten
+rows — tinting it makes a green column carrying no decision — so it takes a
+green dot and no fill. **Deactivated** recedes; an inert account is an end
+state.
+
+Nothing is red. No account status is a failure, and spending the danger colour
+on one would leave nothing to spell an actual failure with.
+
+The tinted chip is Beacon's mechanism exactly: `--_chip` at 16% for the fill and
+70% against the body ink for the label. Measured on the amber: **5.63:1** on the
+panel, **5.23:1** on the zebra row, **4.91:1** on a hovered row. The hovered row
+is the binding case, and it is why the ink mixes toward the body colour —
+amber-11 unmixed measures 3.61:1 on the same fill. `bca-status-chip` carries the
+same three tones through esa-pill's public hooks, so a status reads identically
+in a cell and in the record.
+
+### Still true from the first pass
 - **AG Grid v35 Theming API, no CSS import.** `themeQuartz.withParams({...})`
   passed as `gridOptions.theme`; there is no `ag-theme-*.css`. Params are
   literal hex because AG Grid resolves them at config time and cannot read
   custom properties — keep them in sync with the theme BY VALUE.
-- **Two deliberate divergences from Beacon's grid.** (1) Type is 16px data and
-  header in 48px rows, not Beacon's 13px in 44px. Beacon's spoke is a faithful
-  port of a production app that predates the floor; this spoke is setting a
-  design system, and 16px is the floor for anything a person reads. The row
-  grew from the type, not from taste: 19.2px of line box plus the same ~28px
-  of breathing room Beacon's 44px row gives its 13px text. (2) The header is
-  the panel's own surface with dark semibold labels and a hairline, not a
-  brand slab. A solid `#364500` band would undo the 2026-08-13 chrome
-  decision, which exists because Andy called the untinted shell "too stark".
-  Beacon reached the same answer for the same reason in `settingsEsaTheme`.
-  Brand identity lives in `accentColor` — sort, filter-active, checkbox.
 - **`backgroundColor` must be set, not just `oddRowBackgroundColor`.** Quartz's
-  default even row is white, so setting only the odd one left the header on
-  the panel and the rows on a surface the app has nowhere else. Both are
-  `#fafaf7` now; the zebra is sage-3 at ΔE 0.0284 from it, where
-  `--bca-neutral-2` measures 0.0139 and disappears.
+  default even row is white, so setting only the odd one put the rows on a
+  surface the app has nowhere else. Both are `#fafaf7`; the zebra is sage-3 at
+  ΔE 0.0284 from it, where `--bca-neutral-2` measures 0.0139 and disappears.
 - **A cell renderer cannot use an `.astro` lego.** `.astro` components are
   compile-time and their CSS is scoped to a `data-astro-cid` attribute; a
   renderer builds its node with `document.createElement` at runtime and can
   never carry it, so the node renders completely unstyled. The Lit tier is not
   an escape either — there is no `esa-pill` web component. The status chip is
-  therefore drawn twice: `bca-status-chip.astro` (esa-pill) on the record page,
-  and `:global(.bca-grid-chip)` in `bca-user-grid.astro` for cells. The only
-  thing keeping them from drifting is that the grid copy reads esa-pill's own
-  public hooks. **Hub gap:** the legos that appear in data grids across every
-  spoke — pill, badge, icon — need Lit twins, or the hub needs a documented
-  "grid cell" CSS layer.
-- **Status is one quiet chip for every value.** Active / Invited / Deactivated
-  are lifecycle facts, not severities — an invited account is not a warning —
-  and the page already carries brand chrome plus a purple link column. One
-  fill, one hairline, the label doing the work. Deactivated is the exception
-  and reads muted, because that account really is inert.
-- **The chip's fill is border-carried on a hovered row.** Sunken neutral sits
-  ΔE 0.0623 from the panel and 0.0414 from the canvas, but only 0.0123 from
-  the grid's green-3 row hover — under the visible-edge floor. So
-  `--pill-border-color` moved up a rung to `--color-border` (0.0681 against the
-  fill) and holds the chip's shape when the fill goes. Same resolution as the
-  panel/white seam in the chrome block.
-- **Record-page pattern**: `bca-record-header` (avatar + name + context +
-  chips + actions) → `bca-field-group` × N (esa-card + a two-column `<dl>`) →
-  `bca-user-edit-dialog`. Role and Status appear both as chips in the identity
-  band and as fields in the Access group; that duplication is deliberate and
-  the edit-in-place demo depends on it — saving updates all four displays at
-  once, which is what proves they are one value.
+  therefore drawn twice: `bca-status-chip.astro` (esa-pill) in the panel, and
+  `:global(.bca-grid-chip)` in `bca-user-grid.astro` for cells, with the same
+  three tones in both. **Hub gap:** the legos that appear in data grids across
+  every spoke — pill, badge, icon — need Lit twins, or the hub needs a
+  documented "grid cell" CSS layer.
 - **The edit dialog is scoped to what an administrator owns.** Role and status
-  only. Name, email, organization and job title belong to the person and
-  arrive from the directory; an admin editing them would be changing a fact
-  about a colleague rather than a permission.
+  only. Name, email, organization and job title belong to the person and arrive
+  from the directory; an admin editing them would be changing a fact about a
+  colleague rather than a permission.
 - **No Deactivated row in the fixture.** Nobody on the real project team has
   been deactivated, and inventing a person to demonstrate a state would put an
   unmodeled name in the data. The state is reachable through the edit dialog
   instead. If the grid needs to show it at rest, that is a fixture decision for
   Andy, not one to make quietly.
+
+## The admin page-title treatment (2026-08-14)
+`bca-page-header` is the pattern every admin page uses — not a one-off on Users.
+Andy asked for bigger and less bold, with an icon to its left, and for a
+proposal on the icon's colour.
+
+- **36px Crimson Pro Light** (`--type-size-700`, weight 300) against
+  `esa-page-header`'s default of `--type-size-600` at 550.
+- **The glyph is brand Green, not the title's ink.** A 2px-stroke Lucide outline
+  at cap height carries far more mass than Crimson Pro Light does at the same
+  colour, so matching the ink makes the icon the loudest thing in the row. Green
+  measures L 0.364 against the ink's 0.243 — a real value step back — and still
+  holds 10.00:1 on the panel. It also reads as identity rather than emphasis,
+  which is what a page glyph is for.
+- **24px, `size="lg"`.** Crimson Pro's cap height at 36px is ≈24px, so the glyph
+  sits on the cap line rather than floating against it.
 
 ## Components to build (bca-*)
 - [ ] `bca-score-meter` — 0–100 amber bar + numeral (hub promotion candidate)
@@ -420,6 +499,29 @@ they inherit the face at all. Making Light stick everywhere is a heading pass
 over the components, not a token change.
 
 ## Hub gaps found while building (candidates to promote)
+- **`esa-page-header` cannot put a glyph on the title's line.** Its `icon` prop
+  is EYEBROW-only (`{icon && <EsaIcon name={icon} size="sm" />}` inside the
+  eyebrow `<p>`), its `title` is a string prop with no slot, and its two slots
+  are `breadcrumbs` and `actions`. There is no way in. Beacon hit the same wall
+  and hand-rolled it — its `PageLayout` puts `<EsaIcon>` INSIDE the `<h1>` — and
+  so does this spoke, in `bca-page-header`, which reads esa-page-header's own
+  `--page-header-title-*` hooks so the two cannot drift. **Hub fix:** a
+  `titleIcon` prop, or a `title` slot.
+- **`esa-side-dialog`'s close button has no themed focus ring.** `.close` sets
+  border, radius, background, colour and a hover — but no `:focus-visible`, so
+  the UA's blue ring lands on it. The lego moves focus into the panel on open,
+  so this shows on *every* open, and it cannot be fixed from a spoke: the button
+  is in the component's shadow root and `-webkit-focus-ring-color` is not a
+  custom property a theme can re-point. **Hub fix:** a `:focus-visible` rule
+  reading `--focus-ring-color` / `--focus-ring-width`, as the other legos do.
+- **`esa-button` does not forward `paths` to `esa-icon`.** It renders
+  `<EsaIcon name={icon} size={size} />` and stops, so an icon outside the
+  built-in registry silently renders an empty 20px SVG next to the label —
+  visible as a gap, not as an error. `esa-icon` itself takes `paths` precisely
+  for this, and `esa-sidebar-nav` passes it through. Not blocking here (every
+  glyph the admin pages use — `plus`, `pencil`, `download`, `users` — is in the
+  registry), but the next spoke with a brand glyph on a button will hit it.
+  **Hub fix:** an `iconPaths` prop passed straight through.
 - **`esa-pill` and `esa-badge` hardcode `font-size` with no hook.** Every other
   value on both — `--pill-bg`, `--pill-text-color`, `--pill-border-color`,
   `--pill-radius`, `--badge-bg`, `--badge-text-color` — is a public token, but

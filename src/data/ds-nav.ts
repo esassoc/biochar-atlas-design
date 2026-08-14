@@ -58,6 +58,14 @@ export const componentGroups: NavGroup[] = [
       c('Chip Group', 'esa-chip-group'),
     ],
   },
+  // Compositions this spoke owns rather than components it inherits — the
+  // shapes every admin surface reuses. They are documented here because a
+  // developer reaching for "how does a list page work" looks in the same place
+  // as "how does a button work".
+  {
+    label: 'Patterns',
+    items: [c('Data grid', 'bca-user-grid'), c('Record panel', 'bca-user-panel')],
+  },
 ];
 
 export const allGroups: NavGroup[] = [foundations, ...componentGroups];

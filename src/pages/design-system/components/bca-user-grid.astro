@@ -1,0 +1,105 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Api from '@esa/docs/Api.astro';
+import BcaUserGrid from '../../../components/bca/bca-user-grid.astro';
+import BcaUserPanel from '../../../components/bca/bca-user-panel.astro';
+import BcaUserEditDialog from '../../../components/bca/bca-user-edit-dialog.astro';
+
+const themeParams = [
+  { name: 'headerHeight / rowHeight', type: 'number', default: '48 / 44', description: 'Beacon’s numbers. The row height carries the density; the header sits one step taller so the slab has presence.' },
+  { name: 'headerFontSize / dataFontSize', type: 'string', default: "'13px'", description: 'Below the app’s 16px minimum by explicit decision. The carve-out covers the grid module only.' },
+  { name: 'headerBackgroundColor / headerTextColor', type: 'string', default: "'#364500' / '#ffffff'", description: 'Brand Green with white labels, 10.46:1.' },
+  { name: 'backgroundColor', type: 'string', default: "'#fafaf7'", description: 'The panel. Quartz defaults this to white, which puts rows on a surface the app has nowhere else.' },
+  { name: 'oddRowBackgroundColor', type: 'string', default: "'#f2f1e9'", description: 'Sage 3 — the shell’s own hue, ΔE 0.0284 from the panel. A neutral zebra measures 0.0139 and disappears.' },
+  { name: 'rowHoverColor', type: 'string', default: "'#e6eae0'", description: 'Green 3, ΔE 0.0540 from the panel.' },
+  { name: 'accentColor', type: 'string', default: "'#364500'", description: 'Sort arrows, active filters, checked checkboxes.' },
+  { name: 'wrapperBorderRadius', type: 'string', default: "'4px 4px 0 0'", description: 'Bottom corners squared so the count strip welds under the grid. atlasCardTheme rounds all four, for a grid that ends at its last row.' },
+];
+
+const renderers = [
+  { name: 'makeStatusChipRenderer(tones)', type: 'function', description: 'Returns a cell renderer drawing a dot, a label and an optional tint. Each tone is { chip: hex, quiet?: boolean }; the consuming component supplies the matching :global CSS, because AG Grid builds cells outside Astro’s style scope.' },
+  { name: 'makeLinkRenderer({ href })', type: 'function', description: 'The primary cell as a real anchor. href builds the destination from the row, so copy-link and middle-click still work even though a left click is intercepted to open the panel.' },
+];
+
+const options = [
+  { name: 'getRowId', type: '(p) => string', description: 'Set to the record id. Without it a saved edit cannot find its node and has to rebuild rowData, losing sort, filter and scroll position.' },
+  { name: 'onRowClicked', type: '(e) => void', description: 'Opens the record. Guarded against the anchor in the name cell so the two gestures do not fire together; guard against .ag-checkbox too on any grid with selection.' },
+];
+---
+<ComponentDoc
+  name="Data grid"
+  category="Patterns"
+  slug="bca-user-grid"
+  type=".astro"
+  origin="spoke"
+  summary="The house grid every admin collection reuses — a control strip, an AG Grid on the Atlas theme, and a record-count strip welded underneath. A port of Beacon's grid page, palette-swapped, with Beacon's density held."
+>
+  <Section id="anatomy" title="Anatomy">
+    <p>
+      Three bands that read as one frame rather than three stacked elements. The
+      control strip is a bordered container above; the grid squares its bottom
+      corners; the count strip repeats the border with its top edge removed and
+      rounds the bottom.
+    </p>
+    <p>
+      This is the shipped component, not a copy of it — search, sort, filter,
+      CSV export and row-to-panel all work here exactly as they do on
+      <a href={`${import.meta.env.BASE_URL}admin/users`}>Admin › Users</a>.
+      Click any row.
+    </p>
+    <BcaUserGrid />
+  </Section>
+
+  <Section id="density" title="Density">
+    <p>
+      Cells and header run at 13px in 44px rows, and the control strip and count
+      strip come down with them. That is below the 16px minimum this design
+      system holds everywhere else, and it is deliberate: a dense data grid is
+      the one surface where the number of rows a person can compare at once
+      beats the comfort of any single row. The exception travels with this
+      pattern and nothing outside it — a record opened from the grid goes back
+      to the app scale.
+    </p>
+  </Section>
+
+  <Section id="status" title="Status cells">
+    <p>
+      Colour marks the exception, not the value. Of ten accounts eight are
+      active, so tinting that makes a green column carrying no decision.
+      <strong>Invited</strong> is the one value asking someone to act, so it is
+      the only chip with a fill and the eye lands on it directly.
+      <strong>Deactivated</strong> recedes — an inert account is an end state,
+      not a failure.
+    </p>
+    <p>
+      Nothing here is red. No account status is an error, and spending the
+      danger colour on one would leave nothing to spell an actual failure with.
+      The tinted chip mixes its tone at 16% for the fill and 70% against the
+      body ink for the label: 5.63:1 on the panel, 5.23:1 on the zebra row and
+      4.91:1 on a hovered row — the hovered row being the binding case rather
+      than the resting one.
+    </p>
+  </Section>
+
+  <Section id="api" title="API">
+    <h3>Theme parameters</h3>
+    <p>
+      <code>atlasTheme</code> in <code>src/lib/bca-grid.ts</code>. AG Grid
+      resolves theme params at config time and cannot read CSS custom
+      properties, so every value is a literal annotated with the token it
+      mirrors — keep the two in sync by value.
+    </p>
+    <Api props={themeParams} />
+
+    <h3>Cell renderers</h3>
+    <Api props={renderers} />
+
+    <h3>Grid options that matter</h3>
+    <Api props={options} />
+  </Section>
+
+  <BcaUserPanel />
+  <BcaUserEditDialog />
+  <esa-snackbar-container id="app-toasts"></esa-snackbar-container>
+</ComponentDoc>
