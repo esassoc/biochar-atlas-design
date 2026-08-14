@@ -286,7 +286,15 @@ especially, but also the body". So the boundary is not "the grid" but **the
 dense data surfaces** — the grid, and the record panel that reads out of a row.
 The panel runs beacon-design's drawer scale verbatim: a `--type-size-400` name
 (20px), 15px values, 14px labels, 13px chips. The 16px floor still governs page
-content, which is why `bca-page-header` above it is untouched at 36px.
+content, which is why `bca-page-header`'s title above it is untouched at 36px.
+
+**Widened again, to the controls that act on a dense module.** Andy on the
+finished page: step "Invite user" down a size, "it is reading large against a
+13px grid and a carded toolbar whose controls are already at `size="sm"`." So a
+page action is not page content — it belongs to the module it acts on and takes
+that module's scale. The boundary now reads: **the dense data surfaces and the
+controls that operate them.** Prose, titles, ledes and anything a person types
+into stay at 16px.
 
 ### Columns fill the grid — Andy, 2026-08-14
 Fixed `width` left the six columns stopping two-thirds across with a dead band
@@ -302,6 +310,47 @@ to a resize event snaps every column back and silently undoes the resize the
 user just made. Measured at 1600px the six columns sum to 1194 against a 1196px
 wrapper; at 760px they hold their floors and the grid scrolls instead of
 crushing an email to five characters.
+
+### The page-header action slot owns its own size — Andy, 2026-08-14
+"Invite user" shipped at the default `md`: 40px tall, 16px label, 20px icon,
+8px corner, sitting above a toolbar of 30px/13px controls and a 13px grid. The
+16px came in sideways — the theme re-points `--form-font-size-md` to 1rem so a
+field a person types into clears the floor, and `esa-button` reads the same
+token. Nothing chose 16px for a button.
+
+Set at the slot, not the call site, so every admin page inherits it and the next
+one cannot forget. `.bca-page-header__actions` re-points the `md` family and lets
+it inherit:
+
+```css
+--form-height-md: var(--form-height-sm, 32px);
+--form-radius-md: var(--form-radius-sm, 4px);
+--form-font-size-md: 0.8125rem;
+--icon-size-md: var(--icon-size-sm, 16px);
+```
+
+Three properties make this work. Both legos resolve their size **on the element**
+(`--_btn-height` reads `var(--form-height-md)`, `--_icon-size` reads
+`var(--icon-size-md)`), so the nearest ancestor wins — no reach into
+`.esa-button__native`, no private `--_btn-*`. It touches only controls at the
+DEFAULT size, because `.esa-button--sm` reads the `-sm` family and `--lg` reads
+`-lg`, neither of which is re-pointed — so a caller who declares a size still
+gets it. And it is contained: measured after the change, `:root`'s
+`--form-font-size-md` is still `1rem`, so the edit panel's fields are untouched.
+
+Type at 13px and box at 32px is deliberate. Matching the strip's label size puts
+the CTA on one scale with the page; the 32px height (locked to the search
+field's, 2px over the content-height ghost buttons) is what keeps it the largest
+control in the column. **Presence comes from the box and the fill, not the type.**
+Measured at 1600px: invite 32px/13px/16px-icon/4px, search field 32px, Download
+30px/13px, Clear 27px/13px, cells 13px, title 36px.
+
+Note the divergence from `bca-user-grid`'s control strip, which reaches the same
+13px by a different route — its call sites declare `size="sm"` and the container
+overrides the `sm` type. Both are legitimate (those buttons are genuinely
+secondary), but there are now two mechanisms for one intent. Worth collapsing to
+the slot mechanism when the grid is next opened; not worth churning an approved
+surface for.
 
 ### The header is a brand slab — Andy, 2026-08-14
 Also a reversal. The header first shipped as the panel's own surface with dark

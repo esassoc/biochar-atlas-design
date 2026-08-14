@@ -103,8 +103,36 @@ const hasActions = Astro.slots.has('actions');
   }
 
   /* Top-aligned with the title rather than centred on the bar, so the actions
-     do not drift when a lede lands. */
+     do not drift when a lede lands.
+
+     The size default for the slot, not for the page (Andy, 2026-08-14: "Invite
+     user" read large against a 13px grid). Every admin page inherits it by
+     slotting a plain <EsaButton> — no `size` at the call site, so the next page
+     cannot forget.
+
+     Mechanism: re-point the md family here and let it inherit. esa-button and
+     esa-icon both resolve their size on the element (--_btn-height reads
+     var(--form-height-md), --_icon-size reads var(--icon-size-md)), so the
+     nearest ancestor wins. It only touches controls at the DEFAULT size —
+     .esa-button--sm reads --form-*-sm and --lg reads --form-*-lg, neither of
+     which is touched, so a caller who declares a size still gets it. No reach
+     into .esa-button__native and no private --_btn-* tokens.
+
+     Why the type is a literal and not var(--form-font-size-sm): the theme
+     re-points --form-font-size-md to 1rem for Andy's 16px floor, which is
+     about fields a person TYPES INTO. A page action is not that, and it
+     inherited the 16px by accident. 0.8125rem is the same literal
+     bca-user-grid uses for its control strip, so the CTA, the search field and
+     the two ghost buttons under it all read at one scale. Presence comes from
+     the box, not the type: --form-height-sm (32px) leaves it locked to the
+     search field's height and 2px taller than the content-height ghost
+     buttons, so the primary action is still the largest thing in the column
+     while carrying the same label size. */
   .bca-page-header__actions {
     padding-top: var(--spacing-150, 0.375rem);
+    --form-height-md: var(--form-height-sm, 32px);
+    --form-radius-md: var(--form-radius-sm, 4px);
+    --form-font-size-md: 0.8125rem;
+    --icon-size-md: var(--icon-size-sm, 16px);
   }
 </style>

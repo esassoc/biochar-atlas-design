@@ -101,6 +101,13 @@ const bcaProps = [
   </Section>
 
   <Section id="sizes" title="Sizes">
+    <p>
+      The action slot of <code>bca-page-header</code> sets its own size, so a button
+      slotted there needs no <code>size</code> — it lands at the dense scale, 13px
+      label in a 32px box with a 4px corner, matching the control strip below it. The
+      slot re-points the <code>md</code> family only, so an explicit <code>size</code>
+      still wins where a surface genuinely needs one.
+    </p>
     <Preview code={`<BcaButton tone="green" size="lg">Evaluate</BcaButton>`}>
       <BcaButton tone="green" size="xs">Evaluate</BcaButton>
       <BcaButton tone="green" size="sm">Evaluate</BcaButton>
