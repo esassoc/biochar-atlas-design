@@ -7,7 +7,8 @@
 // Biochar changes vs Beacon:
 //   - Tokens: every --bcn-* swapped for semantic (--color-*) or spoke (--bca-*)
 //     tokens from theme-biochar.css, always with literal fallbacks.
-//   - Sidebar header: inline leaf mark + "Biochar Atlas" wordmark. Beacon's
+//   - Sidebar header: the issued ABI brand mark — the stacked lockup when the
+//     sidenav is expanded, the symbol alone on the collapsed rail. Beacon's
 //     project-switcher is dropped.
 //   - Nav: data-driven NavSections. The four planned Atlas modules are TOP-LEVEL
 //     sections (collapsed by default) whose not-yet-built sub-pages render as
@@ -291,25 +292,20 @@ if (activeNavId) {
       <nav class="side-nav collapsed" id="side-nav">
         <div class="sidebar-header">
           <a href={withBase('/')} class="brand" aria-label="Biochar Atlas home">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="brand__mark"
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-            </svg>
-            <span class="brand__text">
-              <span class="brand__wordmark">Biochar Atlas</span>
-            </span>
+            <img
+              class="brand__logo brand__logo--lockup"
+              src={withBase('/abi-logo-stacked-alpha.png')}
+              width="3157"
+              height="1286"
+              alt="American Biochar Institute"
+            />
+            <img
+              class="brand__logo brand__logo--symbol"
+              src={withBase('/abi-logo-symbol-alpha.png')}
+              width="1240"
+              height="1246"
+              alt="American Biochar Institute"
+            />
           </a>
         </div>
 
@@ -722,31 +718,34 @@ if (activeNavId) {
   .brand:hover {
     background: var(--_nav-hover-bg, rgba(0, 0, 0, 0.04));
   }
-  .brand__mark {
+  /* The marks are issued PNGs — dark green + gold on transparent. They sit on
+     the tinted sidenav as-issued: no filter, no tint, no recolor. Width is set
+     in CSS and height stays auto so the intrinsic width/height attributes fix
+     the aspect ratio and nothing reflows on load. */
+  .brand__logo {
     flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    color: var(--color-primary, #234a31);
+    height: auto;
   }
-  .brand__text {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+  .brand__logo--lockup {
+    width: 156px;
   }
-  .brand__wordmark {
-    font-size: 1.0625rem;
-    font-weight: var(--font-weight-bold, 700);
-    color: var(--color-text-primary, #33312a);
-    line-height: 1.2;
-    white-space: nowrap;
+  /* 36px, not the 28px the old leaf glyph used: the symbol is a dense cluster
+     with fine negative space, and below ~32px the gold star and the cutouts
+     close up into a blob. Still clears the 56px the collapsed rail leaves. */
+  .brand__logo--symbol {
+    display: none;
+    width: 36px;
   }
   .side-nav.collapsed .brand {
     justify-content: center;
     padding: var(--spacing-200, 0.5rem) 0;
     width: 100%;
   }
-  .side-nav.collapsed .brand__text {
+  .side-nav.collapsed .brand__logo--lockup {
     display: none;
+  }
+  .side-nav.collapsed .brand__logo--symbol {
+    display: block;
   }
 
   .main-nav {
