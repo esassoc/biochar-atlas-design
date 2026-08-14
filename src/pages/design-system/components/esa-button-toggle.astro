@@ -26,7 +26,7 @@ const events = [
   summary="The inherited Ecology segmented single-select — one-of-N choices rendered as a row of connected buttons. Form-associated and following the WAI-ARIA radiogroup pattern; the selected segment fills with forest green from <code>--color-primary</code>. In the Atlas it switches the map / form entry paths."
 >
   <Section id="preview" title="Preview">
-    <Preview code={`<esa-button-toggle label="Entry path"></esa-button-toggle>\n\n<script>\n  el.options = [\n    { value: 'map', label: 'Map' },\n    { value: 'form', label: 'Form' },\n    { value: 'compare', label: 'Compare' },\n  ];\n  el.value = 'map';\n</script>`}>
+    <Preview code={`<esa-button-toggle label="Entry path"></esa-button-toggle>\n\n\u003cscript>\n  el.options = [\n    { value: 'map', label: 'Map' },\n    { value: 'form', label: 'Form' },\n    { value: 'compare', label: 'Compare' },\n  ];\n  el.value = 'map';\n\u003c/script>`}>
       <esa-button-toggle label="Entry path" data-demo="preview"></esa-button-toggle>
     </Preview>
   </Section>

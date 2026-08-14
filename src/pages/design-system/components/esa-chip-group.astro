@@ -30,7 +30,7 @@ const events = [
       Exactly one chip is active (the WAI-ARIA radiogroup pattern). Arrow keys move the
       selection with wrap-around; <code>Home</code>/<code>End</code> jump to the ends.
     </p>
-    <Preview align="start" code={`<esa-chip-group label="Primary goal" name="goal" value="water"></esa-chip-group>\n\n<script>\n  el.options = [\n    { value: 'water', label: 'Water retention' },\n    { value: 'som', label: 'Soil organic matter' },\n    { value: 'carbon', label: 'Carbon sequestration' },\n    { value: 'ph', label: 'pH adjustment' },\n  ];\n</script>`}>
+    <Preview align="start" code={`<esa-chip-group label="Primary goal" name="goal" value="water"></esa-chip-group>\n\n\u003cscript>\n  el.options = [\n    { value: 'water', label: 'Water retention' },\n    { value: 'som', label: 'Soil organic matter' },\n    { value: 'carbon', label: 'Carbon sequestration' },\n    { value: 'ph', label: 'pH adjustment' },\n  ];\n\u003c/script>`}>
       <esa-chip-group label="Primary goal" name="goal" value="water" data-demo="goals"></esa-chip-group>
     </Preview>
   </Section>
@@ -41,7 +41,7 @@ const events = [
       <code>values</code> array — the shape of the Atlas's &ldquo;select application goals&rdquo;
       step. Arrows move focus without selecting; Enter or Space toggles the focused chip.
     </p>
-    <Preview align="start" code={`<esa-chip-group label="Application goals" name="goals" multiple></esa-chip-group>\n\n<script>\n  el.options = [/* goals */];\n  el.values = ['water', 'som', 'carbon'];\n</script>`}>
+    <Preview align="start" code={`<esa-chip-group label="Application goals" name="goals" multiple></esa-chip-group>\n\n\u003cscript>\n  el.options = [/* goals */];\n  el.values = ['water', 'som', 'carbon'];\n\u003c/script>`}>
       <esa-chip-group label="Application goals" name="goals" multiple data-demo="goals-multi"></esa-chip-group>
     </Preview>
   </Section>
