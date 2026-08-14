@@ -595,73 +595,95 @@
   --bca-soh-nodata: var(--bca-neutral-4);
 
   /* ═══ INDICATOR BARS — continuous 0–100 ═══════════════════════════════
-     Conventional red→yellow→green, ordered by LIGHTNESS. Andy chose this on
-     2026-08-14 over the colorblind-safer single-hue path that shipped first
-     (cream→green, worst-case adjacent ΔE 0.141) — the same call he made for
-     status on 2026-08-13: a red-to-green score bar is a convention users
-     arrive already knowing, and the ABI palette has no red to spell it with
-     (all nine chromatic brand colors sit at OKLCH hue 67–150 except Purple at
-     335; the 0–60 band is empty). So this ramp is deliberately NOT
-     brand-derived. Steps 1, 3 and 5 are the hub's own Radix primitives —
-     red-7, yellow-11, green-12 — the same borrow the status block makes, so
-     the theming contract holds: this block re-points SEMANTICS, it does not
-     mint a private red. Steps 2 and 4 are the two literals, each taken at its
-     family's own hue and chroma and re-lit onto the lightness grid, because
-     the primitive layer has no rung there.
+     ColorBrewer RdYlGn-5 with the peak held and the green sunk. Andy chose
+     this on 2026-08-14 from six candidates compared side by side under
+     Machado simulation, and it is the SECOND reversal that day. The record,
+     in order, so the two it replaces are not lost:
 
-     What the reversal costs, measured (Machado 2009 CVD simulation, OKLab ΔE):
+       1. single-hue cream→green   worst adjacent 0.141 · ends 0.580
+       2. lightness-ordered RdYlGn 0.103 · 0.433   (shipped 5dda48f)
+       3. this one                 0.107 · 0.106
 
-       worst-case adjacent pair   0.103  (deuteranopia, 4→5)
-                                  0.105 protanopia · 0.109 tritanopia
-       scale ends, worst case     0.433  (protanopia)
-       lightness span             0.485  (L 0.807 → 0.322), strictly
-                                  monotonic, min adjacent ΔL 0.102
+     Ramp 2 kept the red→green hue story but re-lit it onto a descending
+     lightness ladder, and that ladder is what bought the 0.433 ends. Ramp 3
+     gives it back deliberately: it holds ColorBrewer's yellow peak — step 3
+     is the LIGHTEST step, so the ramp is non-monotonic — and sinks the green
+     end to L 0.318. He saw the measurements and took the conventional read.
+     This is a trade, not an oversight. Do not re-litigate it.
 
-     Against 0.141 / 0.580 for the single-hue path this replaces: adjacent
-     separation drops 27%, end separation 25%. Both still clear the 0.020
-     perceptual floor by 5× and 21×.
+     Measured (Machado 2009 CVD simulation, OKLab ΔE, worst case across
+     protanopia / deuteranopia / tritanopia; 0.020 is the visible-edge floor):
 
-     What it does NOT cost is the thing that made the guide's own screenshot
-     (p.37, described there as "a rough idea") unusable. Drawn conventionally
-     — saturated red, orange, bright yellow, mid green, dark green — that ramp
-     is non-monotonic in lightness (span 0.082, yellow being the LIGHTEST
-     step), its worst adjacent pair measures 0.047, its ends collapse to 0.047
-     under protanopia, and steps 1 and 4 land 0.023 apart under deuteranopia —
-     the same color. This ramp is 2.2× better adjacent and 9.2× better at the
-     ends because lightness, not hue, does the ordering: under protanopia and
-     deuteranopia the red→green axis carries no information at all, so hue is
-     decorative there and value is the whole signal. Relative luminance runs
-     0.505 → 0.311 → 0.178 → 0.082 → 0.035, so the ramp also survives
-     greyscale printing, which the guide's version does not.
+       worst adjacent pair       0.107  (deuteranopia, 2→3)
+       closest pair, ANY two     0.036  (protanopia,   2 vs 4)
+       scale ends, 1 vs 5        0.106  (protanopia)
+       worst step vs surface     0.034  (tritanopia, step 3 vs the track)
+       lightness span            0.583  (L 0.318 → 0.901), NON-monotonic
+       relative luminance        0.152 · 0.477 · 0.744 · 0.347 · 0.035
 
-     Step 1 is red-7, not the lighter red-6, and the bar's own track is why.
-     A wider span (red-6 at L 0.857) measures better in isolation — 0.122
-     worst-case — but red-6 sits ΔE 0.044 from the track under deuteranopia,
-     so a low score reads as an EMPTY bar to the reader it most needs to
-     reach. Red-7 holds 0.091 there. The track pair is the binding surface
-     check, not the chrome: every step clears canvas, panel, sidenav and
-     topbar by ΔE ≥ 0.144.
+     Two lines of that table are load-bearing, and both point at the numeral:
 
-     Mitigation, and it is not optional: the score numeral must always
-     accompany the bar. Color is never the sole carrier of the score
-     (WCAG 1.4.1), and after this reversal that requirement is load-bearing
-     rather than belt-and-braces.
+     1. The closest pair is 2 vs 4, not an adjacent pair. Under protanopia the
+        orange and the green both collapse toward the same yellow and land
+        0.036 apart. Those are the ~30% and ~70% bars — exactly the comparison
+        a reader makes scanning a column of scores. Adjacent-safe is not the
+        same as scan-safe, and only this ramp has that shape: ramps 1 and 2
+        had their closest pair ON the adjacent diagonal.
+     2. The ends closed from 0.433 to 0.106, a 4× reduction in the very
+        separation the scale exists to carry.
 
-     On sharing a screen with --bca-soh-*: the map ramp is a Gold→Green olive
-     path (hue 80–122) and this one runs red→orange→gold→blue-green (hue
-     18–165). Steps 1–2 are unambiguous — the map ramp has nothing in the
-     red/orange band. Step 5 is the near pair at ΔE 0.075: both are dark
-     greens, separated by hue (164° here vs 122° for brand Green) and by
-     context — the map ramp only ever paints polygons, this one only ever
-     fills a track. Step 3 is ΔE 0.021 from --bca-status-amber-11 and step 5
-     IS --color-green-12, which the theme already spells success with; both
-     are deliberate, and a mid score reading as the caution amber is the
-     reading we want. */
-  --bca-bar-1: var(--color-red-7);     /* #f4a9aa  L 0.807  C 0.089  H  18.3 */
-  --bca-bar-2: #e17e30;                /*          L 0.690  C 0.151  H  54.4 — orange-8's hue+chroma, re-lit */
-  --bca-bar-3: var(--color-yellow-11); /* #ab6400  L 0.571  C 0.129  H  63.9 */
-  --bca-bar-4: #165c3e;                /*          L 0.424  C 0.085  H 160.3 — green-11's hue, re-lit and re-chroma'd */
-  --bca-bar-5: var(--color-green-12);  /* #193b2d  L 0.322  C 0.048  H 164.5 */
+     So the score numeral ALWAYS accompanies the bar. Color is never the sole
+     carrier of the score (WCAG 1.4.1). Under ramp 2 that was belt-and-braces;
+     here it is the mechanism, and a bar shipped without its numeral is an
+     accessibility regression rather than a style lapse.
+
+     The numeral sits BESIDE the bar, never inside the fill. No single ink
+     survives the ramp — white clears steps 1 and 5 (5.19:1, 12.32:1) and
+     fails 2, 3 and 4 (1.99, 1.32, 2.65); neutral-12 does the reverse (8.19,
+     12.33, 6.16 against 3.14, 1.32). The crossover happens twice, so an ink
+     that switches with the value is two bugs waiting rather than one rule.
+
+     Greyscale no longer works, and that is the quiet cost. Luminance runs
+     0.152 → 0.477 → 0.744 → 0.347 → 0.035, an inverted V: photocopied, a bar
+     at 20% and a bar at 80% are both dark. Ramps 1 and 2 both descended
+     cleanly. The numeral covers this too.
+
+     Step 1 keeps its own literal rather than aliasing --bca-status-red-11
+     (#cd2a30), which sits ΔE 0.0232 away — over the floor, but close enough
+     that across a page the two read as one red, so nothing looks broken
+     either way. They stay separate because they answer to different
+     constraints: the status red is pinned by a white-label requirement
+     (5.29:1) it can never lose, this one by CVD separation from steps 2 and 4
+     and from the track. Aliased, a future contrast fix on the danger button
+     would silently re-light a score bar. #d7191c is also the one step held
+     unmodified from published RdYlGn-5 — 2 through 5 all moved — so it is the
+     ramp's anchor, not a spare red. This RETIRES the previous block's claim
+     that the bar ramp "does not mint a private red": it does now, on purpose.
+
+     Step 3 against the track is the tight pair at 0.034 — above the floor,
+     not comfortably. The mechanism: #e7e579 sits at L 0.901 and the track at
+     L 0.898. In normal vision chroma separates them (C 0.131 vs 0.005); under
+     tritanopia the yellow's chroma collapses toward the neutral axis and
+     lightness, the fallback, carries nothing. The step's lightness is fixed,
+     so the track is the only movable side.
+     RECOMMENDED, NOT APPLIED — the track is settled separately and not ours
+     to move quietly: --bca-bar-track → --bca-neutral-5 (#d8d7d4) takes the
+     pair to 0.042 and stays inside the surface band (3–5). neutral-6 reaches
+     0.060 but draws an empty bar at border weight, which reads as
+     filled-with-grey rather than empty.
+
+     On sharing a screen with --bca-soh-*: this ramp overlaps the map ramp's
+     gold band, where ramp 2 did not. Three pairs now sit under 0.075 —
+     bar-2/soh-2 at 0.072, bar-3/soh-1 at 0.071, bar-5/soh-5 at 0.060 —
+     against one for ramp 2. They stay legible by container rather than by
+     color: the map ramp only ever paints polygons on the basemap, this one
+     only ever fills a track in a panel. Never put a legend for both in one
+     strip. */
+  --bca-bar-1: #d7191c;  /* L 0.560  C 0.218  H  27.7 — RdYlGn-5 red, unmodified */
+  --bca-bar-2: #fca448;  /* L 0.791  C 0.148  H  63.6 */
+  --bca-bar-3: #e7e579;  /* L 0.901  C 0.131  H 107.8 — the held peak; lightest step */
+  --bca-bar-4: #77af1c;  /* L 0.689  C 0.176  H 129.6 */
+  --bca-bar-5: #033e16;  /* L 0.318  C 0.088  H 148.4 — the sunk green */
   --bca-bar-track: var(--bca-neutral-4);
 
   /* ═══ RECOMMENDATION BADGES ═══════════════════════════════════════════
