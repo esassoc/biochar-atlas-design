@@ -1,20 +1,20 @@
-import{i as a,b as i,a as l}from"./lit-element.C8p3bJxG.js";class n extends a{constructor(){super(),this.onDocClick=e=>{this._open&&(e.composedPath().includes(this)||(this._open=!1))},this.onSearchInput=e=>{this._search=e.target.value,this._active=-1,this._open||(this._open=!0)},this.onKeydown=e=>{const t=this.filteredOptions;switch(e.key){case"ArrowDown":if(e.preventDefault(),!this._open)return this.openDropdown();{let r=this._active+1;for(;r<t.length&&t[r].disabled;)r++;r<t.length&&(this._active=r)}break;case"ArrowUp":if(e.preventDefault(),!this._open)return this.openDropdown();{let r=this._active-1;for(;r>=0&&t[r].disabled;)r--;r>=0&&(this._active=r)}break;case"Enter":if(e.preventDefault(),this._open&&this._active>=0){const r=t[this._active];r&&!r.disabled&&this.selectOption(r)}else this._open||this.openDropdown();break;case"Escape":e.preventDefault(),this._open=!1;break;case"Tab":this._open=!1;break}},this.label="",this.options=[],this.size="md",this.placeholder="Select...",this.helpText="",this.errorText="",this.required=!1,this.disabled=!1,this.multiple=!1,this.searchable=!0,this.chipMode=!1,this._search="",this._selected=[],this._open=!1,this._active=-1,this.internals=this.attachInternals()}static{this.formAssociated=!0}static{this.properties={label:{type:String},options:{type:Array},size:{type:String,reflect:!0},placeholder:{type:String},helpText:{type:String,attribute:"help-text"},errorText:{type:String,attribute:"error-text"},required:{type:Boolean},disabled:{type:Boolean,reflect:!0},multiple:{type:Boolean},searchable:{type:Boolean},chipMode:{type:Boolean,attribute:"chip-mode"},_search:{state:!0},_selected:{state:!0},_open:{state:!0},_active:{state:!0}}}connectedCallback(){super.connectedCallback(),document.addEventListener("click",this.onDocClick),this.syncFormValue()}disconnectedCallback(){super.disconnectedCallback(),document.removeEventListener("click",this.onDocClick)}set value(e){e==null?this._selected=[]:Array.isArray(e)?this._selected=e:this._selected=[e],this.syncFormValue()}get value(){return this.multiple?this._selected:this._selected[0]??""}get filteredOptions(){const e=this._search.toLowerCase();return e?this.options.filter(t=>t.label.toLowerCase().includes(e)):this.options}get displayValue(){return this._selected.length===0?"":this.options.find(t=>t.value===this._selected[0])?.label??""}get selectedOptions(){return this.options.filter(e=>this._selected.includes(e.value))}get inputValue(){return this.multiple?this._search:this._search||this.displayValue}isSelected(e){return this._selected.includes(e)}syncFormValue(){this.internals.setFormValue(this.multiple?this._selected.join(","):this._selected[0]??null)}emit(){this.syncFormValue(),this.dispatchEvent(new CustomEvent("change",{detail:{value:this.value},bubbles:!0,composed:!0}))}toggleDropdown(){this.disabled||(this._open?this._open=!1:this.openDropdown())}openDropdown(){this.disabled||(this._open=!0,this._active=-1,requestAnimationFrame(()=>{this.renderRoot.querySelector(".input")?.focus()}))}selectOption(e){if(e.disabled)return;const t=e.value;if(this.multiple){const r=this._selected.indexOf(t);this._selected=r>=0?this._selected.filter(o=>o!==t):[...this._selected,t],this._search="",this.emit(),requestAnimationFrame(()=>{this.renderRoot.querySelector(".input")?.focus()})}else this._selected=[t],this._search="",this._open=!1,this.emit()}removeValue(e,t){t?.stopPropagation(),this._selected=this._selected.filter(r=>r!==e),this.emit()}clearSelection(e){e?.stopPropagation(),this._selected=[],this.emit()}renderTags(){const e=this.selectedOptions;if(e.length===0)return null;if(e.length>1)return i`<span class="chip chip--count">
+import{i as s,b as i,a}from"./lit-element.C8p3bJxG.js";class n extends s{constructor(){super(),this.onDocClick=e=>{this._open&&(e.composedPath().includes(this)||(this._open=!1))},this.onSearchInput=e=>{this._search=e.target.value,this._active=-1,this._open||(this._open=!0)},this.onKeydown=e=>{const r=this.filteredOptions;switch(e.key){case"ArrowDown":if(e.preventDefault(),!this._open)return this.openDropdown();{let t=this._active+1;for(;t<r.length&&r[t].disabled;)t++;t<r.length&&(this._active=t)}break;case"ArrowUp":if(e.preventDefault(),!this._open)return this.openDropdown();{let t=this._active-1;for(;t>=0&&r[t].disabled;)t--;t>=0&&(this._active=t)}break;case"Enter":if(e.preventDefault(),this._open&&this._active>=0){const t=r[this._active];t&&!t.disabled&&this.selectOption(t)}else this._open||this.openDropdown();break;case"Escape":e.preventDefault(),this._open=!1;break;case"Tab":this._open=!1;break}},this.label="",this.options=[],this.size="md",this.placeholder="Select...",this.helpText="",this.errorText="",this.required=!1,this.disabled=!1,this.multiple=!1,this.searchable=!0,this.chipMode=!1,this._search="",this._selected=[],this._open=!1,this._active=-1,this.internals=this.attachInternals()}static{this.formAssociated=!0}static{this.properties={label:{type:String},options:{type:Array},size:{type:String,reflect:!0},placeholder:{type:String},helpText:{type:String,attribute:"help-text"},errorText:{type:String,attribute:"error-text"},required:{type:Boolean},disabled:{type:Boolean,reflect:!0},multiple:{type:Boolean},searchable:{type:Boolean},chipMode:{type:Boolean,attribute:"chip-mode"},_search:{state:!0},_selected:{state:!0},_open:{state:!0},_active:{state:!0}}}connectedCallback(){super.connectedCallback(),document.addEventListener("click",this.onDocClick),this.syncFormValue()}disconnectedCallback(){super.disconnectedCallback(),document.removeEventListener("click",this.onDocClick)}set value(e){e==null?this._selected=[]:Array.isArray(e)?this._selected=e:this._selected=[e],this.syncFormValue()}get value(){return this.multiple?this._selected:this._selected[0]??""}get filteredOptions(){const e=this._search.toLowerCase();return e?this.options.filter(r=>r.label.toLowerCase().includes(e)):this.options}get displayValue(){return this._selected.length===0?"":this.options.find(r=>r.value===this._selected[0])?.label??""}get selectedOptions(){return this.options.filter(e=>this._selected.includes(e.value))}get inputValue(){return this.multiple?this._search:this._search||this.displayValue}isSelected(e){return this._selected.includes(e)}syncFormValue(){this.internals.setFormValue(this.multiple?this._selected.join(","):this._selected[0]??null)}emit(){this.syncFormValue(),this.dispatchEvent(new CustomEvent("change",{detail:{value:this.value},bubbles:!0,composed:!0}))}toggleDropdown(){this.disabled||(this._open?this._open=!1:this.openDropdown())}openDropdown(){this.disabled||(this._open=!0,this._active=-1,requestAnimationFrame(()=>{this.renderRoot.querySelector(".input")?.focus()}))}selectOption(e){if(e.disabled)return;const r=e.value;if(this.multiple){const t=this._selected.indexOf(r);this._selected=t>=0?this._selected.filter(o=>o!==r):[...this._selected,r],this._search="",this.emit(),requestAnimationFrame(()=>{this.renderRoot.querySelector(".input")?.focus()})}else this._selected=[r],this._search="",this._open=!1,this.emit()}removeValue(e,r){r?.stopPropagation(),this._selected=this._selected.filter(t=>t!==e),this.emit()}clearSelection(e){e?.stopPropagation(),this._selected=[],this.emit()}renderTags(){const e=this.selectedOptions;if(e.length===0)return null;if(e.length>1)return i`<span class="chip chip--count">
         <span class="chip__label">${e.length} Options</span>
         <button
           type="button"
           class="chip__remove"
           aria-label="Clear selection"
-          @click=${r=>this.clearSelection(r)}
+          @click=${t=>this.clearSelection(t)}
         >
           ${this.xIcon()}
         </button>
-      </span>`;const t=e[0];return i`<span class="chip">
-      <span class="chip__label">${t.label}</span>
+      </span>`;const r=e[0];return i`<span class="chip">
+      <span class="chip__label">${r.label}</span>
       <button
         type="button"
         class="chip__remove"
-        aria-label=${"Remove "+t.label}
-        @click=${r=>this.removeValue(t.value,r)}
+        aria-label=${"Remove "+r.label}
+        @click=${t=>this.removeValue(r.value,t)}
       >
         ${this.xIcon()}
       </button>
@@ -49,16 +49,16 @@ import{i as a,b as i,a as l}from"./lit-element.C8p3bJxG.js";class n extends a{co
           </div>
 
           ${this._open?i`<div class="dropdown" role="listbox">
-                ${this.filteredOptions.length===0?i`<div class="option option--empty">No results found</div>`:this.filteredOptions.map((t,r)=>{const o=this.isSelected(t.value);return i`<div
-                        class="option ${r===this._active?"option--active":""} ${o?"option--selected":""} ${t.disabled?"option--disabled":""}"
+                ${this.filteredOptions.length===0?i`<div class="option option--empty">No results found</div>`:this.filteredOptions.map((r,t)=>{const o=this.isSelected(r.value);return i`<div
+                        class="option ${t===this._active?"option--active":""} ${o?"option--selected":""} ${r.disabled?"option--disabled":""}"
                         role="option"
                         aria-selected=${o}
-                        aria-disabled=${t.disabled??!1}
-                        @click=${()=>this.selectOption(t)}
-                        @mouseenter=${()=>this._active=r}
+                        aria-disabled=${r.disabled??!1}
+                        @click=${()=>this.selectOption(r)}
+                        @mouseenter=${()=>this._active=t}
                       >
                         ${this.multiple?i`<span class="check ${o?"check--selected":""}">${this.checkIcon()}</span>`:null}
-                        <span class="option__label">${t.label}</span>
+                        <span class="option__label">${r.label}</span>
                       </div>`})}
               </div>`:null}
         </div>
@@ -68,7 +68,7 @@ import{i as a,b as i,a as l}from"./lit-element.C8p3bJxG.js";class n extends a{co
     `}chevronIcon(){return i`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>`}checkIcon(){return i`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>`}xIcon(){return i`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>`}static{this.styles=l`
+      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>`}static{this.styles=a`
     :host {
       display: block;
       --_field-padding-y: var(--form-padding-y-md, 8px);
@@ -353,4 +353,4 @@ import{i as a,b as i,a as l}from"./lit-element.C8p3bJxG.js";class n extends a{co
     .field--error .input:focus {
       box-shadow: 0 0 0 2px var(--color-danger-border, rgba(211, 47, 47, 0.25));
     }
-  `}}customElements.get("esa-select")||customElements.define("esa-select",n);const d=[{label:"Douglas-fir slash, 550°C",value:"doug-fir-550"},{label:"Mixed hardwood, 650°C",value:"hardwood-650"},{label:"Softwood bark, 500°C",value:"softwood-500"},{label:"Walnut shell, 600°C",value:"walnut-600",disabled:!0},{label:"Wheat straw, 450°C",value:"wheat-450"},{label:"Hazelnut shell, 550°C",value:"hazelnut-550"}];customElements.whenDefined("esa-select").then(()=>{document.querySelectorAll("esa-select").forEach(s=>{s.options=d})});
+  `}}customElements.get("esa-select")||customElements.define("esa-select",n);
