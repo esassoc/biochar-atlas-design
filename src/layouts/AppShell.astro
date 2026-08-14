@@ -219,9 +219,8 @@ if (activeNavId) {
     <!-- ═══ BODY (sidenav + content) ═══ -->
     <div class="modern-layout__body">
       <!-- ─── side nav ─── -->
-      <!-- Expanded by default: the nav hierarchy, the Atlas lockup and the
-           inert roadmap sections are the demo. Collapsed-first hid all three
-           behind a click. -->
+      <!-- Expanded by default: the lockup and the nav hierarchy are the demo,
+           and collapsed-first hid both behind a click. -->
       <nav class="side-nav" id="side-nav">
         <div class="sidebar-header">
           <a href={withBase('/')} class="brand" aria-label="Biochar Atlas — American Biochar Institute">
@@ -242,7 +241,19 @@ if (activeNavId) {
               <>
                 {section.link ? (
                   <div class:list={['nav-section', { 'nav-section--active': section.active }]}>
-                    <a href={section.href ?? `#${section.id}`} class="nav-section__header nav-section__header--link">
+                    {/* aria-label AND title: on the 72px rail the label span is
+                        display:none, so without these the control is an
+                        unlabelled icon. The accordion sections get their name
+                        back from the flyout panel; a link section has no
+                        flyout, so the native tooltip is the only thing naming
+                        it for a sighted mouse user. Both repeat the visible
+                        label when the rail is open, which is harmless. */}
+                    <a
+                      href={section.href ?? `#${section.id}`}
+                      class="nav-section__header nav-section__header--link"
+                      aria-label={section.title}
+                      title={section.title}
+                    >
                       <EsaIcon
                         name={section.icon}
                         size="sm"
@@ -258,7 +269,12 @@ if (activeNavId) {
                       { 'nav-section--collapsed': !section.expanded, 'nav-section--active': section.active },
                     ]}
                   >
-                    <button type="button" class="nav-section__header" aria-expanded={section.expanded ? 'true' : 'false'}>
+                    <button
+                      type="button"
+                      class="nav-section__header"
+                      aria-label={section.title}
+                      aria-expanded={section.expanded ? 'true' : 'false'}
+                    >
                       <EsaIcon
                         name={section.icon}
                         size="sm"
