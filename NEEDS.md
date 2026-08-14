@@ -300,6 +300,15 @@ over the components, not a token change.
   `--form-label-font-size` / `--form-label-font-weight` hooks the same day.
 
 ## Spoke-init lesson (for the NEXT spoke)
+- **Never write an escaped tag inside a prop that gets `set:html`.**
+  `ComponentDoc.astro` renders its `summary` with `set:html`, and Astro decodes
+  entities in an attribute at parse time — so `&lt;details&gt;` reached the DOM
+  as a real, unclosed `<details>` element. The rest of the page nested inside
+  it and the browser labelled it with its own default marker, which is why the
+  esa-collapsible page rendered as "▼ Details" with the body jammed into the
+  summary line. Name the element in prose (`the native <code>details</code>
+  element`) instead. It was the only instance in the spoke; grep `&lt;` before
+  adding another.
 - `.claude/` (component-first skill + check-component-first hook +
   settings.json) is part of spoke init — beacon-design and cb-fish-design both
   carry it. This spoke initially missed it (ported 2026-06-11); copy it on
