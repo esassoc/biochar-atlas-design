@@ -146,13 +146,17 @@ const seed = {
       if (who) who.textContent = user.name;
     }
 
-    function openEdit(id: string): void {
+    // The control that opened the editor, so closing can hand focus back to it.
+    let opener: HTMLElement | null = null;
+
+    function openEdit(id: string, from?: HTMLElement): void {
       if (!current[id]) return;
       editingId = id;
+      opener = from ?? null;
       fill(id);
       // Card-stack when the editor opens over the record: the under card slides
-      // left to peek out, and the top card brings NO second backdrop so the page
-      // does not double-dim. Both classes are removed again on close.
+      // left to peek out and takes a scrim, so it reads as a card behind rather
+      // than as this one's shadow. Both classes are removed again on close.
       const stacked = !!record?.open;
       panel!.classList.toggle('is-stacked', stacked);
       record?.classList.toggle('is-under', stacked);
@@ -166,12 +170,29 @@ const seed = {
     panel.addEventListener('close', () => {
       record?.classList.remove('is-under');
       editingId = null;
+
+      // Hand focus back ourselves. The lego stores document.activeElement at
+      // show() and calls .focus() on it at close, which cannot work here: when
+      // the record panel is open its real focus sits INSIDE its shadow root, so
+      // document.activeElement reports the <esa-side-dialog> HOST — an element
+      // with no tabindex, whose .focus() is a no-op. Focus therefore fell to
+      // <body>, and because Escape is bound to each panel's own .panel element,
+      // a second Escape then did nothing at all: the stack unwound one level and
+      // dead-ended with the record panel undismissable by keyboard.
+      //
+      // Measured as pre-existing — identical with this pass stashed — so it is a
+      // lego gap, not a regression from the scrim. Filed in NEEDS.md. Focus goes
+      // to the opener, which is slotted light DOM inside the record panel, and
+      // keydown from slotted content bubbles through the flattened tree to
+      // .panel, so the record panel's own Escape works again.
+      if (record?.open && opener?.isConnected) opener.focus();
+      opener = null;
     });
 
     document.querySelectorAll('[data-opens-user-edit]').forEach((trigger) =>
       trigger.addEventListener('click', () => {
         const id = (trigger as HTMLElement).dataset.userId;
-        if (id) openEdit(id);
+        if (id) openEdit(id, trigger as HTMLElement);
       }),
     );
 
@@ -211,11 +232,8 @@ const seed = {
 
 <style>
   /* ═══ The top card of the stack ═══
-     No second backdrop: the record panel underneath already dims the page, and
-     a second one at 50% darkens it twice, which makes the under card read as
-     disabled rather than as a card behind. The under card's own slide is set on
-     the record panel, in bca-user-panel.astro, because a component styles its
-     own element.
+     The under card's own slide is set on the record panel, in
+     bca-user-panel.astro, because a component styles its own element.
 
      IT HAS TO BE --side-dialog-backdrop-bg, NOT --color-backdrop. The lego
      reads `var(--side-dialog-backdrop-bg, var(--color-backdrop, …))`, so
@@ -227,10 +245,32 @@ const seed = {
      redirect, so re-pointing --color-backdrop here does nothing at all.
      Measured: the backdrop stayed rgba(0,0,0,.5) with the class applied.
      beacon-design's permit-tracking sets --color-backdrop for this and loads
-     the same token file, so its stacked editor double-dims today. Filed in
-     NEEDS.md. */
+     the same token file, so its stacked editor's backdrop is unreachable
+     today. Filed in NEEDS.md.
+
+     THE SCRIM IS DELIBERATE AND IT REVERSES THE FIRST PASS. That pass set this
+     to `transparent` to stop the page double-dimming — right about the
+     mechanism, wrong about the goal. With no second backdrop the record card
+     underneath stayed at full brightness, so at a 20px peek it read as a drop
+     shadow rather than as a panel under a panel (Andy, 2026-08-14: "when they
+     stack now, they blend too much"). The card underneath SHOULD dim; the fix
+     for the double-dim is a lighter scrim, not no scrim. 22% takes the record
+     card to #c4c4c2 against the top card's #fafaf7 and the page to 61%, which
+     is one step of depth rather than the app going away.
+
+     This dialog's backdrop covers the record panel because of the z-order set
+     on the host: this panel's backdrop is 1310 and the record panel is 1300,
+     so the scrim lands between the two cards rather than behind both. */
   #users-edit-panel.is-stacked {
-    --side-dialog-backdrop-bg: transparent;
+    --side-dialog-backdrop-bg: var(--bca-panel-stack-scrim);
+  }
+
+  /* Same leading edge as the record panel — see bca-user-panel.astro and the
+     SIDE PANELS block in theme-biochar.css. On the top card of a stack it does
+     the second half of the job the scrim starts: the scrim makes the value
+     break, this draws the line at the seam. */
+  #users-edit-panel {
+    --shadow-400: var(--bca-panel-shadow);
   }
 
   .bca-user-edit-panel__head {

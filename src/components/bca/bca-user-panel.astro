@@ -329,7 +329,16 @@ import { users, usersById, formatDate } from '../../data/users';
      and its rounded corner. permit-tracking has the same 28px overhang; it is
      masked there by the double-dim bug noted in bca-user-edit-panel.astro. */
   #users-record-panel.is-under {
-    --side-dialog-inset: 36px;
+    --side-dialog-inset: 40px;
+  }
+
+  /* The leading edge. esa-side-dialog hardcodes box-shadow to --shadow-400 and
+     ships no --side-dialog-shadow hook, so re-pointing --shadow-400 on the host
+     is the only lever — see theme-biochar.css for why the shipped value (8%
+     alpha, straight down) draws nothing on a right-anchored panel, and for the
+     grep proving the re-point cannot reach anything else. */
+  #users-record-panel {
+    --shadow-400: var(--bca-panel-shadow);
   }
 
   /* The lego's header slot is a single row; the hidden siblings must not

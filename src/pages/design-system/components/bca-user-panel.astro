@@ -21,8 +21,9 @@ const legoApi = [
 const hooks = [
   { name: '--_width', type: 'length', default: 'per size', description: 'The one to set. 520px here, and the edit panel that stacks over it matches — a stack needs equal widths, because the under card peeks by sliding rather than by being wider.' },
   { name: '--z-modal / --z-modal-backdrop', type: 'number', default: '400 / 300', description: 'Must be raised above the app shell. esa-side-dialog is a custom overlay, not a native <dialog>, so it has no top layer and DOM order will not save it. This shell’s topbar is 1100 and its nav flyout 1200, so the record panel runs at 1300 / 1250 and the edit panel above it at 1340 / 1310.' },
-  { name: '--side-dialog-inset', type: 'length', default: '16px', description: 'The gap on all four sides, and the stacking knob: the under card re-points it to 36px while a second panel is open, which the lego animates. The peek is the difference between the two insets and must stay under the 24px body padding.' },
-  { name: '--side-dialog-backdrop-bg', type: 'color', default: 'rgba(0,0,0,.5)', description: 'The top card of a stack sets it transparent so the page dims once, not twice. It must be this token and not --color-backdrop: the lego falls back to --color-backdrop only when this one is unset, and component-tokens.css sets it at :root — so the substitution has already happened and the concrete colour is what inherits down.' },
+  { name: '--side-dialog-inset', type: 'length', default: '16px', description: 'The gap on all four sides, and the stacking knob: the under card re-points it to 40px while a second panel is open, which the lego animates. The peek is the difference between the two insets, capped at the lego\u2019s 24px body padding \u2014 past that the strip slices glyphs off the labels underneath.' },
+  { name: '--side-dialog-backdrop-bg', type: 'color', default: 'rgba(0,0,0,.5)', description: 'The scrim. The top card of a stack sets it to --bca-panel-stack-scrim (30% black), which dims the card underneath one step without taking the page to the 50% the record panel already applies. It must be this token and not --color-backdrop: the lego falls back to --color-backdrop only when this one is unset, and component-tokens.css sets it at :root \u2014 so the substitution has already happened and the concrete colour is what inherits down.' },
+  { name: '--shadow-400', type: 'shadow', default: '0 8px 32px -8px rgba(0,0,0,.08)', description: 'The panel\u2019s elevation, hardcoded in the lego with no --side-dialog-shadow hook. Both panels re-point it to --bca-panel-shadow: the shipped value throws straight DOWN at 8%, and a right-anchored panel only ever shows its left edge.' },
   { name: '--record-*', type: 'length / weight', default: 'page scale', description: 'The density block. bca-record-header, bca-field-group and bca-field all read these, so a panel sets its scale once on the slot scopes rather than threading a prop through three components.' },
 ];
 ---
@@ -96,19 +97,44 @@ const hooks = [
       the record you were reading is still there, one card back.
     </p>
     <p>
-      Two knobs do all of it, both esa-side-dialog custom properties. The under
-      card re-points <code>--side-dialog-inset</code> to 36px, which the lego
-      animates, so it slides left and peeks out by 20px — the peek is the
-      difference between the two insets, and it has to stay under the lego's
-      24px body padding or the strip shows the first sliver of every label
-      instead of the card's own edge. The top card sets
-      <code>--side-dialog-backdrop-bg: transparent</code>, so the page dims once
-      instead of twice — a second scrim makes the under card read as disabled
-      rather than as a card behind. Both classes come off when the top card
-      closes.
+      Three things separate the layers, and the geometry is the weakest of them.
+      The under card re-points <code>--side-dialog-inset</code> to 40px, which
+      the lego animates, so it slides left and peeks out by 24px — the peek is
+      the difference between the two insets, and 24px is a hard ceiling because
+      it is the lego's own body padding. One pixel more and the strip shows the
+      first sliver of every label instead of the card's own edge.
     </p>
     <p>
-      That second one has to be the component token and not
+      A 24px strip is not enough on its own, so the top card also brings a scrim
+      and a leading edge. <code>--side-dialog-backdrop-bg</code> goes to 30%
+      black — the card underneath dims, the way the page dims when the record
+      opens, but at well under the page scrim's 50% because this is one step of
+      depth rather than the app going away. That is the primary lever. Sampled
+      off the render, the profile across the seam runs <code>#484847</code> for
+      the page, <code>#aeaeab</code> for the card underneath and
+      <code>#fafaf7</code> for the top card — two hard steps, which is a bigger
+      value break than any shadow can draw.
+    </p>
+    <p>
+      The shadow draws the line the scrim's value break implies.
+      esa-side-dialog hardcodes <code>box-shadow</code> to
+      <code>--shadow-400</code> and ships no shadow hook of its own, and the
+      shipped <code>--shadow-400</code> is <code>0 8px 32px -8px rgba(0,0,0,.08)</code>
+      — straight down, at 8%. On a panel pinned to the right edge, the only edge
+      you see is the left one, and a downward shadow draws nothing there. Both
+      panels re-point <code>--shadow-400</code> to
+      <code>--bca-panel-shadow</code>, which throws left and keeps its density
+      near the edge so the peek beside it stays legible.
+    </p>
+    <p>
+      It holds at three levels. Each panel's backdrop dims everything below it,
+      so the scrims compose without any depth bookkeeping — a third card puts
+      the record at 51%, the editor at 30% and itself at zero, which stays
+      monotonic and readable. The insets are the only part that would need a
+      third value.
+    </p>
+    <p>
+      The backdrop has to be the component token and not
       <code>--color-backdrop</code>. The lego reads
       <code>var(--side-dialog-backdrop-bg, var(--color-backdrop, …))</code>, and
       <code>component-tokens.css</code> already sets the component token at
@@ -117,12 +143,16 @@ const hooks = [
       left to redirect.
     </p>
     <p>
-      Escape unwinds one level at a time, and that falls out of the lego rather
-      than needing code: it binds Escape to its own panel's
-      <code>keydown</code>, not to the document, and focus moves into whichever
-      card opened last. The same is true of the backdrop — the top card's
-      transparent scrim still sits above the under card's, so an outside click
-      closes one level.
+      Escape unwinds one level at a time, because the lego binds Escape to its
+      own panel's <code>keydown</code> rather than to the document. Handing
+      focus back is the part that does need code: the lego stores
+      <code>document.activeElement</code> at open and calls
+      <code>.focus()</code> on it at close, and when the record panel is open
+      that reports the <code>&lt;esa-side-dialog&gt;</code> <em>host</em> — real
+      focus is inside its shadow root. Focusing a host with no tabindex is a
+      no-op, so focus fell to <code>&lt;body&gt;</code> and the second Escape
+      did nothing. The editor's close handler restores focus to the control that
+      opened it instead.
     </p>
     <p>
       The URL carries the record and not the depth. Beacon's drawers are not

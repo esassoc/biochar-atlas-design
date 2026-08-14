@@ -422,28 +422,66 @@ right-hand drawer put two overlay grammars on one screen for one record.
 `prototypes/permit-tracking.astro` (segment dossier → permit editor), which is
 the same shape.
 
-- **Two knobs, both esa-side-dialog custom properties.** The under card
-  re-points `--side-dialog-inset` (the lego animates it and explicitly supports
-  a host changing it while open); the top card kills its own backdrop.
-- **The peek is the DIFFERENCE between the two insets, and it must stay under
-  24px.** That is the lego's header / body / footer padding. Beacon's 44px
+- **Three separators, and the geometry is the weakest of them.** Revised
+  2026-08-14 after Andy looked at the first pass: *"we need more clear
+  shadows/overlays to clearly delineate the layers. When they stack now, they
+  blend too much."* Inset alone does not carry it.
+- **The peek is the DIFFERENCE between the two insets, and 24px is a hard
+  ceiling.** That is the lego's header / body / footer padding. Beacon's 44px
   against a default 16 exposes 28px, so the last 4px are the first sliver of
   every label — a column of clipped glyph fragments down the left edge, which
-  reads as a rendering fault rather than as a card behind. This spoke uses
-  **36px, a 20px peek**, which lands entirely inside the padding so the strip is
-  the card's own surface and its rounded corner. permit-tracking has the same
-  28px overhang today; it is masked there by the backdrop bug below.
+  reads as a rendering fault rather than as a card behind. This spoke sits at
+  **40px, a 24px peek**: right at the padding edge, so the strip is entirely the
+  card's own surface. Confirmed by sampling the render — no glyph pixels in the
+  strip. It cannot grow, and a scrim does not rescue it: dimming a clipped glyph
+  does not unclip it. permit-tracking has the same 28px overhang today.
+- **The scrim is the primary lever, and it REVERSES the first pass.** That pass
+  set the top card's backdrop to `transparent` to stop the page double-dimming —
+  right about the mechanism, wrong about the goal. With no second backdrop the
+  card underneath stayed at full brightness and read as a drop shadow. The card
+  underneath *should* dim; the fix for double-dimming is a lighter scrim, not no
+  scrim. `--bca-panel-stack-scrim` is 30% black, well under the page scrim's
+  50%. Sampled off the render, the profile across the seam is `#484847` page →
+  `#aeaeab` under card → `#fafaf7` top card: two hard steps.
+- **The lego ships no usable elevation.** `esa-side-dialog` hardcodes
+  `box-shadow: var(--shadow-400, …)` with no `--side-dialog-shadow` hook, and
+  the shipped `--shadow-400` is `0 8px 32px -8px rgba(0,0,0,0.08)` — straight
+  DOWN at 8%. A right-anchored panel only ever shows its LEFT edge, so the
+  shipped shadow draws nothing where it matters. That is the root cause of the
+  blending, and it applies to a lone panel as much as to a stack. Both panels
+  re-point `--shadow-400` to `--bca-panel-shadow`, which throws left and keeps
+  its density near the edge (~10px reach) so it does not swallow the 24px peek.
+  Contained: grepped, the only three legos reading `--shadow-400` are
+  esa-side-dialog, esa-back-to-top and esa-search-panel, and neither of the last
+  two appears inside a panel. Hub fix filed below.
 - **It has to be `--side-dialog-backdrop-bg`, not `--color-backdrop`.** See the
   hub-gaps section — this one is a token-architecture trap, and Beacon is
   currently on the wrong side of it.
 - **z-index above the record panel:** `--z-modal: 1340; --z-modal-backdrop:
-  1310` against the record's 1300 / 1250.
-- **Escape unwinds one level, for free.** The lego binds Escape to its own
-  panel's `keydown` rather than to the document, and focus moves into whichever
-  card opened last — so nothing had to be written to keep the two from
-  collapsing together. The same is true of the backdrop: the top card's
-  transparent scrim still sits above the under card's, so an outside click
-  closes one level. Verified over CDP.
+  1310` against the record's 1300 / 1250. This is what puts the scrim BETWEEN
+  the two cards rather than behind both.
+- **It holds at three levels.** Verified with a temporary third panel: the
+  scrims compose with no depth bookkeeping, because each panel's backdrop dims
+  everything below it — the first card lands at 51%, the second at 30%, the top
+  at zero, monotonic and readable. Only the insets would need a third value
+  (64 / 40 / 16). Worth noting the premise this check came from was wrong:
+  permit-tracking is **two** side-dialogs, not three. Its third overlay,
+  `notif-dialog`, is a centred `esa-dialog` and not part of the stack.
+- **Escape unwinds one level, but focus restore needed code.** The lego binds
+  Escape to its own panel's `keydown` rather than to the document, so the levels
+  do not collapse together. Handing focus back is where it broke: the lego
+  stores `document.activeElement` at open and calls `.focus()` on it at close,
+  and when the record panel is open that reports the `<esa-side-dialog>` HOST —
+  real focus is inside its shadow root. Focusing a host with no tabindex is a
+  no-op, so focus fell to `<body>`, and since Escape is bound per panel, the
+  second press did nothing: the stack unwound one level and dead-ended with the
+  record panel undismissable by keyboard. Measured as **pre-existing** (identical
+  with this pass stashed), so it is a lego gap, not a regression. The editor's
+  `close` handler now restores focus to the control that opened it, which is
+  slotted light DOM inside the record panel — keydown from slotted content
+  bubbles through the flattened tree to `.panel`, so the record's own Escape
+  works again. Verified: Esc ×1 closes the editor and returns the inset, Esc ×2
+  closes the record and clears `?user=`.
 - **The URL carries the record, never the depth.** `?user=` does not change when
   the editor opens. Beacon's drawers are not addressable at all; a link that
   reopened someone else's half-filled edit form is a worse contract than no
@@ -627,6 +665,30 @@ they inherit the face at all. Making Light stick everywhere is a heading pass
 over the components, not a token change.
 
 ## Hub gaps found while building (candidates to promote)
+- **`esa-side-dialog` has no shadow hook, and the shadow it does take is the
+  wrong shape for it.** The panel hardcodes `box-shadow: var(--shadow-400, …)`.
+  There is no `--side-dialog-shadow`, so the only way to change a panel's
+  elevation is to re-point the generic `--shadow-400` on the host — a semantic
+  token being bent to mean one component. Worse, the shipped `--shadow-400` is
+  `0 8px 32px -8px rgba(0,0,0,0.08)`: purely DOWNWARD, at 8% alpha. Every
+  side-dialog is pinned to a viewport edge, so the only edge a user sees is the
+  leading one, and a downward shadow draws nothing there. Two stacked panels had
+  no visible boundary at all. **Hub fix:** add `--side-dialog-shadow`, and give
+  it a default with a horizontal component keyed off `position` — a
+  right-anchored panel wants its shadow thrown left, a left-anchored one thrown
+  right. The generic elevation scale is built for cards on a page, not for
+  edge-anchored overlays.
+- **`esa-side-dialog`'s focus restore cannot return focus into another shadow
+  root.** `updated()` stores `document.activeElement` on open and calls
+  `.focus()` on it on close. When the previously-focused element lives inside
+  another component's shadow tree — which is exactly the case for a stacked
+  panel, since the lego's own `focusFirst()` focuses the shadow-DOM ✕ first —
+  `document.activeElement` reports that component's HOST. Focusing a host with
+  no tabindex is a silent no-op and focus lands on `<body>`. Because Escape is
+  bound to each panel's own `.panel` keydown, the panel underneath then cannot
+  be dismissed by keyboard at all. **Hub fix:** walk `shadowRoot.activeElement`
+  down the tree when storing the target, or store a `composedPath()[0]`
+  reference. Both this and permit-tracking's stack are affected.
 - **A component token set at `:root` from a generic one kills the generic one's
   reach.** `esa-side-dialog` reads
   `var(--side-dialog-backdrop-bg, var(--color-backdrop, rgba(0,0,0,.5)))`, which
@@ -640,8 +702,7 @@ over the components, not a token change.
   and `--confirm-dialog-backdrop-bg` are declared the same way, so the same trap
   is set on three components. **beacon-design is on the wrong side of it
   today:** `prototypes/permit-tracking.astro` sets `--color-backdrop:
-  transparent` on its stacked editor and loads the same token file, so its stack
-  double-dims. **Hub fix:** leave a component token undeclared when its only
+  transparent` on its stacked editor and loads the same token file, so its stacked editor cannot reach its backdrop at all. **Hub fix:** leave a component token undeclared when its only
   value is the generic fallback, or document that the component token is the
   only per-element lever. The generic-token fallback in the component's own CSS
   is a promise the token file breaks.

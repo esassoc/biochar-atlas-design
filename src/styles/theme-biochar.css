@@ -551,6 +551,46 @@
   --snackbar-item-bg-warning: var(--color-warning);  /* white 5.02 */
   --snackbar-item-bg-danger:  var(--color-danger);   /* white 5.29 */
 
+  /* ═══ SIDE PANELS — elevation and the stack ═══════════════════════════
+     Two values that exist because the hub's do not read on a RIGHT-ANCHORED
+     panel. esa-side-dialog hardcodes `box-shadow: var(--shadow-400, …)` with
+     no --side-dialog-shadow hook of its own, and the shipped --shadow-400 is
+     `0 8px 32px -8px rgba(0,0,0,0.08)` — purely DOWNWARD at 8% alpha. A panel
+     pinned to the right edge shows only its left edge, and a downward shadow
+     draws nothing there. That is why two stacked panels blended into each
+     other: neither one had a leading edge (Andy, 2026-08-14, "we need more
+     clear shadows/overlays to clearly delineate the layers").
+
+     --bca-panel-shadow throws LEFT and lands the density near the edge rather
+     than spreading it: -10px offset, 20px blur, -8px spread, so the visible
+     reach is about 10px and the peek strip beside it stays legible instead of
+     being swallowed by gradient. The second term is the hub's own downward
+     lift, kept so a panel still sits above the page. Applied by re-pointing
+     --shadow-400 on the side-dialog host, which is contained: grepped, the
+     only three legos that read --shadow-400 are esa-side-dialog,
+     esa-back-to-top and esa-search-panel, and neither of the last two appears
+     inside a panel. The honest fix is a --side-dialog-shadow hook in the hub;
+     filed in NEEDS.md.
+
+     --bca-panel-stack-scrim dims the card UNDERNEATH when a second panel
+     opens over it — one step of depth, not the whole app going away, so it is
+     well under the page scrim's 50%. It composes: the page is already at 50%
+     from the first panel's backdrop and 30% over that puts it at 65%, while
+     the card underneath takes the 30% alone. Sampled off the render, the
+     profile across the seam is #484847 page → #aeaeab under card → #fafaf7 top
+     card, with the shadow carrying the under card from #adadaa down to #878784
+     as it approaches the edge. Two hard steps and a gradient between them —
+     the scrim makes the value break, the shadow only draws the line.
+
+     It composes at depth too, with no bookkeeping: each panel's backdrop dims
+     everything below it, so a third card would put the first at 51% and the
+     second at 30% and stay monotonic. Only the insets would need a third
+     value. Verified with a temporary third panel. */
+  --bca-panel-shadow:
+    -10px 0 20px -8px rgba(0, 0, 0, 0.38),
+    0 10px 34px -12px rgba(0, 0, 0, 0.20);
+  --bca-panel-stack-scrim: rgba(0, 0, 0, 0.30);
+
   /* ═══ TYPE ════════════════════════════════════════════════════════════
      ABI brand type. Inter for the interface; Crimson Pro Light for headlines
      (applied to h1/h2 at the bottom of this file). Sentence case everywhere —
