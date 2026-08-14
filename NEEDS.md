@@ -189,6 +189,15 @@ at `/suitability-tool`, holding `bca-coming-soon`.
 - **The user avatar is filled brand Gold with Green initials** (6.54:1). Never
   white on gold — that is 1.60:1. The ring is gone; the disc sits ΔE 0.1416
   from the topbar and holds its own edge.
+- **Sublinks are text-only** (Andy, 2026-08-13); icons belong to the section
+  header. The indent that replaces them is not a chosen number — it is
+  `calc(header padding + icon size + gap)`, so a sublink label lands exactly
+  under its section label (both at x=50 in a 340px nav) and the icon column
+  reads as a gutter. The row itself is no longer inset, so the active tint is
+  as wide as a section header's hover fill. Inside the collapsed-rail flyout
+  there is no icon column to align to, so sublinks there reset to their own
+  8px padding and line up with the panel title instead. `NavItem` no longer
+  has an `icon` field.
 - The workflow stepper's own treatment remains out of scope — wireframe work.
 
 

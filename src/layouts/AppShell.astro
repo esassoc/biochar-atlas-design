@@ -20,15 +20,12 @@ import EsaIcon from '@esa/ecology/esa-icon.astro';
 import BcaGlobalSearch from '../components/bca/bca-global-search.astro';
 import { withBase } from '../lib/base';
 
+/** Sublinks are text-only — the icon column belongs to the section header. */
 interface NavItem {
   id: string;
   label: string;
   /** Real route (already withBase'd). Defaults to the `#id` stub when absent. */
   href?: string;
-  /** Lucide glyph key — esa-icon registry name or LUCIDE entry below. */
-  icon?: string;
-  /** Inline Lucide path markup override for glyphs not in either lookup. */
-  iconPaths?: string;
   active?: boolean;
   /** Ghosted roadmap item — muted, not-allowed cursor, no navigation. */
   disabled?: boolean;
@@ -66,13 +63,6 @@ const LUCIDE = {
   // section icons
   'map-pinned':
     '<path d="M18 8c0 3.613-3.869 7.429-5.393 8.795a1 1 0 0 1-1.214 0C9.87 15.429 6 11.613 6 8a6 6 0 0 1 12 0"/><circle cx="12" cy="8" r="2"/><path d="M8.714 14h-3.71a1 1 0 0 0-.948.683l-2.004 6A1 1 0 0 0 3 22h18a1 1 0 0 0 .948-1.316l-2-6a1 1 0 0 0-.949-.684h-3.712"/>',
-  // Suitability items
-  'map-pin':
-    '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
-  'columns-2': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/>',
-  bookmark: '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
-  calculator:
-    '<rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>',
   // Atlas-module sections (database lives in esa-icon's registry)
   store:
     '<path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/>',
@@ -82,17 +72,6 @@ const LUCIDE = {
     '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
   // About section
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
-  'file-text':
-    '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
-  'folder-open':
-    '<path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2"/>',
-  // Admin items
-  archive:
-    '<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
-  'refresh-cw':
-    '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
-  'git-branch':
-    '<line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
   // user menu
   user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   'log-out':
@@ -116,16 +95,10 @@ const {
       expanded: true,
       dividerAfter: true,
       items: [
-        {
-          id: 'suitability-tool',
-          label: 'Suitability Tool',
-          icon: 'map-pin',
-          href: withBase('/suitability-tool'),
-          active: true,
-        },
-        { id: 'scenario-comparison', label: 'Scenario Comparison', icon: 'columns-2', disabled: true },
-        { id: 'saved-assessments', label: 'Saved Assessments', icon: 'bookmark', disabled: true },
-        { id: 'cps-336-calculator', label: 'CPS 336 Calculator', icon: 'calculator', disabled: true },
+        { id: 'suitability-tool', label: 'Suitability Tool', href: withBase('/suitability-tool'), active: true },
+        { id: 'scenario-comparison', label: 'Scenario Comparison', disabled: true },
+        { id: 'saved-assessments', label: 'Saved Assessments', disabled: true },
+        { id: 'cps-336-calculator', label: 'CPS 336 Calculator', disabled: true },
       ],
     },
     {
@@ -183,8 +156,8 @@ const {
       iconPaths: LUCIDE['info'],
       expanded: false,
       items: [
-        { id: 'methodology', label: 'Methodology', icon: 'file-text', href: '#' },
-        { id: 'resources', label: 'Resources', icon: 'folder-open', href: '#' },
+        { id: 'methodology', label: 'Methodology', href: '#' },
+        { id: 'resources', label: 'Resources', href: '#' },
       ],
     },
     {
@@ -193,9 +166,9 @@ const {
       icon: 'settings',
       expanded: false,
       items: [
-        { id: 'admin-catalog', label: 'Biochar Catalog', icon: 'archive', href: '#' },
-        { id: 'datasets-refresh', label: 'Datasets & Refresh', icon: 'refresh-cw', href: '#' },
-        { id: 'algorithm-versions', label: 'Algorithm Versions', icon: 'git-branch', href: '#' },
+        { id: 'admin-catalog', label: 'Biochar Catalog', href: '#' },
+        { id: 'datasets-refresh', label: 'Datasets & Refresh', href: '#' },
+        { id: 'algorithm-versions', label: 'Algorithm Versions', href: '#' },
       ],
     },
   ],
@@ -372,24 +345,10 @@ if (activeNavId) {
                         <li class="nav-item">
                           {item.disabled ? (
                             <span class="nav-sublink nav-sublink--disabled" aria-disabled="true">
-                              {item.icon && (
-                                <EsaIcon
-                                  name={item.icon}
-                                  size="sm"
-                                  paths={item.iconPaths ?? LUCIDE[item.icon as keyof typeof LUCIDE]}
-                                />
-                              )}
                               <span class="nav-sublink__label">{item.label}</span>
                             </span>
                           ) : (
                             <a href={item.href ?? `#${item.id}`} class:list={['nav-sublink', { active: item.active }]}>
-                              {item.icon && (
-                                <EsaIcon
-                                  name={item.icon}
-                                  size="sm"
-                                  paths={item.iconPaths ?? LUCIDE[item.icon as keyof typeof LUCIDE]}
-                                />
-                              )}
                               <span class="nav-sublink__label">{item.label}</span>
                             </a>
                           )}
@@ -1075,36 +1034,38 @@ if (activeNavId) {
     max-height: none;
     opacity: 1;
   }
-  .side-nav.collapsed .nav-flyout .nav-item {
-    padding-left: 0;
+  /* The flyout has no icon column to align to, so the sublinks drop back to
+     their own padding and line up with the panel title instead. */
+  .side-nav.collapsed .nav-flyout .nav-sublink {
+    padding-left: var(--spacing-200, 0.5rem);
   }
 
-  /* Indent is shallower than Beacon's 2.5rem — items carry their own icons
-     (or sit one level under an iconed section header), which do the hierarchy
-     work without eating label width. */
   .nav-item {
-    padding: 0 0 0 var(--spacing-300, 0.75rem);
+    padding: 0;
   }
   .nav-item + .nav-item {
     margin-top: var(--spacing-050, 0.125rem);
   }
 
+  /* Sublinks are text-only (Andy, 2026-08-13), so the indent is what carries
+     the level. Rather than a chosen number, it is the section header's own
+     left padding + icon + gap — the label lands exactly under the header
+     label, and the icon column reads as a gutter instead of dead space. The
+     row itself still spans the full nav width, so the active fill stays as
+     wide as a section header's hover fill. */
   .nav-sublink {
     display: flex;
     align-items: center;
-    gap: var(--spacing-250, 0.625rem);
     padding: var(--spacing-200, 0.5rem);
+    padding-left: calc(
+      var(--spacing-200, 0.5rem) + var(--icon-size-sm, 16px) + var(--spacing-250, 0.625rem)
+    );
     color: var(--color-text-secondary, #54514a);
     text-decoration: none;
     border-radius: var(--radius-100, 0.25rem);
     font-size: 0.9375rem; /* 15px — nav items stay ≥14px */
     transition: all 150ms ease;
     line-height: 1.2;
-  }
-  .nav-sublink :global(.esa-icon) {
-    flex-shrink: 0;
-    color: var(--color-text-tertiary, #6a665e);
-    transition: color 150ms ease;
   }
   .nav-sublink__label {
     flex: 1;
@@ -1125,9 +1086,6 @@ if (activeNavId) {
     color: var(--_nav-active-ink, #364500);
     font-weight: var(--font-weight-semibold, 600);
   }
-  .nav-sublink.active :global(.esa-icon) {
-    color: var(--_nav-active-ink, #364500);
-  }
   /* Pins the active row against hover. `.nav-sublink.active` and
      `.nav-sublink:hover` both weigh 0,2,0, so today the active rule wins only
      because it happens to come later — this states the intent instead of
@@ -1141,9 +1099,6 @@ if (activeNavId) {
   .nav-sublink--disabled {
     color: var(--color-text-muted, #807c73);
     cursor: default;
-  }
-  .nav-sublink--disabled :global(.esa-icon) {
-    color: var(--color-text-muted, #807c73);
   }
   .nav-sublink--disabled:hover {
     background: transparent;
