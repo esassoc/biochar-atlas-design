@@ -1,0 +1,86 @@
+---
+// bca-button — esa-button wearing an ABI brand tone.
+//
+// Green, Purple and Gold as ACTION colors (Andy, 2026-08-14). The hub's button
+// carries a fixed set of semantic colors — primary, secondary, danger,
+// success, warning, info, ai, ghost — and five of the six the docs page showed
+// were status tones borrowed for a control that is not a status. This adds the
+// identity half beside them rather than replacing them: danger stays
+// conventional red, because a destructive action should not be brand-colored.
+//
+// `tone="green"` is `color="primary"` and nothing else — --color-primary IS
+// brand Green, so there is no second green here. Purple and Gold each need
+// four values, and each breaks a rule Green does not; the numbers and the
+// reasoning live in theme-biochar.css § BRAND TONES, and the tokens do too.
+import EsaButton from '@esa/ecology/esa-button.astro';
+
+interface Props {
+  tone?: 'green' | 'purple' | 'gold';
+  appearance?: 'fill' | 'outline' | 'dashed' | 'soft';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
+  icon?: string;
+  iconOnly?: boolean;
+  disabled?: boolean;
+  loading?: boolean;
+  href?: string;
+  [attr: string]: unknown;
+}
+const { tone = 'green', ...rest } = Astro.props as Props;
+---
+
+<!-- bcn-lego-checked: esa-button IS the button and renders every one of these —
+     this file only sets its private color knobs to brand values. It has to be a
+     wrapper rather than a class or a token: --_accent and friends are declared
+     on `.esa-button[data-astro-cid-…]`, which weighs 0,2,0, so a spoke rule
+     needs a third selector to win without depending on bundle order, and a
+     wrapper's own scoped `[cid] :global(.esa-button)` supplies it. Checked
+     Beacon: no brand-tone button (its brand IS its primary). The reusable home
+     is a `tone` axis on the hub's own button, orthogonal to `color`; filed in
+     NEEDS.md. -->
+
+<span class:list={['bca-button', `bca-button--${tone}`]}>
+  <EsaButton color="primary" {...rest}><slot /></EsaButton>
+</span>
+
+<style>
+  /* display:contents so the wrapper never affects layout — it exists only to
+     carry a selector with enough weight to reach the lego's private knobs. */
+  .bca-button {
+    display: contents;
+  }
+
+  /* Green is primary. Listed so the tone set reads as three in the markup and
+     in the docs, and so a future change to the brand's action green has one
+     place to land. */
+  .bca-button--green :global(.esa-button) {
+    --_accent: var(--color-primary);
+    --_accent-hover: var(--color-primary-hover);
+    --_on: var(--color-text-inverse);
+    --_accent-text: var(--color-primary-strong);
+  }
+
+  .bca-button--purple :global(.esa-button) {
+    --_accent: var(--bca-tone-purple);
+    --_accent-hover: var(--bca-tone-purple-hover);
+    --_on: var(--bca-tone-purple-ink);
+    --_accent-text: var(--bca-tone-purple-strong);
+  }
+
+  .bca-button--gold :global(.esa-button) {
+    --_accent: var(--bca-tone-gold);
+    --_accent-hover: var(--bca-tone-gold-hover);
+    --_on: var(--bca-tone-gold-ink);
+    --_accent-text: var(--bca-tone-gold-strong);
+  }
+
+  /* Gold is the one tone whose fill color cannot also be its border. The issued
+     Gold is 1.53:1 against the panel — invisible as an outline, and half what
+     WCAG 1.4.11 asks of a control boundary. esa-button draws outline and dashed
+     borders from --_accent, so the border is overridden to the same gold-11 the
+     label already uses (5.43 on the panel). Every other tone's border is its
+     fill and needs nothing. */
+  .bca-button--gold :global(.esa-button--appearance-outline .esa-button__native),
+  .bca-button--gold :global(.esa-button--appearance-dashed .esa-button__native) {
+    border-color: var(--bca-tone-gold-strong);
+  }
+</style>

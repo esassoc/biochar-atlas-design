@@ -162,6 +162,51 @@ else from them. Extending with lighter/darker steps is the agreement with ABI
 - Compatibility block at the end of the theme re-points the old `--bca-*`
   names the prototype pages still reference. Retire with those pages.
 
+## Brand button tones (2026-08-14)
+Andy's read of the shipped Button page: only the first swatch (primary green)
+was on-brand, and the rest were the hub's semantic tone set borrowed for a
+control that is not a status. Brand tones were ADDED beside the conventional
+ones rather than replacing them — danger in particular stays conventional red,
+consistent with the 2026-08-13 status decision.
+
+- **`bca-button` wraps `esa-button` and adds a `tone` axis** — green, purple,
+  gold. It has to be a wrapper: `--_accent` and its siblings are declared on
+  `.esa-button[data-astro-cid-…]` at 0,2,0, so a spoke rule needs a third
+  selector to win without depending on bundle order, and a wrapper's own
+  scoped `[cid] :global(.esa-button)` supplies it. **Hub gap:** a `tone` axis
+  on the hub's button, orthogonal to `color`, so a brand does not need a
+  wrapper per spoke.
+- **`tone="green"` IS `color="primary"`.** `--color-primary` is brand Green, so
+  there is no second green — listing it keeps the set reading as three and
+  gives a future change one place to land.
+- **Purple survives as a fill, but not at the issued hex.** Brand Purple
+  `#45173d` is purple-12, a text color. As a fill it carries white at 14.55:1
+  but sits ΔE 0.1046 from `--bca-neutral-12`, the app's own near-black — at
+  button scale it reads as a black button with a cast. Step 11 `#834877` reads
+  purple (ΔE 0.268 from neutral-12), carries white at 6.65:1, and clears
+  1.4.11 against the panel on its own at 6.36. So the fill is step 11 and the
+  issued hex returns as the hover, where a deeper value is wanted anyway.
+  Note the adjacency: `--color-text-link` is also purple-12, so a purple button
+  and a link share a family — different roles, one a fill and one text.
+- **Gold is the one tone whose fill cannot also be its border.** The issued
+  Gold is 1.53:1 against the panel: invisible as an outline, half what WCAG
+  1.4.11 asks of a control boundary. Outline draws border AND label from
+  gold-11 (5.43 panel, 5.11 canvas). Gold also cannot carry white — 1.60:1 —
+  so the fill's ink is ABI Green at 6.54:1, the same pairing the topbar avatar
+  uses. **This is the failure visible in Andy's screenshot**, a gold button
+  with a white label.
+- **Gold's hover cannot be gold-10**, which drops that green label to 3.62:1.
+  It is the OKLab midpoint of gold-9 and gold-10, `#e4a73d` — a real point
+  between two rungs rather than a value solved for a target — holding the label
+  at 4.93:1 while darkening visibly (ΔE 0.0833, four times the visible-edge
+  floor).
+- **The page was cut, not extended.** Six near-identical swatch rows would have
+  become nine. It now groups by the decision a designer is actually making:
+  Brand tones (fill and outline), Emphasis (secondary, ghost), Destructive, and
+  Status colors — the last documented rather than recommended, because
+  colouring a button by status describes an outcome before it has happened.
+  The same reasoning changed the Snackbar page's variant triggers to neutral.
+
 ## The house grid and record page (2026-08-14)
 The Admin › Users prototype establishes the two page shapes this app reuses for
 every collection: `/admin/users` (AG Grid list) and `/admin/users/{id}` (record
@@ -356,10 +401,20 @@ over the components, not a token change.
   fallbacks are HUB PRIMITIVES**, not the semantic tokens a theme re-points —
   so an unthemed toast renders hub green, hub orange, hub red and, for info,
   BLUE. The same shape as the tone-ink and tone-hover problem below, at a
-  fourth location. Themed here. Two more on the same component: the DEFAULT
-  (variantless) background is a bare `var(--color-gray-12)` with no hook at
-  all, and the `icon` property is declared reactive but `renderIcon()` never
-  reads it — setting it does nothing.
+  fourth location. Themed here; measured on the rendered page at
+  `#676556 / #177c52 / #a45e00 / #cd2a30`, white ink throughout. Three more on
+  the same component. The DEFAULT (variantless) background is a bare
+  `var(--color-gray-12)` with no hook at all — latent today, since `variant`
+  defaults to `'info'`. The `icon` property is declared reactive but
+  `renderIcon()` switches only on `variant`, so setting it does nothing. And
+  the message sizes from `--type-size-200` (15px ceiling) and the action label
+  from `--type-size-150` (14px), both inside shadow DOM with no size hook —
+  under the 16px floor for text a person reads. **The workaround has a trap
+  worth keeping:** re-pointing those scale steps on `esa-snackbar-item` does
+  nothing, because the container renders its items inside its OWN shadow root
+  and a document stylesheet cannot match an element in a shadow tree. It has to
+  go on `esa-snackbar-container`, where the inherited custom property crosses
+  the boundary. Hub fix: `--snackbar-item-font-size`.
 - **No `esa-*` lego is a record-page identity header** — an entity's mark, its
   name, one line of context, its status chips and its record-level actions.
   `esa-page-header` is the list-page answer and has no place for a mark or for

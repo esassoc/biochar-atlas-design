@@ -56,11 +56,17 @@ const itemEvents = [
   </Section>
 
   <Section id="variants" title="Variants">
-    <Preview code={`<EsaButton id="toast-info" color="info">Refresh SSURGO data</EsaButton>\n<EsaButton id="toast-success" color="success">Save assessment</EsaButton>\n<EsaButton id="toast-warning" color="warning">Override soil values</EsaButton>\n<EsaButton id="toast-danger" color="danger">Run scoring</EsaButton>`}>
-      <EsaButton id="toast-info" color="info">Refresh SSURGO data</EsaButton>
-      <EsaButton id="toast-success" color="success">Save assessment</EsaButton>
-      <EsaButton id="toast-warning" color="warning">Override soil values</EsaButton>
-      <EsaButton id="toast-danger" color="danger">Run scoring</EsaButton>
+    <p>
+      The triggers are deliberately neutral. Colouring a button by the tone it
+      will raise makes the button claim an outcome before the action has run —
+      a red "score this field" reads as destructive. The tone belongs on the
+      toast, which is the thing reporting what happened.
+    </p>
+    <Preview code={`<EsaButton id="toast-info" color="secondary" appearance="outline">Refresh SSURGO data</EsaButton>\n<EsaButton id="toast-success" color="secondary" appearance="outline">Save assessment</EsaButton>\n<EsaButton id="toast-warning" color="secondary" appearance="outline">Override soil values</EsaButton>\n<EsaButton id="toast-danger" color="secondary" appearance="outline">Score with no goals set</EsaButton>`}>
+      <EsaButton id="toast-info" color="secondary" appearance="outline">Refresh SSURGO data</EsaButton>
+      <EsaButton id="toast-success" color="secondary" appearance="outline">Save assessment</EsaButton>
+      <EsaButton id="toast-warning" color="secondary" appearance="outline">Override soil values</EsaButton>
+      <EsaButton id="toast-danger" color="secondary" appearance="outline">Score with no goals set</EsaButton>
     </Preview>
   </Section>
 
@@ -115,7 +121,7 @@ const itemEvents = [
       toasts.warning('Manual soil-test values override the SSURGO defaults.');
     });
     document.getElementById('toast-danger')?.addEventListener('click', () => {
-      toasts.danger('Scoring failed — check your goal selections and try again.');
+      toasts.danger('Scoring needs at least one management goal.');
     });
 
     document.getElementById('toast-action')?.addEventListener('click', () => {

@@ -796,3 +796,19 @@
 [data-theme="biochar"] .esa-badge.esa-badge--md {
   font-size: 1rem;
 }
+
+/* esa-snackbar-item sizes its message from --type-size-200 and its action label
+   from --type-size-150, both inside shadow DOM with no size hook — so the two
+   top out at 15px and 14px. A toast message is body text someone reads, and the
+   only lever a theme has is re-pointing those scale steps so they inherit in.
+
+   It has to go on the CONTAINER, not the item: the container renders its items
+   INSIDE its own shadow root, and a document stylesheet cannot match an element
+   in a shadow tree — only inherited custom properties cross the boundary.
+   Scoped to the element so the app-wide scale is untouched. Hub fix: a
+   --snackbar-item-font-size hook, like the four background hooks the component
+   already exposes. */
+[data-theme="biochar"] esa-snackbar-container {
+  --type-size-200: 1rem;
+  --type-size-150: 1rem;
+}

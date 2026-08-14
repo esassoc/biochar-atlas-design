@@ -4,19 +4,26 @@ import Section from '@esa/docs/Section.astro';
 import Preview from '@esa/docs/Preview.astro';
 import Api from '@esa/docs/Api.astro';
 import EsaButton from '@esa/ecology/esa-button.astro';
+import BcaButton from '../../../components/bca/bca-button.astro';
 
-const colors = ['primary', 'secondary', 'danger', 'success', 'warning', 'info'] as const;
+const brandTones = ['green', 'purple', 'gold'] as const;
 
 const props = [
-  { name: 'color', type: "'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'info' | 'ai' | 'ghost'", default: "'primary'", description: 'Semantic color role. Biochar forest green comes from --color-primary.' },
-  { name: 'appearance', type: "'fill' | 'outline' | 'dashed'", default: "'fill'", description: 'Solid, outlined, or dashed-outline.' },
+  { name: 'color', type: "'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'info' | 'ai' | 'ghost'", default: "'primary'", description: 'Semantic color role. Primary is ABI Green — the theme re-points --color-primary.' },
+  { name: 'appearance', type: "'fill' | 'outline' | 'dashed' | 'soft'", default: "'fill'", description: 'Solid, outlined, dashed-outline, or a neutral surface that fills with the accent on hover.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Control size (shared form scale).' },
   { name: 'icon', type: 'string', description: 'Lucide icon name, shown left of the label.' },
   { name: 'iconOnly', type: 'boolean', default: 'false', description: 'Icon-only mode (no text).' },
   { name: 'active', type: 'boolean', default: 'false', description: 'Pressed/active state.' },
   { name: 'disabled', type: 'boolean', default: 'false', description: 'Non-interactive state.' },
   { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner and blocks input.' },
+  { name: 'href', type: 'string', description: 'Renders an anchor styled identically — a link that looks like a button.' },
   { name: 'type', type: "'button' | 'submit' | 'reset'", default: "'button'", description: 'Native button type.' },
+];
+
+const bcaProps = [
+  { name: 'tone', type: "'green' | 'purple' | 'gold'", default: "'green'", description: 'ABI brand action color. Green is --color-primary; purple and gold come from --bca-tone-*.' },
+  { name: '…', type: 'EsaButton props', description: 'Every other prop is forwarded to esa-button unchanged.' },
 ];
 ---
 <ComponentDoc
@@ -24,47 +31,106 @@ const props = [
   category="Core"
   slug="esa-button"
   type=".astro"
-  summary="The inherited Ecology button, wearing the Biochar Atlas skin. Primary picks up the forest green because the theme re-points <code>--color-primary</code> — this is the &ldquo;Evaluate suitability&rdquo; green; the rest of the palette is inherited."
+  summary="The inherited Ecology button. Its primary is ABI Green, because the theme re-points <code>--color-primary</code>. Purple and Gold arrive through <code>bca-button</code>, which sets the same private knobs to brand values — the identity half of the set, beside the conventional one."
 >
-  <Section id="colors" title="Colors">
-    <Preview code={`<EsaButton color="primary">Evaluate suitability</EsaButton>`}>
-      {colors.map((c) => <EsaButton color={c}>Evaluate</EsaButton>)}
+  <Section id="brand" title="Brand tones">
+    <p>
+      Green, Purple and Gold are the ABI palette's action colors: emphasis and
+      calls to action. Green is <code>primary</code> — there is no second green.
+      Purple's fill is step 11 rather than the issued <code>#45173d</code>,
+      which is a text color and reads as a black button at fill scale; the
+      issued hex returns as the hover. Gold takes a dark label at 6.54:1 —
+      white on Gold is 1.60:1.
+    </p>
+    <Preview code={`<BcaButton tone="gold">Download report</BcaButton>`}>
+      {brandTones.map((t) => <BcaButton tone={t}>Evaluate suitability</BcaButton>)}
     </Preview>
   </Section>
 
-  <Section id="outline" title="Outline">
-    <Preview code={`<EsaButton color="primary" appearance="outline">Evaluate</EsaButton>`}>
-      {colors.map((c) => <EsaButton color={c} appearance="outline">Evaluate</EsaButton>)}
+  <Section id="brand-outline" title="Brand tones, outlined">
+    <p>
+      Gold is the one tone whose border cannot be its fill: the issued Gold is
+      1.53:1 against the panel, so an outlined Gold button draws its border and
+      its label from <code>--bca-tone-gold-strong</code> instead.
+    </p>
+    <Preview code={`<BcaButton tone="gold" appearance="outline">Download report</BcaButton>`}>
+      {brandTones.map((t) => (
+        <BcaButton tone={t} appearance="outline">Evaluate suitability</BcaButton>
+      ))}
+    </Preview>
+  </Section>
+
+  <Section id="emphasis" title="Emphasis">
+    <p>
+      What a button carries when it is not a brand call to action. Secondary is
+      the Sage neutral; ghost is transparent until hovered.
+    </p>
+    <Preview code={`<EsaButton color="secondary">Reset scenario</EsaButton>\n<EsaButton color="ghost">Cancel</EsaButton>`}>
+      <EsaButton color="secondary">Reset scenario</EsaButton>
+      <EsaButton color="secondary" appearance="outline">Reset scenario</EsaButton>
+      <EsaButton color="ghost">Cancel</EsaButton>
+    </Preview>
+  </Section>
+
+  <Section id="danger" title="Destructive">
+    <p>
+      Conventional red, deliberately not brand. A destructive action should read
+      as destructive to someone who has never seen this palette — which is also
+      why the status families stay off the brand.
+    </p>
+    <Preview code={`<EsaButton color="danger">Delete assessment</EsaButton>\n<EsaButton color="danger" appearance="soft">Delete assessment</EsaButton>`}>
+      <EsaButton color="danger">Delete assessment</EsaButton>
+      <EsaButton color="danger" appearance="outline">Delete assessment</EsaButton>
+      <EsaButton color="danger" appearance="soft">Delete assessment</EsaButton>
+    </Preview>
+  </Section>
+
+  <Section id="status" title="Status colors">
+    <p>
+      Success, warning and info exist on the lego and resolve to this spoke's
+      status families. They belong on badges, alert boxes and score bars; a
+      button is an action, and colouring one by status describes the outcome
+      before it has happened. Shown here so the set is documented, not to
+      recommend it.
+    </p>
+    <Preview code={`<EsaButton color="success">Saved</EsaButton>`}>
+      <EsaButton color="success">Saved</EsaButton>
+      <EsaButton color="warning">Check values</EsaButton>
+      <EsaButton color="info">Details</EsaButton>
     </Preview>
   </Section>
 
   <Section id="sizes" title="Sizes">
-    <Preview code={`<EsaButton size="xs">Evaluate</EsaButton>`}>
-      <EsaButton color="primary" size="xs">Evaluate</EsaButton>
-      <EsaButton color="primary" size="sm">Evaluate</EsaButton>
-      <EsaButton color="primary" size="md">Evaluate</EsaButton>
-      <EsaButton color="primary" size="lg">Evaluate</EsaButton>
+    <Preview code={`<BcaButton tone="green" size="lg">Evaluate</BcaButton>`}>
+      <BcaButton tone="green" size="xs">Evaluate</BcaButton>
+      <BcaButton tone="green" size="sm">Evaluate</BcaButton>
+      <BcaButton tone="green" size="md">Evaluate</BcaButton>
+      <BcaButton tone="green" size="lg">Evaluate</BcaButton>
     </Preview>
   </Section>
 
   <Section id="icons" title="With icons">
     <p>Pass a Lucide icon name via <code>icon</code>; add <code>iconOnly</code> to drop the label.</p>
-    <Preview code={`<EsaButton icon="download">Download report</EsaButton>\n<EsaButton icon="plus" iconOnly aria-label="Add biochar" />`}>
-      <EsaButton color="primary" icon="download">Download report</EsaButton>
+    <Preview code={`<BcaButton tone="gold" icon="download">Download report</BcaButton>\n<BcaButton icon="plus" iconOnly aria-label="Add biochar" />`}>
+      <BcaButton tone="gold" icon="download">Download report</BcaButton>
       <EsaButton color="secondary" icon="search">Find a field</EsaButton>
-      <EsaButton color="primary" icon="plus" iconOnly aria-label="Add biochar" />
+      <BcaButton tone="green" icon="plus" iconOnly aria-label="Add biochar" />
     </Preview>
   </Section>
 
   <Section id="states" title="States">
-    <Preview code={`<EsaButton color="ghost">Cancel</EsaButton>\n<EsaButton disabled>Disabled</EsaButton>\n<EsaButton loading>Scoring</EsaButton>`}>
-      <EsaButton color="ghost">Cancel</EsaButton>
-      <EsaButton color="primary" disabled>Disabled</EsaButton>
-      <EsaButton color="primary" loading>Scoring</EsaButton>
+    <Preview code={`<BcaButton disabled>Disabled</BcaButton>\n<BcaButton loading>Scoring</BcaButton>`}>
+      <BcaButton tone="green" disabled>Disabled</BcaButton>
+      <BcaButton tone="green" loading>Scoring</BcaButton>
+      <BcaButton tone="purple" disabled>Disabled</BcaButton>
     </Preview>
   </Section>
 
   <Section id="api" title="API">
     <Api props={props} />
+  </Section>
+
+  <Section id="api-bca" title="bca-button API">
+    <Api props={bcaProps} />
   </Section>
 </ComponentDoc>
