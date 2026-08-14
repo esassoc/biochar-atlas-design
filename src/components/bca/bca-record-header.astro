@@ -1,0 +1,122 @@
+---
+// bca-record-header — the identity band at the top of any record page: the
+// entity's mark, its name, one line of context, its status chips, and the
+// actions that apply to the whole record.
+//
+// Generic on purpose. Users is the first record type in this app; the biochar
+// catalog, datasets and algorithm versions are the same shape, so this takes
+// the entity by props and slots rather than knowing about accounts.
+import EsaAvatar from '@esa/ecology/esa-avatar.astro';
+import EsaBreadcrumbs from '@esa/ecology/esa-breadcrumbs.astro';
+import type { EsaBreadcrumbItem } from '@esa/ecology/esa-breadcrumbs.astro';
+
+interface Props {
+  /** The record's own name — the page's h1. */
+  name: string;
+  /** One line of context under the name, e.g. job title and organization. */
+  context?: string;
+  /** Trail above the title; the last item is the current page. */
+  crumbs?: EsaBreadcrumbItem[];
+  /** Drives the avatar's initials. Omit to drop the mark entirely. */
+  avatarName?: string;
+}
+const { name, context, crumbs, avatarName } = Astro.props as Props;
+const hasChips = Astro.slots.has('chips');
+const hasActions = Astro.slots.has('actions');
+---
+
+<!-- bcn-lego-checked: esa-page-header is the hub's page-top lego and it is the
+     right thing for a LIST page — this spoke's Users list uses it. It does not
+     fit a RECORD page: it emits breadcrumbs, an eyebrow, a title, a lede and an
+     actions slot, with no place for the entity's mark or for the status chips
+     that belong beside the name rather than under it. Its title also sits at
+     the page-title role, where a record's name wants to sit with its avatar on
+     the same baseline. Everything INSIDE this component is a lego —
+     esa-avatar, esa-breadcrumbs, and whatever the caller slots into chips and
+     actions. Checked Beacon: beacon-design's record page
+     (prototypes/data-catalog-action.astro) hand-rolls the same identity band
+     for the same reason. The reusable home is a hub-level esa-record-header;
+     filed in NEEDS.md. -->
+
+<header class="bca-record-header">
+  {crumbs && crumbs.length > 0 && (
+    <div class="bca-record-header__crumbs">
+      <EsaBreadcrumbs items={crumbs} />
+    </div>
+  )}
+
+  <div class="bca-record-header__bar">
+    <div class="bca-record-header__identity">
+      {avatarName && <EsaAvatar name={avatarName} size="lg" />}
+      <div class="bca-record-header__titles">
+        <h1 class="bca-record-header__name">{name}</h1>
+        {context && <p class="bca-record-header__context">{context}</p>}
+        {hasChips && (
+          <div class="cluster" data-gap="sm">
+            <slot name="chips" />
+          </div>
+        )}
+      </div>
+    </div>
+
+    {hasActions && (
+      <div class="cluster bca-record-header__actions" data-gap="sm">
+        <slot name="actions" />
+      </div>
+    )}
+  </div>
+</header>
+
+<style>
+  .bca-record-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-400, 1rem);
+  }
+
+  .bca-record-header__bar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-500, 1.5rem);
+    flex-wrap: wrap;
+  }
+
+  .bca-record-header__identity {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-400, 1rem);
+    min-width: 0;
+  }
+
+  .bca-record-header__titles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-200, 0.5rem);
+    min-width: 0;
+  }
+
+  /* No weight pinned here on purpose: that is what lets the theme's Crimson
+     Pro Light rule land on the name. Pinning 600 is how every other heading in
+     this spoke ends up semibold — see NEEDS.md. */
+  .bca-record-header__name {
+    margin: 0;
+    font-size: var(--type-size-600, 1.875rem);
+    line-height: 1.15;
+    color: var(--color-text-primary, #21201c);
+  }
+
+  .bca-record-header__context {
+    margin: 0;
+    font-size: 1.0625rem;
+    line-height: 1.4;
+    color: var(--color-text-secondary, #474540);
+  }
+
+  /* Top-aligned with the name rather than centred on the band: the identity
+     block grows downward as chips and context land, and a centred action row
+     would drift with it. */
+  .bca-record-header__actions {
+    padding-top: var(--spacing-100, 0.25rem);
+  }
+</style>

@@ -4,6 +4,11 @@
 // and sets data-theme="biochar" so every inherited esa-* component re-skins.
 import '@esa/tokens/tokens.css';
 import '@esa/tokens/component-tokens.css';
+// The hub's composition layer — layout primitives (.stack/.cluster/.repel/.grid)
+// and type roles (.type-body/.type-label/…). Opt-in classes, so loading them
+// restyles nothing; they are what keeps a page a manifest instead of bespoke CSS.
+import '@esa/tokens/layouts.css';
+import '@esa/tokens/type-roles.css';
 import '../styles/theme-biochar.css';
 import { withBase } from '../lib/base';
 // Runtime handoff inspector (hub package) — self-gating: dormant unless the

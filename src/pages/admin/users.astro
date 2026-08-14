@@ -1,0 +1,37 @@
+---
+// Admin › Users — the list. The house grid pattern this app reuses for every
+// collection: a page header carrying the one create action, a searchable
+// AG Grid, and a record-count strip.
+import AppShell from '../../layouts/AppShell.astro';
+import EsaPageHeader from '@esa/ecology/esa-page-header.astro';
+import EsaButton from '@esa/ecology/esa-button.astro';
+import BcaUserGrid from '../../components/bca/bca-user-grid.astro';
+---
+
+<!-- manifest:
+  layout: AppShell > stack(lg) spine       # Atlas app shell + sidenav
+  sections:
+    - page header -> esa-page-header       # title + the Invite user action
+    - user list   -> bca-user-grid         # toolbar, AG Grid, record count
+-->
+
+<AppShell title="Users — Biochar Atlas" activeNavId="admin-users">
+  <div class="page stack" data-gap="lg">
+    <EsaPageHeader title="Users">
+      <Fragment slot="actions">
+        <EsaButton color="primary" icon="plus">Invite user</EsaButton>
+      </Fragment>
+    </EsaPageHeader>
+
+    <BcaUserGrid />
+  </div>
+</AppShell>
+
+<style>
+  /* The shell's content region has no padding of its own — it is edge-to-edge
+     so the suitability tool can fill it — so a document-shaped page supplies
+     its own gutter. */
+  .page {
+    padding: var(--spacing-600, 2rem);
+  }
+</style>

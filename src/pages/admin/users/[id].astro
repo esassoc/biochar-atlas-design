@@ -1,0 +1,96 @@
+---
+// Admin › Users › {name} — the record page. The house pattern for a single
+// entity: an identity band, then the record's fields in named groups, then the
+// dialog that edits the part an administrator owns.
+import AppShell from '../../../layouts/AppShell.astro';
+import BcaRecordHeader from '../../../components/bca/bca-record-header.astro';
+import BcaFieldGroup from '../../../components/bca/bca-field-group.astro';
+import BcaField from '../../../components/bca/bca-field.astro';
+import BcaStatusChip from '../../../components/bca/bca-status-chip.astro';
+import BcaUserEditDialog from '../../../components/bca/bca-user-edit-dialog.astro';
+import EsaButton from '@esa/ecology/esa-button.astro';
+import { users, usersById, formatDate } from '../../../data/users';
+import { withBase } from '../../../lib/base';
+
+export function getStaticPaths() {
+  return users.map((user) => ({ params: { id: user.id }, props: { user } }));
+}
+
+const { user } = Astro.props;
+const invitedBy = usersById[user.invitedBy];
+const crumbs = [
+  { label: 'Admin' },
+  { label: 'Users', href: withBase('/admin/users') },
+  { label: user.name },
+];
+---
+
+<!-- manifest:
+  layout: AppShell > stack(lg) spine        # Atlas app shell + sidenav
+  sections:
+    - identity band -> bca-record-header    # avatar, name, context, chips, actions
+    - record fields -> bca-field-group      # Account / Organization / Access
+    - edit          -> bca-user-edit-dialog # role + status, the admin-owned pair
+-->
+
+<AppShell title={`${user.name} — Users — Biochar Atlas`} activeNavId="admin-users">
+  <div class="page stack" data-gap="lg">
+    <BcaRecordHeader
+      name={user.name}
+      context={`${user.title} · ${user.org}`}
+      crumbs={crumbs}
+      avatarName={user.name}
+    >
+      <Fragment slot="chips">
+        <BcaStatusChip value={user.status} field="status" muted={user.status === 'Deactivated'} />
+        <BcaStatusChip value={user.role} field="role" />
+      </Fragment>
+      <Fragment slot="actions">
+        <EsaButton color="primary" icon="pencil" data-opens-user-edit>Edit user</EsaButton>
+      </Fragment>
+    </BcaRecordHeader>
+
+    <div class="grid" data-gap="md" style="--grid-min: 28rem;">
+      <BcaFieldGroup title="Account">
+        <BcaField label="Email">
+          <a href={`mailto:${user.email}`}>{user.email}</a>
+        </BcaField>
+        <BcaField label="User ID" value={user.id} mono />
+        <BcaField label="Member since" value={formatDate(user.memberSince)} />
+        <BcaField label="Invited by">
+          {invitedBy && invitedBy.id !== user.id ? (
+            <a href={withBase(`/admin/users/${invitedBy.id}`)}>{invitedBy.name}</a>
+          ) : (
+            'Created at project setup'
+          )}
+        </BcaField>
+      </BcaFieldGroup>
+
+      <BcaFieldGroup title="Access">
+        <BcaField label="Role">
+          <span data-user-field="role">{user.role}</span>
+        </BcaField>
+        <BcaField label="Status">
+          <BcaStatusChip value={user.status} field="status" muted={user.status === 'Deactivated'} />
+        </BcaField>
+        <BcaField label="Last active" value={formatDate(user.lastActive)} />
+      </BcaFieldGroup>
+
+      <BcaFieldGroup title="Organization">
+        <BcaField label="Organization" value={user.org} />
+        <BcaField label="Job title" value={user.title} />
+      </BcaFieldGroup>
+    </div>
+  </div>
+
+  <BcaUserEditDialog role={user.role} status={user.status} name={user.name} />
+  <esa-snackbar-container id="app-toasts"></esa-snackbar-container>
+</AppShell>
+
+<style>
+  /* The shell's content region is edge-to-edge for the suitability tool, so a
+     document-shaped page supplies its own gutter. */
+  .page {
+    padding: var(--spacing-600, 2rem);
+  }
+</style>

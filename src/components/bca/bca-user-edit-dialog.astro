@@ -1,0 +1,134 @@
+---
+// bca-user-edit-dialog — the two fields an administrator can actually change
+// on someone else's account: the application role and the account status.
+//
+// Name, email, organization and job title are deliberately absent. They belong
+// to the person, not to the account, and an admin editing them would be
+// changing a fact about a colleague rather than a permission. Those arrive
+// from the directory; this dialog is scoped to what an administrator owns.
+//
+// Saving updates the record page in place (the two chips in the identity band
+// and the two matching fields) and raises a toast. There is no server, so the
+// change lives until reload — the interaction is the thing being prototyped.
+import EsaButton from '@esa/ecology/esa-button.astro';
+import type { UserRole, UserStatus } from '../../data/users';
+
+interface Props {
+  /** The account being edited — its current values seed the two selects. */
+  role: UserRole;
+  status: UserStatus;
+  name: string;
+}
+const { role, status, name } = Astro.props as Props;
+
+const roles: UserRole[] = ['Administrator', 'Contributor', 'Viewer'];
+const statuses: UserStatus[] = ['Active', 'Invited', 'Deactivated'];
+const seed = {
+  role,
+  status,
+  name,
+  roles: roles.map((r) => ({ label: r, value: r })),
+  statuses: statuses.map((s) => ({ label: s, value: s })),
+};
+---
+
+<esa-dialog id="user-edit-dialog" heading={`Edit ${name}`} size="sm">
+  <div class="stack" data-gap="md">
+    <esa-select id="user-edit-role" label="Role" size="md"></esa-select>
+    <esa-select id="user-edit-status" label="Status" size="md"></esa-select>
+  </div>
+
+  <Fragment slot="footer">
+    <EsaButton id="user-edit-cancel" color="ghost" appearance="outline">Cancel</EsaButton>
+    <EsaButton id="user-edit-save" color="primary">Save changes</EsaButton>
+  </Fragment>
+</esa-dialog>
+
+<script type="application/json" id="user-edit-seed" set:html={JSON.stringify(seed)}></script>
+
+<script>
+  import '@esa/ecology/esa-dialog';
+  import '@esa/ecology/esa-select';
+  import '@esa/ecology/esa-snackbar-container';
+
+  interface Seed {
+    role: string;
+    status: string;
+    name: string;
+    roles: { label: string; value: string }[];
+    statuses: { label: string; value: string }[];
+  }
+  type Select = HTMLElement & { options: { label: string; value: string }[]; value: string };
+
+  const seedEl = document.getElementById('user-edit-seed');
+  const dialog = document.getElementById('user-edit-dialog') as (HTMLElement & { open: boolean }) | null;
+  const roleSel = document.getElementById('user-edit-role') as Select | null;
+  const statusSel = document.getElementById('user-edit-status') as Select | null;
+
+  if (seedEl && dialog && roleSel && statusSel) {
+    const seed = JSON.parse(seedEl.textContent!) as Seed;
+    // The record's CURRENT values, not the ones it was rendered with. Saving
+    // updates this, so reopening the dialog shows what the page now says —
+    // seeding from the server-rendered values would make the dialog contradict
+    // the record it edits. Cancelling leaves it untouched, so a cancelled edit
+    // is genuinely discarded.
+    const current = { role: seed.role, status: seed.status };
+
+    // `options` is an array property, not an attribute — it has to be assigned,
+    // and the value assigned after it so the label resolves.
+    const seedSelects = () => {
+      roleSel.options = seed.roles;
+      roleSel.value = current.role;
+      statusSel.options = seed.statuses;
+      statusSel.value = current.status;
+    };
+    seedSelects();
+
+    document.querySelectorAll('[data-opens-user-edit]').forEach((trigger) =>
+      trigger.addEventListener('click', () => {
+        seedSelects();
+        dialog.open = true;
+      }),
+    );
+
+    document.getElementById('user-edit-cancel')?.addEventListener('click', () => {
+      dialog.open = false;
+    });
+
+    document.getElementById('user-edit-save')?.addEventListener('click', () => {
+      const role = String(roleSel.value);
+      const status = String(statusSel.value);
+      current.role = role;
+      current.status = status;
+
+      // Every element carrying the value updates together — the chips in the
+      // identity band and the fields in the Account group. Anything showing a
+      // field is marked with data-user-field. A chip's text lives on
+      // esa-pill's own label span, so write through to it when there is one.
+      const write = (field: string, value: string) => {
+        document.querySelectorAll<HTMLElement>(`[data-user-field="${field}"]`).forEach((el) => {
+          const label = el.querySelector<HTMLElement>('.esa-pill__label');
+          if (label) label.textContent = value;
+          else el.textContent = value;
+        });
+      };
+      write('role', role);
+      write('status', status);
+
+      // An inert account reads muted; a live one does not.
+      document
+        .querySelectorAll<HTMLElement>('.bca-status-chip[data-user-field="status"]')
+        .forEach((el) => {
+          if (status === 'Deactivated') el.setAttribute('data-muted', '');
+          else el.removeAttribute('data-muted');
+        });
+
+      dialog.open = false;
+
+      const toasts = document.getElementById('app-toasts') as
+        | (HTMLElement & { success: (m: string) => void })
+        | null;
+      toasts?.success(`${seed.name} is now a ${role.toLowerCase()} · ${status.toLowerCase()}`);
+    });
+  }
+</script>

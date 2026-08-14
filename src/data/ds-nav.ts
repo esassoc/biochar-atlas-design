@@ -44,6 +44,7 @@ export const componentGroups: NavGroup[] = [
       c('Card', 'esa-card'),
       c('Pill', 'esa-pill'),
       c('Alert Box', 'esa-alert-box'),
+      c('Snackbar', 'esa-snackbar'),
       c('Collapsible', 'esa-collapsible'),
       c('Progress Bar', 'esa-progress-bar'),
       c('Empty State', 'esa-empty-state'),

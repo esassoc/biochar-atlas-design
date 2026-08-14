@@ -1,0 +1,144 @@
+---
+import ComponentDoc from '../../../layouts/ComponentDoc.astro';
+import Section from '@esa/docs/Section.astro';
+import Preview from '@esa/docs/Preview.astro';
+import Api from '@esa/docs/Api.astro';
+import EsaButton from '@esa/ecology/esa-button.astro';
+
+const containerMethods = [
+  { name: 'show(config)', type: 'method', description: 'Displays a toast built from an EsaSnackbarConfig. Returns its id.' },
+  { name: 'success(message, config?)', type: 'method', description: "Shorthand for show() with variant: 'success'." },
+  { name: 'info(message, config?)', type: 'method', description: "Shorthand for show() with variant: 'info'." },
+  { name: 'warning(message, config?)', type: 'method', description: "Shorthand for show() with variant: 'warning'." },
+  { name: 'danger(message, config?)', type: 'method', description: "Shorthand for show() with variant: 'danger'." },
+  { name: 'dismiss(id)', type: 'method', description: 'Removes the toast with that id and clears its auto-dismiss timer.' },
+  { name: 'clearAll()', type: 'method', description: 'Removes every active toast.' },
+];
+
+const containerConfig = [
+  { name: 'message', type: 'string', description: 'Toast body text.' },
+  { name: 'variant', type: "'info' | 'success' | 'warning' | 'danger'", default: "'info'", description: 'Tone — background and leading icon.' },
+  { name: 'duration', type: 'number', default: '5000', description: 'Auto-dismiss delay in ms. 0 keeps the toast on screen until dismissed.' },
+  { name: 'action', type: 'string', description: 'Optional action button label.' },
+  { name: 'dismissable', type: 'boolean', default: 'true', description: 'Shows the close button.' },
+  { name: 'uniqueKey', type: 'string', description: "Dedupe key — a second show() carrying a uniqueKey already on screen returns the existing toast's id instead of stacking a duplicate." },
+];
+
+const containerEvents = [
+  { name: 'snackbar-action', type: 'CustomEvent<{ id: string }>', description: "Bubbles from the container when a toast's action button is pressed." },
+];
+
+const itemProps = [
+  { name: 'message', type: 'string', default: "''", description: 'Toast body text.' },
+  { name: 'variant', type: "'info' | 'success' | 'warning' | 'danger'", default: "'info'", description: 'Background and leading icon. Reflected attribute.' },
+  { name: 'action', type: 'string', default: "''", description: 'Optional action button label. Omit to hide the button.' },
+  { name: 'dismissable', type: 'boolean', default: 'true', description: 'Shows the close (×) button.' },
+];
+
+const itemEvents = [
+  { name: 'action', type: 'CustomEvent', description: 'Fired when the action button is pressed. The item also dismisses itself, so a dismiss event follows immediately.' },
+  { name: 'dismiss', type: 'CustomEvent', description: 'Fired when the close button is pressed, or automatically right after action.' },
+];
+---
+<ComponentDoc
+  name="Snackbar"
+  category="Display"
+  slug="esa-snackbar"
+  type="wc"
+  summary="The inherited Ecology snackbar, wearing the Biochar Atlas skin. A toast stack driven imperatively — call <code>show()</code>, or the variant shorthands, on a single container placed once on the page; tones resolve from the spoke's semantic tokens."
+>
+  <Section id="preview" title="Preview">
+    <p>Place one <code>esa-snackbar-container</code> on the page, then drive it imperatively — call <code>show()</code>, or a variant shorthand, on the element itself.</p>
+    <Preview code={`<EsaButton id="toast-default" color="primary">Refresh soil data</EsaButton>\n\n<esa-snackbar-container id="toasts"></esa-snackbar-container>`}>
+      <EsaButton id="toast-default" color="primary">Refresh soil data</EsaButton>
+      <esa-snackbar-container id="toasts"></esa-snackbar-container>
+    </Preview>
+  </Section>
+
+  <Section id="variants" title="Variants">
+    <Preview code={`<EsaButton id="toast-info" color="info">Refresh SSURGO data</EsaButton>\n<EsaButton id="toast-success" color="success">Save assessment</EsaButton>\n<EsaButton id="toast-warning" color="warning">Override soil values</EsaButton>\n<EsaButton id="toast-danger" color="danger">Run scoring</EsaButton>`}>
+      <EsaButton id="toast-info" color="info">Refresh SSURGO data</EsaButton>
+      <EsaButton id="toast-success" color="success">Save assessment</EsaButton>
+      <EsaButton id="toast-warning" color="warning">Override soil values</EsaButton>
+      <EsaButton id="toast-danger" color="danger">Run scoring</EsaButton>
+    </Preview>
+  </Section>
+
+  <Section id="action" title="With an action">
+    <p>An <code>action</code> label renders a button on the toast. Pressing it fires <code>action</code> on the item — the container re-dispatches this as <code>snackbar-action</code> — and dismisses the toast.</p>
+    <Preview code={`<EsaButton id="toast-action" color="secondary" appearance="outline">Remove from comparison</EsaButton>`}>
+      <EsaButton id="toast-action" color="secondary" appearance="outline">Remove from comparison</EsaButton>
+    </Preview>
+  </Section>
+
+  <Section id="duration" title="Duration and dedupe">
+    <p>Set <code>duration: 0</code> to keep a toast on screen until it's dismissed manually. Set <code>uniqueKey</code> to dedupe — click "Note missing coverage" more than once and only one toast stays on screen, because the second call returns the existing toast's id instead of stacking a duplicate.</p>
+    <Preview code={`<EsaButton id="toast-sticky" color="warning" appearance="outline">Flag manual override</EsaButton>\n<EsaButton id="toast-dedupe" color="secondary" appearance="outline">Note missing coverage</EsaButton>`}>
+      <EsaButton id="toast-sticky" color="warning" appearance="outline">Flag manual override</EsaButton>
+      <EsaButton id="toast-dedupe" color="secondary" appearance="outline">Note missing coverage</EsaButton>
+    </Preview>
+  </Section>
+
+  <Section id="api" title="API">
+    <h3>esa-snackbar-container</h3>
+    <p>Grab the container by id and call its methods directly.</p>
+    <Api props={containerMethods} events={containerEvents} />
+
+    <h3>Config object (show)</h3>
+    <Api props={containerConfig} />
+
+    <h3>esa-snackbar-item</h3>
+    <p>Usually rendered by the container for each active toast, but it also works standalone.</p>
+    <Api props={itemProps} events={itemEvents} />
+  </Section>
+</ComponentDoc>
+
+<script>
+  import '@esa/ecology/esa-snackbar-container';
+  import '@esa/ecology/esa-snackbar-item';
+
+  customElements.whenDefined('esa-snackbar-container').then(() => {
+    const toasts = document.getElementById('toasts') as any;
+    if (!toasts) return;
+
+    document.getElementById('toast-default')?.addEventListener('click', () => {
+      toasts.show({ message: 'Soil properties refreshed from SSURGO.' });
+    });
+
+    document.getElementById('toast-info')?.addEventListener('click', () => {
+      toasts.info('Soil properties derived from SSURGO for this field.');
+    });
+    document.getElementById('toast-success')?.addEventListener('click', () => {
+      toasts.success('Assessment saved.');
+    });
+    document.getElementById('toast-warning')?.addEventListener('click', () => {
+      toasts.warning('Manual soil-test values override the SSURGO defaults.');
+    });
+    document.getElementById('toast-danger')?.addEventListener('click', () => {
+      toasts.danger('Scoring failed — check your goal selections and try again.');
+    });
+
+    document.getElementById('toast-action')?.addEventListener('click', () => {
+      toasts.show({
+        message: 'Removed Douglas-fir slash, 550°C from comparison.',
+        variant: 'success',
+        action: 'Undo',
+      });
+    });
+    toasts.addEventListener('snackbar-action', () => {
+      toasts.info('Restored to comparison.');
+    });
+
+    document.getElementById('toast-sticky')?.addEventListener('click', () => {
+      toasts.warning('Manual soil-test override is active for this field.', { duration: 0 });
+    });
+
+    document.getElementById('toast-dedupe')?.addEventListener('click', () => {
+      toasts.show({
+        message: 'This field has no SSURGO coverage — scores are unavailable.',
+        variant: 'warning',
+        uniqueKey: 'no-ssurgo-coverage',
+      });
+    });
+  });
+</script>

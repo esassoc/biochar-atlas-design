@@ -1,0 +1,54 @@
+---
+// bca-field — one label/value row inside a bca-field-group.
+//
+// Pass `value` for plain text; slot children instead when the value is itself
+// a component (a status chip, a link, a monospaced identifier).
+interface Props {
+  label: string;
+  value?: string | number | null;
+  /** Renders the value in the data face — for ids, codes and figures. */
+  mono?: boolean;
+}
+const { label, value, mono = false } = Astro.props as Props;
+const hasSlot = Astro.slots.has('default');
+// An empty value is a fact about the record, not a missing render. The em dash
+// says "this account has never signed in" in the same voice the grid uses.
+const display = value === null || value === undefined || value === '' ? '—' : String(value);
+---
+
+<div class="bca-field">
+  <dt class="bca-field__label">{label}</dt>
+  <dd class:list={['bca-field__value', { 'bca-field__value--mono': mono }]}>
+    {hasSlot ? <slot /> : display}
+  </dd>
+</div>
+
+<style>
+  /* display: contents so the dt and dd land directly on the group's grid — the
+     wrapper exists for HTML's sake (a dl's children must be dt/dd or a div),
+     not for layout. */
+  .bca-field {
+    display: contents;
+  }
+
+  .bca-field__label {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text-secondary, #474540);
+  }
+
+  .bca-field__value {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text-primary, #21201c);
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .bca-field__value--mono {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.9375em;
+  }
+</style>

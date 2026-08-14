@@ -1,0 +1,47 @@
+---
+// bca-status-chip — a lifecycle value (Active / Invited / Deactivated) as a
+// quiet chip. The Astro-side twin of the chip the Users grid draws in a cell.
+//
+// Thin on purpose: esa-pill IS the chip, and the theme already points its
+// radius, border and font size where this spoke wants them. What this adds is
+// (a) `removable={false}`, because a status is not something you take off a
+// record, (b) the muted treatment for an inert account, and (c) a stable hook
+// the record page's edit dialog can find and update in place.
+import EsaPill from '@esa/ecology/esa-pill.astro';
+
+interface Props {
+  value: string;
+  /** Marks the record's own field this chip shows, e.g. "status" or "role". */
+  field?: string;
+  /** Quiets the chip — for a value that means the record is inert. */
+  muted?: boolean;
+}
+const { value, field, muted = false } = Astro.props as Props;
+---
+
+<!-- bcn-lego-checked: nothing is reinvented here — esa-pill renders the chip
+     and the theme points --pill-radius / --pill-border-color / font-size at
+     this spoke's values. The wrapper exists for two things the lego cannot
+     carry: it forwards no arbitrary attributes, so `data-user-field` (the hook
+     the edit dialog updates in place) has nowhere to land, and its variants
+     are semantic tones with no neutral-muted option for an inert record. Both
+     ride on the wrapper, and the muted case is expressed by re-pointing the
+     lego's OWN public hooks rather than by restyling it. Checked esa-badge
+     (13px hardcode, tinted variants only, radius-full hardcode) and
+     esa-chip-group (a selection control, not a display value). -->
+
+<span class="bca-status-chip" data-user-field={field} data-muted={muted ? '' : undefined}>
+  <EsaPill label={value} removable={false} size="md" />
+</span>
+
+<style>
+  .bca-status-chip {
+    display: inline-flex;
+  }
+  /* 6.10:1 on the panel — quiet, comfortably over 4.5. The fill drops out so
+     an inert account reads as an outline where a live one reads as a solid. */
+  .bca-status-chip[data-muted] {
+    --pill-text-color: var(--color-text-tertiary, #615f5a);
+    --pill-bg: transparent;
+  }
+</style>

@@ -1,0 +1,275 @@
+---
+// bca-user-grid — the Users list section: search + clear-filters toolbar, the
+// AG Grid itself, and the download + record-count strip welded under it.
+//
+// The composition is Beacon's house grid page (beacon-design's
+// data-catalog-actions.astro), which is the reference implementation for this
+// pattern across ESA. What differs is the palette and the type scale — see the
+// divergence note on `atlasTheme` in src/lib/bca-grid.ts.
+//
+// Rows cross the SSR→client boundary through a JSON payload island rather than
+// a serialized prop: the grid is created in a client script, and this keeps the
+// fixture in one place with the markup that consumes it.
+import EsaButton from '@esa/ecology/esa-button.astro';
+import { users } from '../../data/users';
+import { withBase } from '../../lib/base';
+
+const rows = users.map((u) => ({
+  id: u.id,
+  name: u.name,
+  email: u.email,
+  org: u.org,
+  role: u.role,
+  status: u.status,
+  lastActive: u.lastActive,
+}));
+
+const payload = { rows, detailBase: withBase('/admin/users') };
+---
+
+<!-- bcn-lego-checked: the interactive parts here ARE legos — esa-button for
+     every control, esa-text-field for the search. Two things are hand-rolled,
+     for two different reasons.
+
+     (1) The three-band frame: a toolbar row, an AG Grid host div, and a
+     record-count strip. No esa-* lego is a data-grid host — AG Grid needs a
+     bare element it owns outright — and esa-card would draw a second border
+     and radius around a grid that already draws its own wrapper. Checked
+     Beacon: beacon-design's grid pages hand-roll the identical .grid-header /
+     .tracker-grid / .table-footer trio, and Beacon prod wraps it in an Angular
+     `beacon-grid` component, which is what this file is for this spoke.
+
+     (2) The status chip inside a cell. esa-pill IS the right lego for this
+     shape and the record page uses it — but .astro legos are COMPILE-TIME,
+     and their CSS is Astro-scoped to a `data-astro-cid` attribute. A cell
+     renderer builds its node at runtime with document.createElement, so it can
+     never carry that attribute and would render completely unstyled. Nor is
+     the Lit tier an escape: there is no esa-pill web component. So the chip is
+     reimplemented here in :global CSS reading esa-pill's OWN public hooks
+     (--pill-bg / --pill-border-color / --pill-radius), which is the only thing
+     keeping the two from drifting. Beacon hit this exactly and resolved it the
+     same way. Filed in NEEDS.md. -->
+
+<section class="bca-user-grid">
+  <div class="bca-user-grid__toolbar">
+    <div class="bca-user-grid__search">
+      <esa-text-field id="users-search" placeholder="Search users…" size="md"></esa-text-field>
+    </div>
+    <EsaButton id="users-clear" color="ghost" appearance="outline">Clear filters</EsaButton>
+  </div>
+
+  <div id="users-grid" class="bca-user-grid__host"></div>
+
+  <div class="bca-user-grid__foot">
+    <EsaButton id="users-download" color="ghost" appearance="outline" icon="download">
+      Download as CSV
+    </EsaButton>
+    <p class="bca-user-grid__count">
+      <span id="users-total">0</span> users<span id="users-filtered" hidden></span>
+    </p>
+  </div>
+
+  <script type="application/json" id="users-grid-data" set:html={JSON.stringify(payload)}></script>
+</section>
+
+<script>
+  import { createGrid, ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+  import type { GridApi, GridOptions, ColDef } from 'ag-grid-community';
+  import { atlasTheme, statusChipRenderer, makeLinkRenderer } from '../../lib/bca-grid';
+  import '@esa/ecology/esa-text-field';
+
+  ModuleRegistry.registerModules([AllCommunityModule]);
+
+  interface UserRow {
+    id: string;
+    name: string;
+    email: string;
+    org: string;
+    role: string;
+    status: string;
+    lastActive: string | null;
+  }
+
+  const host = document.getElementById('users-grid');
+  const payloadEl = document.getElementById('users-grid-data');
+  if (host && payloadEl) {
+    const { rows, detailBase } = JSON.parse(payloadEl.textContent!) as {
+      rows: UserRow[];
+      detailBase: string;
+    };
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    // An account that has never signed in has no last-active date. The em dash
+    // is the absence itself, not a placeholder for a value we failed to load.
+    const asDate = (iso: string | null) => {
+      if (!iso) return '—';
+      const [y, m, d] = iso.split('-').map(Number);
+      return `${d} ${months[m - 1]} ${y}`;
+    };
+
+    const columnDefs: ColDef<UserRow>[] = [
+      {
+        field: 'name',
+        headerName: 'Name',
+        width: 240,
+        cellRenderer: makeLinkRenderer({ href: (d) => `${detailBase}/${d.id}` }),
+      },
+      { field: 'email', headerName: 'Email', width: 330 },
+      { field: 'org', headerName: 'Organization', width: 160 },
+      { field: 'role', headerName: 'Role', width: 170 },
+      {
+        field: 'status',
+        headerName: 'Status',
+        width: 150,
+        cellRenderer: statusChipRenderer,
+        cellClass: 'bca-grid-chip-cell',
+      },
+      {
+        field: 'lastActive',
+        headerName: 'Last active',
+        width: 160,
+        valueFormatter: (p) => asDate(p.value),
+      },
+    ];
+
+    const total = document.getElementById('users-total')!;
+    const filtered = document.getElementById('users-filtered')!;
+    const updateCounts = () => {
+      const shown = api.getDisplayedRowCount();
+      total.textContent = String(rows.length);
+      const hidden = rows.length - shown;
+      filtered.hidden = hidden === 0;
+      filtered.textContent = hidden === 0 ? '' : ` · ${shown} shown`;
+    };
+
+    const gridOptions: GridOptions<UserRow> = {
+      theme: atlasTheme,
+      rowData: rows,
+      columnDefs,
+      defaultColDef: {
+        sortable: true,
+        resizable: true,
+        filter: true,
+        suppressHeaderMenuButton: true,
+        tooltipValueGetter: (p) => p.value,
+      },
+      tooltipShowDelay: 0,
+      tooltipShowMode: 'whenTruncated',
+      onFirstDataRendered: updateCounts,
+      onFilterChanged: updateCounts,
+    };
+
+    const api: GridApi<UserRow> = createGrid(host, gridOptions);
+
+    // esa-text-field fires a composed `change` carrying detail.value on every
+    // keystroke, so the quick filter tracks typing without a debounce.
+    const search = document.getElementById('users-search') as (HTMLElement & { value: string }) | null;
+    search?.addEventListener('change', (e) => {
+      api.setGridOption('quickFilterText', (e as CustomEvent).detail?.value ?? search.value ?? '');
+    });
+
+    document.getElementById('users-clear')?.addEventListener('click', () => {
+      api.setFilterModel(null);
+      api.setGridOption('quickFilterText', '');
+      if (search) search.value = '';
+    });
+
+    document.getElementById('users-download')?.addEventListener('click', () =>
+      api.exportDataAsCsv({ fileName: 'biochar-atlas-users.csv' }),
+    );
+  }
+</script>
+
+<style>
+  .bca-user-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bca-user-grid__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-400, 1rem);
+    margin-bottom: var(--spacing-300, 0.75rem);
+  }
+  .bca-user-grid__search {
+    flex: 0 1 360px;
+    min-width: 240px;
+  }
+  .bca-user-grid__search :global(esa-text-field) {
+    display: block;
+  }
+
+  /* The grid owns the vertical space the shell's content region leaves after
+     the topbar, the page header and the two strips. min-height keeps it usable
+     on a short window rather than collapsing to a couple of rows. */
+  .bca-user-grid__host {
+    width: 100%;
+    height: calc(100vh - 400px);
+    min-height: 360px;
+  }
+
+  /* Welded under the grid: the grid's own bottom corners are squared to meet
+     it, and this strip repeats the wrapper border with the top edge removed so
+     the two read as one frame. */
+  .bca-user-grid__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-400, 1rem);
+    padding: var(--spacing-250, 0.625rem) var(--spacing-400, 1rem);
+    background: var(--color-surface, #fafaf7);
+    border: 1px solid var(--color-border, #d0cfcc);
+    border-top: 0;
+    border-radius: 0 0 var(--radius-200, 6px) var(--radius-200, 6px);
+  }
+  .bca-user-grid__count {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-text-secondary, #474540);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Cells AG Grid injects, which land outside Astro's style scope ──────
+     Every value below reads esa-pill's own public hook, so the chip in a cell
+     and the chip on the record page cannot drift apart.
+
+     Deliberately one fill and one hairline for all three values, with the
+     label carrying the meaning. Tinting per value would put a third color
+     system on a page that already has brand chrome and a purple link column,
+     and these are lifecycle facts rather than severities — an invited account
+     is not a warning. Deactivated is the exception: it reads muted because the
+     account is genuinely inert. */
+  .bca-user-grid :global(.ag-cell.bca-grid-chip-cell) {
+    display: flex;
+    align-items: center;
+  }
+  .bca-user-grid :global(.bca-grid-chip) {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--spacing-250, 0.625rem);
+    border: 1px solid var(--pill-border-color, var(--color-border, #d0cfcc));
+    border-radius: var(--pill-radius, 4px);
+    background: var(--pill-bg, var(--color-surface-sunken, #e8e5de));
+    color: var(--pill-text-color, var(--color-text-primary, #21201c));
+    font-size: 1rem;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .bca-user-grid :global(.bca-grid-chip[data-status='deactivated']) {
+    color: var(--color-text-tertiary, #615f5a);
+    background: transparent;
+  }
+
+  /* The name column. Purple links are the brand guide's own call for links on
+     a light surface — --color-text-link is purple-12 at 13.92:1 on the panel. */
+  .bca-user-grid :global(.bca-grid-name) {
+    color: var(--color-text-link, #45173d);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .bca-user-grid :global(.bca-grid-name:hover) {
+    color: var(--color-text-link-hover, #36082f);
+  }
+</style>

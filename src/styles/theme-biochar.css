@@ -454,6 +454,102 @@
      is on the other three. It does clear the perceptual floor (ΔE 0.062),
      which is chroma doing the work value cannot. */
 
+  /* ═══ CHIPS AND AVATARS ═══════════════════════════════════════════════
+     esa-pill's default variant is the quiet neutral chip this app wants for
+     lifecycle values (Active / Invited / Deactivated), and every color on it
+     is a public hook. Two things it gets wrong for this spoke, both fixed
+     here: the radius is --radius-full, and a lozenge reads as a filter tag
+     you can remove rather than a status you cannot — the house form is the
+     quiet 4px chip. And its font-size is hardcoded at 13px with no hook at
+     all, which is the one thing a token cannot reach; see the rule below the
+     token block.
+
+     esa-avatar derives its background from an hsl() hash of the person's
+     name, which sprays arbitrary hues through a controlled palette. Pointed
+     at the pairing the topbar avatar already hand-rolls: brand Gold with
+     Green initials at 6.54:1. Never white on Gold, which is 1.60:1. */
+     The border moves up one rung, from --color-border-light to --color-border.
+     The pill's fill is the sunken neutral, which sits ΔE 0.0623 from the panel
+     and 0.0414 from the canvas — visible on both — but only 0.0123 from the
+     grid's green-3 row hover, under the visible-edge floor. On a hovered row
+     the fill goes away and the border is the only thing holding the chip's
+     shape, so it has to be the rung that reads: neutral-6 measures 0.0681
+     against the fill where neutral-5 measures less. Same resolution as the
+     panel/white seam in the chrome block — declare it border-carried rather
+     than hunting a fill that clears everything. */
+  --pill-radius: var(--radius-100);
+  --pill-border-color: var(--color-border);
+  --avatar-bg: var(--bca-brand-gold);
+  --avatar-text-color: var(--color-primary);
+
+  /* ═══ FORM TYPE ═══════════════════════════════════════════════════════
+     The hub chains --form-font-size-md to --type-size-200, which clamps at
+     0.9375rem — so every default-size input, select and textarea in the app
+     tops out at 15px and drops to 12px on a narrow viewport. That is under
+     Andy's 16px floor for text a person reads, and a field someone types into
+     is the clearest case of it. Re-pointed here, at md only: xs and sm exist
+     for dense toolbar controls and keep the hub's scale, so the size ladder
+     still means something. Reach for md on anything a user fills in. */
+  --form-font-size-md: 1rem;
+
+  /* ═══ BRAND TONES — emphasis and CTA, not status ══════════════════════
+     Green, Purple and Gold as action colors (Andy, 2026-08-14). These are
+     the identity half of the button set; the status families above stay
+     conventional and stay off the brand, and danger in particular stays red
+     because a destructive action should not be brand-colored.
+
+     Green needs nothing new — --color-primary IS brand Green, so `tone=green`
+     resolves to the primary chain. Purple and Gold each need four values, and
+     each one breaks a rule that Green does not.
+
+     PURPLE survives as a fill, but not at the issued hex. Brand Purple is
+     #45173d, which is purple-12 — a text color. As a button fill it carries
+     white at 14.55:1 and sits ΔE 0.1046 from --bca-neutral-12, the app's own
+     near-black: at button scale it reads as a black button with a cast, not
+     as purple. Step 11 reads purple (ΔE 0.268 from neutral-12), still carries
+     white at 6.65:1, and clears 1.4.11 against the panel on its own at 6.36.
+     So the fill is step 11 and the issued hex returns as the hover — the
+     brand color appears unmodified, in the state where a deeper value is
+     what you want anyway. Note the adjacency: --color-text-link is also
+     purple-12, so a purple button and a link share a family. Different
+     roles, and the button is a fill where the link is text.
+
+     GOLD is the one tone whose fill color cannot also be its border. The
+     issued Gold #ffc261 is 1.53:1 against the panel — as an outline border
+     that is invisible and half of what WCAG 1.4.11 asks of a control
+     boundary. Outline takes gold-11 for the border AND the text (5.43 panel,
+     5.11 canvas). Gold also cannot carry white: white on Gold is 1.60:1, so
+     the fill's ink is ABI Green at 6.54:1 — the same pairing the topbar
+     avatar uses. And its hover cannot be gold-10, which would drop that
+     green label to 3.62:1. The hover is the OKLab midpoint of gold-9 and
+     gold-10 — a real point between two rungs rather than a number solved for
+     a target — which holds the label at 4.93:1 and still darkens visibly
+     (ΔE 0.0833, four times the visible-edge floor). */
+  --bca-tone-purple:        var(--bca-purple-11);  /* white 6.65 · panel 6.36 */
+  --bca-tone-purple-hover:  var(--bca-purple-12);  /* = brand Purple, white 14.55 */
+  --bca-tone-purple-ink:    var(--color-text-inverse);
+  --bca-tone-purple-strong: var(--bca-purple-11);  /* outline border + text, 6.36 on panel */
+
+  --bca-tone-gold:          var(--bca-gold-9);     /* = brand Gold */
+  --bca-tone-gold-hover:    #e4a73d;               /* mid(gold-9, gold-10) — see above */
+  --bca-tone-gold-ink:      var(--bca-green-9);    /* 6.54 · NEVER white, which is 1.60 */
+  --bca-tone-gold-strong:   var(--bca-gold-11);    /* outline border + text, 5.43 on panel */
+
+  /* ═══ SNACKBAR ════════════════════════════════════════════════════════
+     esa-snackbar-item declares its own hooks and falls back to the HUB's
+     primitives, not to the semantic tokens a theme re-points — so an
+     unthemed toast in this spoke renders hub green, hub ORANGE, hub red and,
+     for info, BLUE, which is nowhere in this palette. Same shape as the
+     tone-ink and tone-hover problem above: remapping --color-{tone} does not
+     reach a component that reads its own hook.
+
+     White on all four is 5.02–5.88:1, because these fills were already
+     chosen at step 11 to carry it. */
+  --snackbar-item-bg-info:    var(--color-info);     /* sage-11, white 5.88 */
+  --snackbar-item-bg-success: var(--color-success);  /* white 5.20 */
+  --snackbar-item-bg-warning: var(--color-warning);  /* white 5.02 */
+  --snackbar-item-bg-danger:  var(--color-danger);   /* white 5.29 */
+
   /* ═══ TYPE ════════════════════════════════════════════════════════════
      ABI brand type. Inter for the interface; Crimson Pro Light for headlines
      (applied to h1/h2 at the bottom of this file). Sentence case everywhere —
@@ -687,4 +783,16 @@
   font-family: var(--font-display);
   font-weight: var(--font-weight-light, 300);
   letter-spacing: -0.005em;
+}
+
+/* esa-pill and esa-badge both hardcode `font-size: 13px` as a private knob with
+   no public hook, so this is the one property on them a token cannot reach.
+   13px is under Andy's 16px floor, and a status chip is read, not glanced.
+   Three class selectors to clear the components' own `.esa-pill[astro-cid]`
+   (0,2,0) without depending on bundle order — see NEEDS.md, where the hub fix
+   is to expose --pill-font-size / --badge-font-size the way every other value
+   on these components already is. */
+[data-theme="biochar"] .esa-pill.esa-pill--md,
+[data-theme="biochar"] .esa-badge.esa-badge--md {
+  font-size: 1rem;
 }
