@@ -13,9 +13,4 @@ export default defineConfig({
   site: 'https://esassoc.github.io',
   base,
   server: { port: 4340 },
-  // leaflet (CommonJS, used by the suitability-tool map) trips Vite's dev
-  // dependency pre-scan, which crawls the .astro entries and chokes parsing the
-  // template markup as TS. `include` pre-bundles it; `noDiscovery` skips the
-  // crawl that throws. Production build is unaffected. (Same fix as beacon.)
-  vite: { optimizeDeps: { include: ['leaflet'], noDiscovery: true } },
 });

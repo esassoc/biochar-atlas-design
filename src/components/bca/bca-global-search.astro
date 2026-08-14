@@ -1,0 +1,84 @@
+---
+// bca-global-search — the topbar's global-search affordance, ported from
+// beacon-design's BcnSearchTrigger: leading magnifier, muted placeholder,
+// centered in the app bar with the same 520px ceiling and field shape.
+//
+// Appearance only. Beacon's version carries [data-omni-trigger] and a "/"
+// keyboard hint because it opens an omnibox; there is no omnibox here, so both
+// are dropped — a shortcut hint for a shortcut that does nothing is a promise
+// the surface cannot keep.
+//
+// bcn-lego-checked: no esa-* lego is a search-TRIGGER field. esa-text-field is
+// a real bordered, labelled input (wrong semantics — this submits nothing),
+// esa-icon-button is icon-only, and esa-search-panel is a full filter surface.
+// Beacon reached the same conclusion in BcnSearchTrigger and cb-fish in
+// cbf-search-field; this is the third spoke to hit the gap, and it is filed as
+// a hub need. bca-global-search is the reusable home here.
+import EsaIcon from '@esa/ecology/esa-icon.astro';
+
+interface Props {
+  placeholder?: string;
+}
+const { placeholder = 'Search…' } = Astro.props;
+---
+
+<button class="bca-global-search" type="button" aria-label="Search">
+  <EsaIcon name="search" size="sm" />
+  <span class="bca-global-search__placeholder">{placeholder}</span>
+</button>
+
+<style>
+  /* The field reads against the topbar on value: --color-surface is the panel
+     white at L 0.985, the topbar sits at L 0.935, so the shape is legible
+     before the border does any work. */
+  .bca-global-search {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-200, 0.5rem);
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: var(--spacing-150, 0.375rem) var(--spacing-300, 0.75rem);
+    background: var(--color-surface, #fafaf7);
+    border: 1px solid var(--color-border, #d9d7cd);
+    border-radius: var(--radius-200, 0.5rem);
+    cursor: text;
+    transition: border-color 150ms ease, background 150ms ease;
+  }
+  .bca-global-search:hover {
+    border-color: var(--color-primary-border, #84906a);
+    background: var(--color-surface-elevated, #ffffff);
+  }
+  .bca-global-search:focus-visible {
+    outline: 2px solid var(--color-primary, #364500);
+    outline-offset: 2px;
+  }
+  .bca-global-search :global(.esa-icon) {
+    flex: none;
+    color: var(--color-text-tertiary, #6a665e);
+  }
+  /* 16px, not beacon's --type-size-200 — that token tops out at 15px and this
+     spoke holds a 16px floor on interface text. */
+  .bca-global-search__placeholder {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text-tertiary, #6a665e);
+  }
+
+  /* On a tight app bar the placeholder drops and the control shrinks to the
+     magnifier alone. */
+  @media (max-width: 720px) {
+    .bca-global-search__placeholder {
+      display: none;
+    }
+    .bca-global-search {
+      max-width: max-content;
+    }
+  }
+</style>

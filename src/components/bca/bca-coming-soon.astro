@@ -1,0 +1,101 @@
+---
+// bca-coming-soon — the state a module's canvas holds until the module ships.
+// Centered in the shell's content region: the institute symbol over the product
+// wordmark, then the module name and its status.
+//
+// The lockup relationship is the same one the sidenav uses — the issued ABI
+// mark carries the institute, "Atlas" carries the product, and the two stack,
+// with "Atlas" in the brand headline face and ABI Green so it reads as a
+// wordmark rather than a caption. The sidenav takes the horizontal mark
+// because it has 156px of width; a centered composition takes the square
+// symbol.
+import { withBase } from '../../lib/base';
+
+interface Props {
+  /** The module standing behind this canvas, e.g. 'Suitability Tool'. */
+  moduleName: string;
+  status?: string;
+}
+const { moduleName, status = 'Coming soon' } = Astro.props;
+---
+
+<!-- bcn-lego-checked: esa-empty-state is the nearest hub lego and does not fit
+     two ways that are mechanical, not taste — its icon slot sizes `svg` only
+     (the ABI mark is an issued PNG, which would render at intrinsic 1240px),
+     and its title size is a private knob fixed at 16–20px Inter semibold, so
+     the brand wordmark cannot reach display scale without overriding the
+     lego's internals. Checked Beacon: no product-identity canvas state. -->
+
+<div class="bca-coming-soon">
+  <div class="bca-coming-soon__lockup">
+    <img
+      class="bca-coming-soon__mark"
+      src={withBase('/abi-logo-symbol-alpha.png')}
+      width="1240"
+      height="1246"
+      alt="American Biochar Institute"
+    />
+    <p class="bca-coming-soon__product">Atlas</p>
+  </div>
+
+  <h1 class="bca-coming-soon__module">{moduleName}</h1>
+  <p class="bca-coming-soon__status">{status}</p>
+</div>
+
+<style>
+  .bca-coming-soon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    /* Fills the shell's content region so the composition centers against the
+       canvas rather than the top of it. */
+    min-height: 100%;
+    padding: var(--spacing-800, 4rem) var(--spacing-500, 1.5rem);
+  }
+
+  .bca-coming-soon__lockup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-300, 0.75rem);
+    margin-bottom: var(--spacing-700, 3rem);
+  }
+
+  /* As-issued: dark green and gold on transparent, no filter or recolor.
+     Width in CSS with height auto so the intrinsic attributes hold the
+     aspect ratio and nothing reflows on load. */
+  .bca-coming-soon__mark {
+    width: 48px;
+    height: auto;
+  }
+
+  .bca-coming-soon__product {
+    margin: 0;
+    font-family: var(--font-display, 'Crimson Pro', Georgia, serif);
+    font-weight: var(--font-weight-light, 300);
+    font-size: 1.75rem; /* 28px */
+    line-height: 1.1;
+    color: var(--color-primary, #364500);
+  }
+
+  /* Same face as the wordmark above it — one lockup family. Scale and color
+     carry the hierarchy instead of a second typeface. */
+  .bca-coming-soon__module {
+    margin: 0;
+    font-family: var(--font-display, 'Crimson Pro', Georgia, serif);
+    font-weight: var(--font-weight-light, 300);
+    font-size: clamp(2.25rem, 1.75rem + 1.75vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary, #33312a);
+  }
+
+  .bca-coming-soon__status {
+    margin: var(--spacing-300, 0.75rem) 0 0;
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.5;
+    color: var(--color-text-tertiary, #6a665e);
+  }
+</style>

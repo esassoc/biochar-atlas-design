@@ -128,21 +128,35 @@ else from them. Extending with lighter/darker steps is the agreement with ABI
 - [ ] `bca-results-card` — floating suitability summary with recommendation
       narrative + report download
 - [ ] `bca-map-legend` — layer legend card with toggles
-- [ ] Leaflet map island (suitability-tool page script, not a component yet)
+- [ ] Leaflet map island — the map, its fixtures and the `leaflet` dependency
+      were all removed when the spoke narrowed to the shell (see below).
+      Rebuilding it starts from `git show a810b3d:src/pages/prototypes/suitability-tool.astro`.
 
-## Left open by the chrome decision (follow-up)
-- AppShell hardcodes `<nav class="side-nav collapsed">` on the suitability
-  tool, so the shipped default is a 72px icon rail. The tinted sidenav was
-  judged expanded, because that is the surface the decision was about — by
-  default it is a narrow strip and the topbar carries most of the tint.
-- The workflow stepper's own treatment is deliberately NOT in the chrome
-  commit. The solid-fill decision applies to the active NAV item, which is what
-  `--_nav-active-bg` styles; the numbered step markers in the canvas are
-  wireframe work.
-- The two `public/abi-logo-stacked*.png` files are extracted but unwired —
-  nothing in the shell renders a logo image yet, and per project notes the mark
-  is being replaced. Use the `-alpha` version when it lands: the shell is
-  tinted now, and the white-backed version shows its box at ΔE 0.0485.
+## Shell demo pass (2026-08-13)
+The spoke's job narrowed to demonstrating the app shell and the design system.
+Deleted: both prototype pages, `bca-assessment-report`,
+`bca-interpretation-panel`, `biochar-map.css`, every `src/data/*` fixture except
+`ds-nav.ts`, `scripts/fetch-parcels.mjs`, and the `leaflet` /`@types/leaflet`
+dependencies with their Vite `optimizeDeps` workaround. One shell page survives
+at `/suitability-tool`, holding `bca-coming-soon`.
+- **The product name now has a home.** The sidenav lockup is the issued ABI
+  mark over "Atlas" in Crimson Pro Light / ABI Green, left-aligned to the mark's
+  edge with no rule between them. `bca-coming-soon` repeats the relationship
+  with the square symbol so the lockup reads the same in both places. On the
+  72px rail the wordmark drops: scaled to fit 56px it lands under the 16px type
+  floor, and the symbol carries identity there.
+- **Phase 2 pills are gone.** Those four sections render inert instead —
+  header only, no chevron, no sublist, `--color-text-muted` at 5.38:1 on the
+  sidenav. The disabled block MUST stay after the `.nav-section__header >
+  .esa-icon:first-child` rule: both weigh 0,2,0, so source order is the only
+  thing muting the icon, and that icon is the entire signal on the rail.
+- **Still hardcoded: `<nav class="side-nav collapsed">`.** The shell now ships
+  collapsed by default, which hides the lockup, the nav hierarchy and the
+  inert sections — everything this pass added. Flipping it means editing the
+  `.sidebar-toggle` button's class and aria state, which `check-component-first`
+  blocks as a styled `<button class=…>`; left for a call on whether that button
+  becomes `esa-icon-button` or takes a lego-check.
+- The workflow stepper's own treatment remains out of scope — wireframe work.
 
 ## Heading weight is component-owned (follow-up)
 The theme declares Crimson Pro Light on `h1`, but the weight only lands where
@@ -155,6 +169,12 @@ they inherit the face at all. Making Light stick everywhere is a heading pass
 over the components, not a token change.
 
 ## Hub gaps found while building (candidates to promote)
+- No `esa-*` lego is a **search-trigger field** — a control shaped like a search
+  input that opens something rather than submitting. `esa-text-field` is a real
+  bordered, labelled input, `esa-icon-button` is icon-only, `esa-search-panel`
+  is a whole filter surface. Beacon built `BcnSearchTrigger`, cb-fish built
+  `cbf-search-field`, and this spoke now has `bca-global-search`: three
+  independent spokes solving the same shape, which is the promotion signal.
 - `--focus-ring-color` is defined twice in `@esa/tokens` and the second one
   wins: `tokens.css` sets it to `--color-primary` (correct — it follows the
   theme), then `component-tokens.css` re-points it to `--color-border-focus`,

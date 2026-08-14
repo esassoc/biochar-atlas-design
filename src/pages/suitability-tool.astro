@@ -1,0 +1,17 @@
+---
+// Suitability Tool — the module's page inside the Atlas app shell. The shell is
+// what this spoke demonstrates right now, so the canvas holds the module's
+// identity and its status and nothing else.
+import AppShell from '../layouts/AppShell.astro';
+import BcaComingSoon from '../components/bca/bca-coming-soon.astro';
+---
+
+<!-- manifest:
+  layout: AppShell                          # page spine — Atlas app shell + sidenav
+  sections:
+    - canvas -> bca-coming-soon             # institute mark, product wordmark, module, status
+-->
+
+<AppShell title="Suitability Tool — Biochar Atlas" activeNavId="suitability-tool">
+  <BcaComingSoon moduleName="Suitability Tool" />
+</AppShell>
