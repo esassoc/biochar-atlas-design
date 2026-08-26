@@ -2,7 +2,7 @@ import{A as h,E as u,i as p,b as i,t as g,a as b}from"./typography.C7xuE2z_.js";
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */const m={CHILD:2},f=a=>(...e)=>({_$litDirective$:a,values:e});class y{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,t,r){this._$Ct=e,this._$AM=t,this._$Ci=r}_$AS(e,t){return this.update(e,t)}update(e,t){return this.render(...t)}}/**
+ */const m={CHILD:2},f=o=>(...e)=>({_$litDirective$:o,values:e});class y{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,t,r){this._$Ct=e,this._$AM=t,this._$Ci=r}_$AS(e,t){return this.update(e,t)}update(e,t){return this.render(...t)}}/**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
@@ -10,7 +10,7 @@ import{A as h,E as u,i as p,b as i,t as g,a as b}from"./typography.C7xuE2z_.js";
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */class c extends l{}c.directiveName="unsafeSVG",c.resultType=2;const x=f(c),_={xs:"label-2xs",sm:"label-xs",md:"label-md",lg:"label-lg"},w={xs:"microcopy-2xs",sm:"microcopy-xs",md:"microcopy-md",lg:"microcopy-lg"},$={xs:"microcopy-2xs-strong",sm:"microcopy-xs-strong",md:"microcopy-md-strong",lg:"microcopy-lg-strong"};class k extends p{constructor(){super(),this.onKeydown=e=>{if(this.disabled)return;const t=this.options;if(t.length===0)return;const r=this.selectedIndex>=0?this.selectedIndex:0;let o;switch(e.key){case"ArrowRight":case"ArrowDown":o=(r+1)%t.length;break;case"ArrowLeft":case"ArrowUp":o=(r-1+t.length)%t.length;break;case"Home":o=0;break;case"End":o=t.length-1;break;case"Enter":case" ":e.preventDefault(),this.select(t[r]);return;default:return}e.preventDefault(),this.select(t[o]),this.focusButton(o)},this.label="",this.helpText="",this.errorText="",this.options=[],this.value="",this.size="md",this.disabled=!1,this.required=!1,this.internals=this.attachInternals()}static{this.formAssociated=!0}static{this.properties={label:{type:String},helpText:{type:String,attribute:"help-text"},errorText:{type:String,attribute:"error-text"},options:{type:Array},value:{type:String},size:{type:String,reflect:!0},name:{type:String,reflect:!0},disabled:{type:Boolean,reflect:!0},required:{type:Boolean}}}get resolvedHelpText(){return this.helpText}connectedCallback(){super.connectedCallback(),this.syncFormValue()}willUpdate(e){(e.has("value")||e.has("options"))&&this.syncFormValue()}updated(){this.syncValidity()}syncValidity(){if(!this.required||this.value){this.internals.setValidity({});return}const e=this.renderRoot?.querySelector(".option")??void 0;this.internals.setValidity({valueMissing:!0},this.label?`Select ${this.label}.`:"Select an option.",e)}get selectedIndex(){return this.options.findIndex(e=>e.value===this.value)}get focusIndex(){const e=this.selectedIndex;return e>=0?e:0}syncFormValue(){this.internals.setFormValue(this.value||null)}select(e){this.disabled||e.value===this.value||(this.value=e.value,this.syncFormValue(),this.dispatchEvent(new CustomEvent("change",{detail:{value:this.value},bubbles:!0,composed:!0})))}focusButton(e){this.renderRoot.querySelectorAll(".option")[e]?.focus()}render(){const e=!!this.label,t=!!this.errorText,r=this.resolvedHelpText,o=t?"error":r?"help":null;return i`
+ */class c extends l{}c.directiveName="unsafeSVG",c.resultType=2;const x=f(c),_={xs:"label-2xs",sm:"label-xs",md:"label-md",lg:"label-lg"},w={xs:"microcopy-2xs",sm:"microcopy-xs",md:"microcopy-md",lg:"microcopy-lg"},$={xs:"microcopy-2xs-strong",sm:"microcopy-xs-strong",md:"microcopy-md-strong",lg:"microcopy-lg-strong"};class k extends p{constructor(){super(),this.onKeydown=e=>{if(this.disabled)return;const t=this.options;if(t.length===0)return;const r=this.selectedIndex>=0?this.selectedIndex:0;let s;switch(e.key){case"ArrowRight":case"ArrowDown":s=(r+1)%t.length;break;case"ArrowLeft":case"ArrowUp":s=(r-1+t.length)%t.length;break;case"Home":s=0;break;case"End":s=t.length-1;break;case"Enter":case" ":e.preventDefault(),this.select(t[r]);return;default:return}e.preventDefault(),this.select(t[s]),this.focusButton(s)},this.label="",this.helpText="",this.errorText="",this.options=[],this.value="",this.size="md",this.disabled=!1,this.required=!1,this.internals=this.attachInternals()}static{this.formAssociated=!0}static{this.properties={label:{type:String},helpText:{type:String,attribute:"help-text"},errorText:{type:String,attribute:"error-text"},options:{type:Array},value:{type:String},size:{type:String,reflect:!0},name:{type:String,reflect:!0},disabled:{type:Boolean,reflect:!0},required:{type:Boolean}}}get resolvedHelpText(){return this.helpText}connectedCallback(){super.connectedCallback(),this.syncFormValue()}willUpdate(e){(e.has("value")||e.has("options"))&&this.syncFormValue()}updated(){this.syncValidity()}syncValidity(){if(!this.required||this.value){this.internals.setValidity({});return}const e=this.renderRoot?.querySelector(".option")??void 0;this.internals.setValidity({valueMissing:!0},this.label?`Select ${this.label}.`:"Select an option.",e)}get selectedIndex(){return this.options.findIndex(e=>e.value===this.value)}get focusIndex(){const e=this.selectedIndex;return e>=0?e:0}syncFormValue(){this.internals.setFormValue(this.value||null)}select(e){this.disabled||e.value===this.value||(this.value=e.value,this.syncFormValue(),this.dispatchEvent(new CustomEvent("change",{detail:{value:this.value},bubbles:!0,composed:!0})))}focusButton(e){this.renderRoot.querySelectorAll(".option")[e]?.focus()}render(){const e=!!this.label,t=!!this.errorText,r=this.resolvedHelpText,s=t?"error":r?"help":null;return i`
       ${e?i`<span class="label typography-${_[this.size]}" id="label">
             ${this.label}${this.required?i`<span class="required" aria-hidden="true">*</span>`:null}
           </span>`:null}
@@ -20,20 +20,20 @@ import{A as h,E as u,i as p,b as i,t as g,a as b}from"./typography.C7xuE2z_.js";
         aria-labelledby=${e?"label":null}
         aria-required=${this.required?"true":null}
         aria-invalid=${t?"true":null}
-        aria-describedby=${o}
+        aria-describedby=${s}
         @keydown=${this.onKeydown}
       >
-        ${this.options.map((s,d)=>{const n=d===this.selectedIndex;return i`<button
+        ${this.options.map((a,d)=>{const n=d===this.selectedIndex;return i`<button
             type="button"
             role="radio"
             class="option ${n?"option--selected":""} typography-${n?$[this.size]:w[this.size]}"
             aria-checked=${n}
-            aria-label=${s.ariaLabel??(s.label?null:s.value)}
+            aria-label=${a.ariaLabel??(a.label?null:a.value)}
             tabindex=${d===this.focusIndex?0:-1}
             ?disabled=${this.disabled}
-            @click=${()=>this.select(s)}
+            @click=${()=>this.select(a)}
           >
-            ${s.icon?i`<svg
+            ${a.icon?i`<svg
                   class="option__icon"
                   viewBox="0 0 24 24"
                   fill="none"
@@ -43,9 +43,9 @@ import{A as h,E as u,i as p,b as i,t as g,a as b}from"./typography.C7xuE2z_.js";
                   stroke-linejoin="round"
                   aria-hidden="true"
                 >
-                  ${x(s.icon)}
+                  ${x(a.icon)}
                 </svg>`:null}
-            ${s.label?i`<span class="option__label">${s.label}</span>`:null}
+            ${a.label?i`<span class="option__label">${a.label}</span>`:null}
           </button>`})}
       </div>
       ${t?i`<span class="error typography-body-sm" id="error">${this.errorText}</span>`:r?i`<span class="help typography-body-sm" id="help">${r}</span>`:null}
@@ -197,4 +197,4 @@ import{A as h,E as u,i as p,b as i,t as g,a as b}from"./typography.C7xuE2z_.js";
         color: Canvas;
       }
     }
-  `]}}customElements.get("esa-button-toggle")||customElements.define("esa-button-toggle",k);
+  `]}}customElements.get("esa-button-toggle")||customElements.define("esa-button-toggle",k);const T=[{value:"map",label:"Map"},{value:"form",label:"Form"},{value:"compare",label:"Compare"}];customElements.whenDefined("esa-button-toggle").then(()=>{document.querySelectorAll("esa-button-toggle[data-demo]").forEach(e=>{e.options=T});const o=document.querySelector('esa-button-toggle[data-demo="preview"]');o&&(o.value="map")});
