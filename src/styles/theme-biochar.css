@@ -89,7 +89,7 @@
      tint rather than a yellow-green one. That is why the active nav state is a
      solid fill now and not a wash — see AppShell. What it buys: green-7 is the
      first step in this palette's history to clear WCAG 1.4.11 (3.40 on card,
-     3.12 on canvas), so --color-primary-border is a legitimate indicator.
+     3.12 on canvas), so --color-border-brand is a legitimate indicator.
 
      The dark end reads as black with a green cast (11 and 12 sit ΔE 0.046 and
      0.066 from neutral-12); text uses neutral-12, so nothing depends on it. */
@@ -205,9 +205,9 @@
         L 0.964 and white there is 0.036 of room and two 0.020 gaps do not fit.
         The panel takes the canvas side (0.0209) because a card on a page is an
         everyday relationship; white over the panel is 0.0162 and would be
-        shadow-carried. Nothing pairs them today — --color-surface-elevated has
+        shadow-carried. Nothing pairs them today — --color-background-elevation-floating has
         zero consumers, and cards inside the workflow panel are themselves
-        --color-surface, so they are already border-carried at ΔE 0.
+        --color-background-elevation-raised, so they are already border-carried at ΔE 0.
      2. The sidenav sits ΔE 0.0170 from basemap land (#f2f1ee) — under floor.
         Declared at --bca-chrome-seam below.
 
@@ -232,13 +232,13 @@
      ΔE 0.0247 — the darker bar closes on the seam but does not swallow it. */
   --bca-chrome-seam:    #deddd4;  /* L 0.896 — vs sidenav ΔE 0.0462 */
 
-  --color-surface:          #fafaf7;  /* L 0.985 — cards, workflow panel, map controls */
-  --color-surface-elevated: #ffffff;  /* no consumers yet; 0.0162 over the panel — shadow, not fill */
-  --color-background:       #f4f3ee;  /* L 0.964 — canvas (report + landing only; see below) */
-  --color-surface-sunken:   var(--bca-neutral-3); /* wells, hover fills, pills — NOT the sidebar */
-  --color-surface-inverse:  var(--bca-neutral-12);
+  --color-background-elevation-raised:          #fafaf7;  /* L 0.985 — cards, workflow panel, map controls */
+  --color-background-elevation-floating: #ffffff;  /* no consumers yet; 0.0162 over the panel — shadow, not fill */
+  --color-background-default:       #f4f3ee;  /* L 0.964 — canvas (report + landing only; see below) */
+  --color-background-elevation-sunken:   var(--bca-neutral-3); /* wells, hover fills, pills — NOT the sidebar */
+  --color-background-default-knockout:  var(--bca-neutral-12);
 
-  /* --color-background paints less than its name suggests. On the suitability
+  /* --color-background-default paints less than its name suggests. On the suitability
      tool .modern-layout__content has no background and .tool fills it edge to
      edge, so the canvas never appears on the flagship page — BaseLayout's own
      comment, "the body IS the canvas", is the whole story. Canvas pairings
@@ -261,15 +261,14 @@
      1.4.11. It is 2.69/2.87 on topbar and sidenav, which is fine because form
      fields live on the panel and on cards, not in the chrome. The step it
      replaced (green-6) measured 1.47 and never cleared anywhere. */
-  --color-primary:         var(--bca-green-9);
-  --color-primary-hover:   var(--bca-green-10);
-  --color-primary-active:  var(--bca-green-11);
-  --color-primary-subtle:  var(--bca-green-3);
-  --color-primary-border:  var(--bca-green-7);
-  --color-primary-strong:  var(--bca-green-9);   /* 10.46 on panel — see -strong note */
-  --color-secondary:       var(--bca-sage-11);
-  --color-secondary-hover: var(--bca-brand-sage-dark);
-  --color-secondary-strong: var(--bca-sage-12);  /* 15.70 on panel, same ink as info */
+  --color-background-brand:         var(--bca-green-9);
+  --color-background-brand-hover:   var(--bca-green-10);
+  --color-background-brand-active:  var(--bca-green-11);
+  --color-background-brand-subtle:  var(--bca-green-3);
+  --color-border-brand:  var(--bca-green-7);
+  --color-content-brand:  var(--bca-green-9);   /* 10.46 on panel — see -strong note */
+  --color-background-brand-muted:       var(--bca-sage-11);
+  --color-background-brand-muted-hover: var(--bca-brand-sage-dark);
 
   /* ═══ TONE INKS AND HOVERS ════════════════════════════════════════════
      Everything below exists because a tone in the hub is THREE values — a
@@ -297,15 +296,15 @@
      while leaving the dot in its family. White on the hover fills runs
      7.59–10.32, so the label gets safer while the pointer is down, and the
      dots clear 1.4.11 against the panel at 7.25–7.82. */
-  --color-secondary-on-fill: var(--color-text-inverse);
-  --color-success-on-fill:   var(--color-text-inverse);
-  --color-warning-on-fill:   var(--color-text-inverse);  /* esa-badge's hook */
-  --button-on-warning:       var(--color-text-inverse);  /* esa-button's hook, same job */
+  --color-content-on-brand-muted: var(--color-content-default-knockout);
+  --color-content-on-utility-success:   var(--color-content-default-knockout);
+  --color-content-on-utility-warning:   var(--color-content-default-knockout);  /* esa-badge's hook */
+  --button-on-warning:       var(--color-content-default-knockout);  /* esa-button's hook, same job */
 
-  --color-success-hover: #1b5b3f;  /* mid(status-green-11, -12), L 0.521 → 0.421 */
-  --color-warning-hover: #78491c;  /* mid(status-amber-11, -12), L 0.550 → 0.451 */
-  --color-danger-hover:  #97212a;  /* mid(status-red-11,   -12), L 0.554 → 0.446 */
-  --color-info-hover:    #43412f;  /* mid(sage-11,         -12), L 0.504 → 0.372 */
+  --color-background-utility-success-hover: #1b5b3f;  /* mid(status-green-11, -12), L 0.521 → 0.421 */
+  --color-background-utility-warning-hover: #78491c;  /* mid(status-amber-11, -12), L 0.550 → 0.451 */
+  --color-background-utility-danger-hover:  #97212a;  /* mid(status-red-11,   -12), L 0.554 → 0.446 */
+  --color-background-utility-info-hover:    #43412f;  /* mid(sage-11,         -12), L 0.504 → 0.372 */
 
   /* ═══ TEXT ════════════════════════════════════════════════════════════
      Measured on the worst light surface in the shell, which is the topbar
@@ -318,11 +317,10 @@
      (An earlier version of this comment measured against a panel of #dedddb.
      No surface in the app was ever that color — it came from a proposal-era
      mock. The numbers above are the shipped shell.) */
-  --color-text-primary:   var(--bca-neutral-12);
-  --color-text-secondary: var(--bca-brand-grey);
-  --color-text-tertiary:  var(--bca-neutral-11);
-  --color-text-muted:     var(--bca-neutral-11);
-  --color-text-inverse:   #ffffff;
+  --color-content-default:   var(--bca-neutral-12);
+  --color-content-default-secondary: var(--bca-brand-grey);
+  --color-content-default-tertiary:  var(--bca-neutral-11);
+  --color-content-default-knockout:   #ffffff;
   /* Disabled: 3.44 on the panel down to 2.84 on the topbar. WCAG exempts
      inactive controls from contrast, and the ghosted Phase 2 nav items are the
      main consumer, but it is under 3.0 on the shell's darkest surface — do not
@@ -330,19 +328,19 @@
   --color-text-disabled:  var(--bca-neutral-9);
 
   /* Links: purple on light, jade on dark, per the brand guide. */
-  --color-text-link:       var(--bca-purple-12);
-  --color-text-link-hover: var(--bca-purple-13);
+  --color-content-link:       var(--bca-purple-12);
+  --color-content-link-hover: var(--bca-purple-13);
   --color-text-link-inverse: var(--bca-brand-jade);
 
   /* ═══ BORDERS ═════════════════════════════════════════════════════════ */
-  --color-border:        var(--bca-neutral-6);
-  --color-border-light:  var(--bca-neutral-5);
-  --color-border-strong: var(--bca-neutral-7);
+  --color-border-default:        var(--bca-neutral-6);
+  --color-border-default-subtle:  var(--bca-neutral-5);
+  --color-border-default-strong: var(--bca-neutral-7);
 
   /* ═══ FOCUS ═══════════════════════════════════════════════════════════
-     tokens.css points --focus-ring-color at --color-primary, but
+     tokens.css points --focus-ring-color at --color-background-brand, but
      component-tokens.css loads after it and re-points the same token to
-     --color-border-focus, which resolves to the hub's --color-grass-8
+     --color-border-default-focus, which resolves to the hub's --color-grass-8
      (#65ba74) — a mint green from a ramp this brand doesn't use. Unoverridden
      that is what every focus ring in the app would be: off-brand, and 2.14:1
      against the canvas, under the 3.0 WCAG 1.4.11 requires of a non-text
@@ -354,7 +352,7 @@
   --focus-ring-width:  2px;
   --focus-ring-offset: 2px;
 
-  --color-active-overlay: color-mix(in srgb, var(--bca-green-9) 8%, transparent);
+  --color-background-overlay-active: color-mix(in srgb, var(--bca-green-9) 8%, transparent);
 
   /* ═══ STATUS SCALE — deliberately NOT brand ═══════════════════════════
      Success, warning and danger use conventional green / yellow / red
@@ -426,28 +424,28 @@
      the 3.0 non-text floor and just under 4.5 for text. That is the intended
      division of labour: solids are icons, bars and dots; status TEXT uses
      -strong, which is 10.47:1 at worst on its own subtle. */
-  --color-info:            var(--bca-sage-11);   /* advisory, the quiet one */
-  --color-info-subtle:     var(--bca-sage-4);    /* step 4, not 3 — see above */
-  --color-info-border:     var(--bca-sage-6);
-  --color-info-strong:     var(--bca-sage-12);   /* 13.48:1 on subtle */
+  --color-background-utility-info:            var(--bca-sage-11);   /* advisory, the quiet one */
+  --color-background-utility-info-subtle:     var(--bca-sage-4);    /* step 4, not 3 — see above */
+  --color-border-utility-info:     var(--bca-sage-6);
+  --color-content-utility-info:     var(--bca-sage-12);   /* 13.48:1 on subtle */
 
-  --color-success:         var(--bca-status-green-11);  /* 5.20 white · 4.68 canvas · 4.64 subtle */
-  --color-success-subtle:  var(--bca-status-green-3);
-  --color-success-border:  var(--bca-status-green-6);
-  --color-success-strong:  var(--bca-status-green-12);  /* 11.00:1 on subtle */
+  --color-background-utility-success:         var(--bca-status-green-11);  /* 5.20 white · 4.68 canvas · 4.64 subtle */
+  --color-background-utility-success-subtle:  var(--bca-status-green-3);
+  --color-border-utility-success:  var(--bca-status-green-6);
+  --color-content-utility-success:  var(--bca-status-green-12);  /* 11.00:1 on subtle */
 
-  --color-warning:         var(--bca-status-amber-11);  /* 5.02 white · 4.52 canvas · 4.63 subtle */
-  --color-warning-subtle:  var(--bca-status-amber-3);   /* 1.00 vs canvas — see note below */
-  --color-warning-border:  var(--bca-status-amber-6);
-  --color-warning-strong:  var(--bca-status-amber-12);  /* 10.47:1 on subtle */
+  --color-background-utility-warning:         var(--bca-status-amber-11);  /* 5.02 white · 4.52 canvas · 4.63 subtle */
+  --color-background-utility-warning-subtle:  var(--bca-status-amber-3);   /* 1.00 vs canvas — see note below */
+  --color-border-utility-warning:  var(--bca-status-amber-6);
+  --color-content-utility-warning:  var(--bca-status-amber-12);  /* 10.47:1 on subtle */
 
-  --color-danger:          var(--bca-status-red-11);    /* 5.29 white · 4.76 canvas · 4.61 subtle */
-  --color-danger-subtle:   var(--bca-status-red-3);
-  --color-danger-border:   var(--bca-status-red-6);
-  --color-danger-strong:   var(--bca-status-red-12);    /* 10.84:1 on subtle */
-  --color-error:           var(--color-danger);
-  --color-error-subtle:    var(--color-danger-subtle);
-  --color-error-border:    var(--color-danger-border);
+  --color-background-utility-danger:          var(--bca-status-red-11);    /* 5.29 white · 4.76 canvas · 4.61 subtle */
+  --color-background-utility-danger-subtle:   var(--bca-status-red-3);
+  --color-border-utility-danger:   var(--bca-status-red-6);
+  --color-content-utility-danger:   var(--bca-status-red-12);    /* 10.84:1 on subtle */
+  --color-error:           var(--color-background-utility-danger);
+  --color-error-subtle:    var(--color-background-utility-danger-subtle);
+  --color-error-border:    var(--color-border-utility-danger);
   /* The amber subtle surface is luminance-identical to the canvas (1.02:1).
      A warning callout separates from the page by hue and by its border, never
      by value — so -border is not optional on a warning container the way it
@@ -464,7 +462,7 @@
      all, which is the one thing a token cannot reach; see the rule below the
      token block.
 
-     The border moves up one rung, from --color-border-light to --color-border.
+     The border moves up one rung, from --color-border-default-subtle to --color-border-default.
      The pill's fill is the sunken neutral, which sits ΔE 0.0623 from the panel
      and 0.0414 from the canvas — visible on both — but only 0.0123 from the
      grid's green-3 row hover, under the visible-edge floor. On a hovered row
@@ -479,19 +477,19 @@
      at the pairing the topbar avatar already hand-rolls: brand Gold with
      Green initials at 6.54:1. Never white on Gold, which is 1.60:1. */
   --pill-radius: var(--radius-100);
-  --pill-border-color: var(--color-border);
+  --pill-border-color: var(--color-border-default);
   --avatar-bg: var(--bca-brand-gold);
-  --avatar-text-color: var(--color-primary);
+  --avatar-text-color: var(--color-background-brand);
 
   /* ═══ FORM TYPE ═══════════════════════════════════════════════════════
-     The hub chains --form-font-size-md to --type-size-200, which clamps at
+     The hub chains --typography-label-md-font-size to --font-size-200, which clamps at
      0.9375rem — so every default-size input, select and textarea in the app
      tops out at 15px and drops to 12px on a narrow viewport. That is under
      Andy's 16px floor for text a person reads, and a field someone types into
      is the clearest case of it. Re-pointed here, at md only: xs and sm exist
      for dense toolbar controls and keep the hub's scale, so the size ladder
      still means something. Reach for md on anything a user fills in. */
-  --form-font-size-md: 1rem;
+  --typography-label-md-font-size: 1rem;
 
   /* ═══ BRAND TONES — emphasis and CTA, not status ══════════════════════
      Green, Purple and Gold as action colors (Andy, 2026-08-14). These are
@@ -499,7 +497,7 @@
      conventional and stay off the brand, and danger in particular stays red
      because a destructive action should not be brand-colored.
 
-     Green needs nothing new — --color-primary IS brand Green, so `tone=green`
+     Green needs nothing new — --color-background-brand IS brand Green, so `tone=green`
      resolves to the primary chain. Purple and Gold each need four values, and
      each one breaks a rule that Green does not.
 
@@ -511,7 +509,7 @@
      white at 6.65:1, and clears 1.4.11 against the panel on its own at 6.36.
      So the fill is step 11 and the issued hex returns as the hover — the
      brand color appears unmodified, in the state where a deeper value is
-     what you want anyway. Note the adjacency: --color-text-link is also
+     what you want anyway. Note the adjacency: --color-content-link is also
      purple-12, so a purple button and a link share a family. Different
      roles, and the button is a fill where the link is text.
 
@@ -528,7 +526,7 @@
      (ΔE 0.0833, four times the visible-edge floor). */
   --bca-tone-purple:        var(--bca-purple-11);  /* white 6.65 · panel 6.36 */
   --bca-tone-purple-hover:  var(--bca-purple-12);  /* = brand Purple, white 14.55 */
-  --bca-tone-purple-ink:    var(--color-text-inverse);
+  --bca-tone-purple-ink:    var(--color-content-default-knockout);
   --bca-tone-purple-strong: var(--bca-purple-11);  /* outline border + text, 6.36 on panel */
 
   --bca-tone-gold:          var(--bca-gold-9);     /* = brand Gold */
@@ -546,15 +544,15 @@
 
      White on all four is 5.02–5.88:1, because these fills were already
      chosen at step 11 to carry it. */
-  --snackbar-item-bg-info:    var(--color-info);     /* sage-11, white 5.88 */
-  --snackbar-item-bg-success: var(--color-success);  /* white 5.20 */
-  --snackbar-item-bg-warning: var(--color-warning);  /* white 5.02 */
-  --snackbar-item-bg-danger:  var(--color-danger);   /* white 5.29 */
+  --snackbar-item-bg-info:    var(--color-background-utility-info);     /* sage-11, white 5.88 */
+  --snackbar-item-bg-success: var(--color-background-utility-success);  /* white 5.20 */
+  --snackbar-item-bg-warning: var(--color-background-utility-warning);  /* white 5.02 */
+  --snackbar-item-bg-danger:  var(--color-background-utility-danger);   /* white 5.29 */
 
   /* ═══ SIDE PANELS — elevation and the stack ═══════════════════════════
      Two values that exist because the hub's do not read on a RIGHT-ANCHORED
-     panel. esa-side-dialog hardcodes `box-shadow: var(--shadow-400, …)` with
-     no --side-dialog-shadow hook of its own, and the shipped --shadow-400 is
+     panel. esa-side-dialog hardcodes `box-shadow: var(--elevation-5, …)` with
+     no --side-dialog-shadow hook of its own, and the shipped --elevation-5 is
      `0 8px 32px -8px rgba(0,0,0,0.08)` — purely DOWNWARD at 8% alpha. A panel
      pinned to the right edge shows only its left edge, and a downward shadow
      draws nothing there. That is why two stacked panels blended into each
@@ -566,8 +564,8 @@
      reach is about 10px and the peek strip beside it stays legible instead of
      being swallowed by gradient. The second term is the hub's own downward
      lift, kept so a panel still sits above the page. Applied by re-pointing
-     --shadow-400 on the side-dialog host, which is contained: grepped, the
-     only three legos that read --shadow-400 are esa-side-dialog,
+     --elevation-5 on the side-dialog host, which is contained: grepped, the
+     only three legos that read --elevation-5 are esa-side-dialog,
      esa-back-to-top and esa-search-panel, and neither of the last two appears
      inside a panel. The honest fix is a --side-dialog-shadow hook in the hub;
      filed in NEEDS.md.
@@ -599,26 +597,26 @@
      The guide names three identity weights (Light / Regular / Bold). UI label
      hierarchy at this data density needs a mid weight too, so 500 and 600 are
      loaded and mapped — an extension, same as the color ramps. */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-  /* --font-display is the hub's own hook (DocsShell's .article h1 reads it and
-     falls back to --font-sans). Wiring it here is what gets the brand headline
+  --typography-font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --typography-font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* --typography-font-family-display is the hub's own hook (DocsShell's .article h1 reads it and
+     falls back to --typography-font-family-sans). Wiring it here is what gets the brand headline
      face onto documentation page titles with no fork. */
-  --font-display: 'Crimson Pro', Georgia, 'Times New Roman', serif;
-  --bca-font-display: var(--font-display);
-  --font-weight-light:    300;
-  --font-weight-regular:  400;
-  --font-weight-medium:   500;
-  --font-weight-semibold: 600;
-  --font-weight-bold:     700;
+  --typography-font-family-display: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  --bca-font-display: var(--typography-font-family-display);
+  --typography-font-weight-light:    300;
+  --typography-font-weight-regular:  400;
+  --typography-font-weight-medium:   500;
+  --typography-font-weight-semibold: 600;
+  --typography-font-weight-bold:     700;
   /* Inter floors at 400 in this spoke (Andy, 2026-08-25: "nothing should be
      less than 400"). The hub's composites resolve DM Sans's 350 "regular" and
      300 "light", both too thin on the parchment canvas, so both rungs land on
      Inter 400 here. The floor is for UI text: Crimson Pro Light display
      headings keep the brand's identity weight via the spoke's own
-     --font-weight-light. */
-  --typography-font-weight-regular: var(--font-weight-regular, 400);
-  --typography-font-weight-light: var(--font-weight-regular, 400);
+     --typography-font-weight-light. */
+  --typography-font-weight-regular: var(--typography-font-weight-regular, 400);
+  --typography-font-weight-light: var(--typography-font-weight-regular, 400);
 
   /* ═══ SOH-BC SUITABILITY — the map's classed ramp ═════════════════════
      Five discrete classes (Not suited → Well suited), the national map's
@@ -853,8 +851,8 @@
    pinning a weight. Ones that still pin 600/700 render Crimson Pro semibold —
    see NEEDS.md; making Light stick everywhere is a heading pass, not a token. */
 [data-theme="biochar"] h1 {
-  font-family: var(--font-display);
-  font-weight: var(--font-weight-light, 300);
+  font-family: var(--typography-font-family-display);
+  font-weight: var(--typography-font-weight-light, 300);
   letter-spacing: -0.005em;
 }
 
@@ -883,8 +881,8 @@
   --icon-size-xs: 12px;
 }
 
-/* esa-snackbar-item sizes its message from --type-size-200 and its action label
-   from --type-size-150, both inside shadow DOM with no size hook — so the two
+/* esa-snackbar-item sizes its message from --font-size-200 and its action label
+   from --font-size-150, both inside shadow DOM with no size hook — so the two
    top out at 15px and 14px. A toast message is body text someone reads, and the
    only lever a theme has is re-pointing those scale steps so they inherit in.
 
@@ -895,6 +893,6 @@
    --snackbar-item-font-size hook, like the four background hooks the component
    already exposes. */
 [data-theme="biochar"] esa-snackbar-container {
-  --type-size-200: 1rem;
-  --type-size-150: 1rem;
+  --font-size-200: 1rem;
+  --font-size-150: 1rem;
 }

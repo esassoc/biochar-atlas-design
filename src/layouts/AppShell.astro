@@ -502,16 +502,16 @@ if (activeNavId) {
     border: none;
     border-radius: var(--radius-100, 0.25rem);
     background: transparent;
-    color: var(--color-text-tertiary, #6a665e);
+    color: var(--color-content-default-tertiary, #6a665e);
     cursor: pointer;
     transition: background 150ms ease, color 150ms ease;
   }
   .sidebar-toggle:hover {
-    background: var(--color-border-light, #ebe8e1);
-    color: var(--color-primary, #234a31);
+    background: var(--color-border-default-subtle, #ebe8e1);
+    color: var(--color-background-brand, #234a31);
   }
   .sidebar-toggle:focus-visible {
-    outline: 2px solid var(--color-primary, #234a31);
+    outline: 2px solid var(--color-background-brand, #234a31);
     outline-offset: 2px;
   }
   .sidebar-toggle__icon {
@@ -537,10 +537,10 @@ if (activeNavId) {
     transition: background 150ms ease;
   }
   .user-trigger:hover {
-    background: var(--color-border-light, #ebe8e1);
+    background: var(--color-border-default-subtle, #ebe8e1);
   }
   .user-trigger:focus-visible {
-    outline: 2px solid var(--color-primary, #234a31);
+    outline: 2px solid var(--color-background-brand, #234a31);
     outline-offset: 2px;
   }
   .user-trigger__avatar {
@@ -557,9 +557,9 @@ if (activeNavId) {
        it holds its own edge, and the old green ring was doing that job for a
        fill that could not. */
     background: var(--bca-brand-gold, #ffc261);
-    color: var(--color-primary, #364500);
+    color: var(--color-background-brand, #364500);
     font-size: 0.875rem;
-    font-weight: var(--font-weight-semibold, 600);
+    font-weight: var(--typography-font-weight-semibold, 600);
     transition: box-shadow 150ms ease;
   }
   .user-trigger:hover .user-trigger__avatar {
@@ -567,14 +567,14 @@ if (activeNavId) {
   }
   .user-trigger__name {
     font-size: 0.875rem;
-    font-weight: var(--font-weight-semibold, 600);
-    color: var(--color-text-primary, #33312a);
+    font-weight: var(--typography-font-weight-semibold, 600);
+    color: var(--color-content-default, #33312a);
     line-height: 1.25;
     white-space: nowrap;
   }
   .user-trigger > :global(.esa-icon:last-child) {
     flex-shrink: 0;
-    color: var(--color-text-muted, #807c73);
+    color: var(--color-content-default-secondary, #807c73);
   }
 
   @media (max-width: 767px) {
@@ -589,7 +589,7 @@ if (activeNavId) {
     top: calc(100% + var(--spacing-200, 0.5rem));
     right: 0;
     min-width: 200px;
-    background: var(--color-surface, #fff);
+    background: var(--color-background-elevation-raised, #fff);
     border-radius: var(--radius-200, 0.5rem);
     border: 1px solid var(--_chrome-border, #ddd9d0);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
@@ -610,8 +610,8 @@ if (activeNavId) {
     width: 100%;
     padding: var(--spacing-250, 0.625rem) var(--spacing-300, 0.75rem);
     font-size: 0.9375rem;
-    font-weight: var(--font-weight-medium, 500);
-    color: var(--color-text-primary, #33312a);
+    font-weight: var(--typography-font-weight-medium, 500);
+    color: var(--color-content-default, #33312a);
     background: transparent;
     border: none;
     border-radius: var(--radius-200, 0.5rem);
@@ -621,19 +621,19 @@ if (activeNavId) {
     transition: background-color 150ms ease;
   }
   .user-panel__item:hover {
-    background: var(--color-surface-sunken, #f3f1ea);
+    background: var(--color-background-elevation-sunken, #f3f1ea);
   }
   .user-panel__item :global(.esa-icon) {
-    color: var(--color-text-tertiary, #6a665e);
+    color: var(--color-content-default-tertiary, #6a665e);
   }
   .user-panel__item--danger {
-    color: var(--color-danger, #ef4444);
+    color: var(--color-background-utility-danger, #ef4444);
   }
   .user-panel__item--danger:hover {
-    background: var(--color-danger-subtle, #fef2f2);
+    background: var(--color-background-utility-danger-subtle, #fef2f2);
   }
   .user-panel__item--danger :global(.esa-icon) {
-    color: var(--color-danger, #ef4444);
+    color: var(--color-background-utility-danger, #ef4444);
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -641,7 +641,7 @@ if (activeNavId) {
      ═══════════════════════════════════════════════════════════════════ */
   .side-nav {
     --_sidenav-bg: var(--bca-chrome-sidenav, #edece5);
-    --_nav-hover-bg: var(--color-active-overlay, rgba(0, 0, 0, 0.04));
+    --_nav-hover-bg: var(--color-background-overlay-active, rgba(0, 0, 0, 0.04));
 
     /* ── The active-item treatment. Two tokens; swap the pair. ──────────
        SHIPPED: green-4 wash + Green label, semibold (Andy asked for quieter
@@ -661,22 +661,22 @@ if (activeNavId) {
        ALTERNATES — replace the two lines below, nothing else moves:
          More presence, same idea:
            --_nav-active-bg:  var(--bca-green-5);   (dE 0.1227, ink 6.06:1)
-           --_nav-active-ink: var(--color-primary);
+           --_nav-active-ink: var(--color-background-brand);
          Brand accent, warm:
            --_nav-active-bg:  var(--bca-gold-5);    (dE 0.0612, ink 8.31:1)
-           --_nav-active-ink: var(--color-primary);
+           --_nav-active-ink: var(--color-background-brand);
          Gold is the only other hue in the mark, so it reads instantly — but it
          is the one move that puts a second hue in a monochrome rail, and gold
          carries no meaning elsewhere in this system yet.
-         Back to the slab: --_nav-active-bg: var(--color-primary) +
-         --_nav-active-ink: var(--color-text-inverse).
+         Back to the slab: --_nav-active-bg: var(--color-background-brand) +
+         --_nav-active-ink: var(--color-content-default-knockout).
        green-3 is not an option in any of these: at dE 0.0126 it is the sidenav. */
     --_nav-active-bg: var(--bca-green-4, #d6dccc);
     /* Stays primary: this also colors .nav-section__header hover and active
        text, which sit directly on the sidenav. Inverting it here would blank
        those labels. The label ON the solid fill uses --_nav-active-ink. */
-    --_nav-active-color: var(--color-primary, #364500);
-    --_nav-active-ink: var(--color-primary, #364500);
+    --_nav-active-color: var(--color-background-brand, #364500);
+    --_nav-active-ink: var(--color-background-brand, #364500);
 
     width: var(--_sidenav-w, 300px);
     height: 100%;
@@ -757,11 +757,11 @@ if (activeNavId) {
      with room to give. At 24px the word measures 124.2px, 3.5× the mark, and
      the pair reads as a mark with a name rather than a name with a mark. */
   .brand__product {
-    font-family: var(--font-display, 'Crimson Pro', Georgia, serif);
-    font-weight: var(--font-weight-light, 300);
+    font-family: var(--typography-font-family-display, 'Crimson Pro', Georgia, serif);
+    font-weight: var(--typography-font-weight-light, 300);
     font-size: 1.5rem; /* 24px */
     line-height: 1;
-    color: var(--color-primary, #364500);
+    color: var(--color-background-brand, #364500);
     white-space: nowrap;
   }
   .side-nav.collapsed .brand {
@@ -821,9 +821,9 @@ if (activeNavId) {
     align-items: center;
     gap: var(--spacing-250, 0.625rem);
     padding: var(--spacing-250, 0.625rem) var(--spacing-200, 0.5rem);
-    color: var(--color-text-primary, #33312a);
+    color: var(--color-content-default, #33312a);
     font-size: 0.9375rem; /* 15px */
-    font-weight: var(--font-weight-semibold, 600);
+    font-weight: var(--typography-font-weight-semibold, 600);
     border: none;
     background: transparent;
     border-radius: var(--radius-100, 0.25rem);
@@ -836,7 +836,7 @@ if (activeNavId) {
   }
   .nav-section__header--link {
     text-decoration: none;
-    color: var(--color-text-primary, #33312a);
+    color: var(--color-content-default, #33312a);
   }
   .nav-section__header:hover {
     background: var(--_nav-hover-bg, rgba(0, 0, 0, 0.04));
@@ -855,12 +855,12 @@ if (activeNavId) {
   /* icon (first esa-icon in the header) */
   .nav-section__header > :global(.esa-icon:first-child) {
     flex-shrink: 0;
-    color: var(--color-text-primary, #33312a);
+    color: var(--color-content-default, #33312a);
     transition: color 150ms ease;
   }
   /* chevron (last esa-icon in the header) */
   .nav-section__header > :global(.esa-icon:last-child) {
-    color: var(--color-text-muted, #807c73);
+    color: var(--color-content-default-secondary, #807c73);
     transition: transform 150ms ease, opacity 200ms ease-in-out;
     flex-shrink: 0;
   }
@@ -967,7 +967,7 @@ if (activeNavId) {
     display: block;
     min-width: 208px;
     padding: var(--spacing-200, 0.5rem);
-    background: var(--color-surface, #fafaf7);
+    background: var(--color-background-elevation-raised, #fafaf7);
     border: 1px solid var(--_chrome-border, #deddd4);
     border-radius: var(--radius-200, 0.5rem);
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
@@ -978,8 +978,8 @@ if (activeNavId) {
     display: block;
     padding: var(--spacing-150, 0.375rem) var(--spacing-200, 0.5rem);
     font-size: 1rem;
-    font-weight: var(--font-weight-semibold, 600);
-    color: var(--color-text-primary, #21201c);
+    font-weight: var(--typography-font-weight-semibold, 600);
+    color: var(--color-content-default, #21201c);
   }
   /* The accordion's own collapsed state must not follow the items into the
      panel — inside a flyout the list is always open. */
@@ -1013,7 +1013,7 @@ if (activeNavId) {
     padding-left: calc(
       var(--spacing-200, 0.5rem) + var(--icon-size-sm, 16px) + var(--spacing-250, 0.625rem)
     );
-    color: var(--color-text-secondary, #54514a);
+    color: var(--color-content-default-secondary, #54514a);
     text-decoration: none;
     border-radius: var(--radius-100, 0.25rem);
     font-size: 0.9375rem; /* 15px — nav items stay ≥14px */
@@ -1029,7 +1029,7 @@ if (activeNavId) {
   }
   .nav-sublink:hover {
     background: var(--_nav-hover-bg, rgba(0, 0, 0, 0.04));
-    color: var(--color-text-primary, #33312a);
+    color: var(--color-content-default, #33312a);
   }
   /* Active = tint fill + Green label + semibold (no left-border indicator).
      All three change together; see the token block on .side-nav for why the
@@ -1037,7 +1037,7 @@ if (activeNavId) {
   .nav-sublink.active {
     background: var(--_nav-active-bg, #d6dccc);
     color: var(--_nav-active-ink, #364500);
-    font-weight: var(--font-weight-semibold, 600);
+    font-weight: var(--typography-font-weight-semibold, 600);
   }
   /* Pins the active row against hover. `.nav-sublink.active` and
      `.nav-sublink:hover` both weigh 0,2,0, so today the active rule wins only

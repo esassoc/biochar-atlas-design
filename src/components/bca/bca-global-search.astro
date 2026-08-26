@@ -28,7 +28,7 @@ const { placeholder = 'Search…' } = Astro.props;
 </button>
 
 <style>
-  /* The field reads against the topbar on value: --color-surface is the panel
+  /* The field reads against the topbar on value: --color-background-elevation-raised is the panel
      white at L 0.985, the topbar sits at L 0.935, so the shape is legible
      before the border does any work. */
   .bca-global-search {
@@ -44,25 +44,25 @@ const { placeholder = 'Search…' } = Astro.props;
     max-width: 380px;
     margin: 0 auto;
     padding: var(--spacing-100, 0.25rem) var(--spacing-300, 0.75rem);
-    background: var(--color-surface, #fafaf7);
-    border: 1px solid var(--color-border, #d9d7cd);
+    background: var(--color-background-elevation-raised, #fafaf7);
+    border: 1px solid var(--color-border-default, #d9d7cd);
     border-radius: var(--radius-200, 0.5rem);
     cursor: text;
     transition: border-color 150ms ease, background 150ms ease;
   }
   .bca-global-search:hover {
-    border-color: var(--color-primary-border, #84906a);
-    background: var(--color-surface-elevated, #ffffff);
+    border-color: var(--color-border-brand, #84906a);
+    background: var(--color-background-elevation-floating, #ffffff);
   }
   .bca-global-search:focus-visible {
-    outline: 2px solid var(--color-primary, #364500);
+    outline: 2px solid var(--color-background-brand, #364500);
     outline-offset: 2px;
   }
   .bca-global-search :global(.esa-icon) {
     flex: none;
-    color: var(--color-text-tertiary, #6a665e);
+    color: var(--color-content-default-tertiary, #6a665e);
   }
-  /* 16px, not beacon's --type-size-200 — that token tops out at 15px and this
+  /* 16px, not beacon's --font-size-200 — that token tops out at 15px and this
      spoke holds a 16px floor on interface text. */
   .bca-global-search__placeholder {
     flex: 1;
@@ -73,7 +73,7 @@ const { placeholder = 'Search…' } = Astro.props;
     white-space: nowrap;
     font-size: 1rem;
     line-height: 1.5;
-    color: var(--color-text-tertiary, #6a665e);
+    color: var(--color-content-default-tertiary, #6a665e);
   }
 
   /* On a tight app bar the placeholder drops and the control shrinks to the

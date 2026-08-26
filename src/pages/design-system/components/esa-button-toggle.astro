@@ -23,7 +23,7 @@ const events = [
   category="Filters &amp; Controls"
   slug="esa-button-toggle"
   type="wc"
-  summary="The inherited Ecology segmented single-select — one-of-N choices rendered as a row of connected buttons. Form-associated and following the WAI-ARIA radiogroup pattern; the selected segment fills with forest green from <code>--color-primary</code>. In the Atlas it switches the map / form entry paths."
+  summary="The inherited Ecology segmented single-select — one-of-N choices rendered as a row of connected buttons. Form-associated and following the WAI-ARIA radiogroup pattern; the selected segment fills with forest green from <code>--color-background-brand</code>. In the Atlas it switches the map / form entry paths."
 >
   <Section id="preview" title="Preview">
     <Preview code={`<esa-button-toggle label="Entry path"></esa-button-toggle>\n\n\u003cscript>\n  el.options = [\n    { value: 'map', label: 'Map' },\n    { value: 'form', label: 'Form' },\n    { value: 'compare', label: 'Compare' },\n  ];\n  el.value = 'map';\n\u003c/script>`}>
@@ -44,10 +44,10 @@ const events = [
   </Section>
 
   <Section id="states" title="States">
-    <Preview align="start" code={`<esa-button-toggle label="Default"></esa-button-toggle>\n<esa-button-toggle label="With hint" hint="Pick an entry path"></esa-button-toggle>\n<esa-button-toggle label="Disabled" disabled></esa-button-toggle>`}>
+    <Preview align="start" code={`<esa-button-toggle label="Default"></esa-button-toggle>\n<esa-button-toggle label="With hint" help-text="Pick an entry path"></esa-button-toggle>\n<esa-button-toggle label="Disabled" disabled></esa-button-toggle>`}>
       <div class="col">
         <esa-button-toggle label="Default" data-demo="plain"></esa-button-toggle>
-        <esa-button-toggle label="With hint" hint="Pick an entry path" data-demo="plain"></esa-button-toggle>
+        <esa-button-toggle label="With hint" help-text="Pick an entry path" data-demo="plain"></esa-button-toggle>
         <esa-button-toggle label="Disabled" disabled data-demo="plain"></esa-button-toggle>
       </div>
     </Preview>
@@ -70,7 +70,7 @@ const events = [
 
 <style>
   .col { display: flex; flex-direction: column; gap: var(--spacing-300, 0.75rem); align-items: flex-start; }
-  .a11y { font-size: 15px; line-height: 1.6; color: var(--color-text-secondary, #54514a); }
+  .a11y { font-size: 15px; line-height: 1.6; color: var(--color-content-default-secondary, #54514a); }
 </style>
 
 <script>

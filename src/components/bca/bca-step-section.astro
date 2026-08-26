@@ -125,10 +125,10 @@ const INFO_PATHS =
     transition: background 150ms ease;
   }
   .bca-step__header:hover {
-    background: var(--color-active-overlay, rgba(0, 0, 0, 0.04));
+    background: var(--color-background-overlay-active, rgba(0, 0, 0, 0.04));
   }
   .bca-step__header:focus-visible {
-    outline: 2px solid var(--color-primary, #364500);
+    outline: 2px solid var(--color-background-brand, #364500);
     outline-offset: 2px;
   }
 
@@ -140,24 +140,24 @@ const INFO_PATHS =
   }
 
   .bca-step__title {
-    color: var(--color-text-primary, #33312a);
+    color: var(--color-content-default, #33312a);
     white-space: nowrap;
   }
 
   /* the quiet text marker the rail used to carry — a word, not a pill */
   .bca-step__optional {
     flex-shrink: 0;
-    color: var(--color-text-muted, #807c73);
+    color: var(--color-content-default-secondary, #807c73);
   }
   .bca-step[data-status='upcoming'] .bca-step__title,
   .bca-step[data-status='skipped'] .bca-step__title {
-    color: var(--color-text-tertiary, #615f5a);
+    color: var(--color-content-default-tertiary, #615f5a);
   }
 
   .bca-step__chevron {
     margin-inline-start: auto;
     flex-shrink: 0;
-    color: var(--color-text-muted, #807c73);
+    color: var(--color-content-default-secondary, #807c73);
     transition: transform 200ms ease;
   }
   .bca-step[data-open] .bca-step__chevron {
@@ -196,15 +196,15 @@ const INFO_PATHS =
   .bca-step__guidance > :global(.esa-icon) {
     flex-shrink: 0;
     margin-block-start: 2px;
-    color: var(--color-text-tertiary, #615f5a);
+    color: var(--color-content-default-tertiary, #615f5a);
   }
   .bca-step__guidance p {
     margin: 0;
     max-width: 34ch;
-    color: var(--color-text-secondary, #54514a);
+    color: var(--color-content-default-secondary, #54514a);
     /* Medium, deliberately — body-sm's regular weight read too thin at this
        size on the canvas, and no medium body composite exists on the ramp. */
-    font-weight: var(--font-weight-medium, 500);
+    font-weight: var(--typography-font-weight-medium, 500);
   }
 
   /* The Phase 2 stage — a dashed placeholder for the step's real surface. */
@@ -213,7 +213,7 @@ const INFO_PATHS =
     padding: var(--spacing-500, 1.5rem);
     border: 1.5px dashed var(--color-border-default, #c6c5c1);
     border-radius: var(--radius-300, 0.75rem);
-    background: var(--color-surface, #fdfdfc);
+    background: var(--color-background-elevation-raised, #fdfdfc);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-300, 0.75rem);
@@ -230,7 +230,7 @@ const INFO_PATHS =
     gap: var(--spacing-150, 0.375rem);
   }
   .bca-step__planned li {
-    color: var(--color-text-secondary, #54514a);
+    color: var(--color-content-default-secondary, #54514a);
     padding-inline-start: var(--spacing-400, 1rem);
     position: relative;
   }

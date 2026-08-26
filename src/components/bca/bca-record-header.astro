@@ -124,19 +124,19 @@ const hasActions = Astro.slots.has('actions');
      The panel takes Inter semibold at Beacon's drawer size. */
   .bca-record-header__name {
     margin: 0;
-    font-family: var(--record-name-family, var(--font-display));
-    font-size: var(--record-name-size, var(--type-size-600, 1.875rem));
-    font-weight: var(--record-name-weight, var(--font-weight-light, 300));
+    font-family: var(--record-name-family, var(--typography-font-family-display));
+    font-size: var(--record-name-size, var(--font-size-600, 1.875rem));
+    font-weight: var(--record-name-weight, var(--typography-font-weight-light, 300));
     letter-spacing: -0.005em;
     line-height: 1.15;
-    color: var(--color-text-primary, #21201c);
+    color: var(--color-content-default, #21201c);
   }
 
   .bca-record-header__context {
     margin: 0;
     font-size: var(--record-context-size, 1.0625rem);
     line-height: 1.4;
-    color: var(--color-text-secondary, #474540);
+    color: var(--color-content-default-secondary, #474540);
   }
 
   /* Top-aligned with the name rather than centred on the band: the identity

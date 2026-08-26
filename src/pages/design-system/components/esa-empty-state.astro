@@ -21,14 +21,14 @@ const props = [
 >
   <Section id="basic" title="Basic">
     <p>Pass an inline SVG via the named <code>icon</code> slot; the default slot holds the call to action.</p>
-    <Preview align="start" code={`<EsaEmptyState\n  title="No field selected"\n  description="Pick a field on the map or enter coordinates to derive its soil context."\n>\n  <svg slot="icon" …map-pin… />\n  <EsaButton color="primary">Find a field</EsaButton>\n</EsaEmptyState>`}>
+    <Preview align="start" code={`<EsaEmptyState\n  title="No field selected"\n  description="Pick a field on the map or enter coordinates to derive its soil context."\n>\n  <svg slot="icon" …map-pin… />\n  <EsaButton variant="primary">Find a field</EsaButton>\n</EsaEmptyState>`}>
       <div class="host">
         <EsaEmptyState
           title="No field selected"
           description="Pick a field on the map or enter coordinates to derive its soil context."
         >
           <svg slot="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
-          <EsaButton color="primary">Find a field</EsaButton>
+          <EsaButton variant="primary">Find a field</EsaButton>
         </EsaEmptyState>
       </div>
     </Preview>
@@ -63,8 +63,8 @@ const props = [
 </ComponentDoc>
 
 <style>
-  .host { width: 100%; border: 1px dashed var(--color-border, #ddd9d0); border-radius: var(--radius-300, 8px); }
+  .host { width: 100%; border: 1px dashed var(--color-border-default, #ddd9d0); border-radius: var(--radius-300, 8px); }
   .host--split { display: grid; grid-template-columns: 1fr 1fr; align-items: center; }
-  .slots { font-size: 15px; color: var(--color-text-secondary, #54514a); }
+  .slots { font-size: 15px; color: var(--color-content-default-secondary, #54514a); }
   @media (max-width: 640px) { .host--split { grid-template-columns: 1fr; } }
 </style>

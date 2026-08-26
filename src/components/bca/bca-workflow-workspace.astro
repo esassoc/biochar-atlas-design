@@ -230,7 +230,7 @@ const ROTATE_CCW =
      traveling with the stuck content. The inline padding keeps the rows off
      the rule; the column is 16px wider to hold their width. */
   .bca-workspace__rail {
-    border-inline-end: 1px solid var(--color-border-light, #ebe8e1);
+    border-inline-end: 1px solid var(--color-border-default-subtle, #ebe8e1);
     padding-inline-end: var(--spacing-400, 1rem);
   }
 
@@ -243,8 +243,8 @@ const ROTATE_CCW =
   .bca-workspace__controls {
     /* Brand-ink the ghost trio's labels to ABI Green; their hover wash is the
        same overlay the stepper rows use, so the whole rail hovers as one. */
-    --color-content-default: var(--color-primary, #364500);
-    --color-background-elevation-sunken: var(--color-active-overlay, rgba(0, 0, 0, 0.04));
+    --color-content-default: var(--color-background-brand, #364500);
+    --color-background-elevation-sunken: var(--color-background-overlay-active, rgba(0, 0, 0, 0.04));
 
     display: flex;
     flex-direction: column;
@@ -252,7 +252,7 @@ const ROTATE_CCW =
     gap: var(--spacing-050, 0.125rem);
     margin-block-start: var(--spacing-400, 1rem);
     padding-block-start: var(--spacing-300, 0.75rem);
-    border-block-start: 1px solid var(--color-border-light, #ebe8e1);
+    border-block-start: 1px solid var(--color-border-default-subtle, #ebe8e1);
   }
   /* the slotted icon sits inside the label span — give the pair its gap */
   .bca-workspace__controls :global(.esa-button__label) {

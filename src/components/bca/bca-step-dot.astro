@@ -56,10 +56,10 @@ const { index, numbered = true } = Astro.props;
     flex-shrink: 0;
     border-radius: var(--radius-full, 9999px);
     border: 1.5px solid var(--color-border-default, #c6c5c1);
-    background: var(--color-surface, #fdfdfc);
-    color: var(--color-text-tertiary, #615f5a);
+    background: var(--color-background-elevation-raised, #fdfdfc);
+    color: var(--color-content-default-tertiary, #615f5a);
     font-size: var(--bca-step-dot-num-size, 0.8125rem); /* numeral tracks the dot's context */
-    font-weight: var(--font-weight-semibold, 600);
+    font-weight: var(--typography-font-weight-semibold, 600);
     font-variant-numeric: tabular-nums;
     line-height: 1;
     transition:
@@ -76,15 +76,15 @@ const { index, numbered = true } = Astro.props;
 
   /* active — brand-green ring, numeral darkens to match */
   :global([data-status='active']) .bca-step-dot {
-    border-color: var(--color-primary, #364500);
-    color: var(--color-primary, #364500);
+    border-color: var(--color-background-brand, #364500);
+    color: var(--color-background-brand, #364500);
   }
 
   /* complete — filled green, the check replaces the numeral */
   :global([data-status='complete']) .bca-step-dot {
-    background: var(--color-primary, #364500);
-    border-color: var(--color-primary, #364500);
-    color: var(--color-text-inverse, #fdfdfc);
+    background: var(--color-background-brand, #364500);
+    border-color: var(--color-background-brand, #364500);
+    color: var(--color-content-default-knockout, #fdfdfc);
   }
   :global([data-status='complete']) .bca-step-dot .bca-step-dot__num {
     display: none;

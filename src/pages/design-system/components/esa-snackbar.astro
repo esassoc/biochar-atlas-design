@@ -49,8 +49,8 @@ const itemEvents = [
 >
   <Section id="preview" title="Preview">
     <p>Place one <code>esa-snackbar-container</code> on the page, then drive it imperatively — call <code>show()</code>, or a variant shorthand, on the element itself.</p>
-    <Preview code={`<EsaButton id="toast-default" color="primary">Refresh soil data</EsaButton>\n\n<esa-snackbar-container id="toasts"></esa-snackbar-container>`}>
-      <EsaButton id="toast-default" color="primary">Refresh soil data</EsaButton>
+    <Preview code={`<EsaButton id="toast-default" variant="primary">Refresh soil data</EsaButton>\n\n<esa-snackbar-container id="toasts"></esa-snackbar-container>`}>
+      <EsaButton id="toast-default" variant="primary">Refresh soil data</EsaButton>
       <esa-snackbar-container id="toasts"></esa-snackbar-container>
     </Preview>
   </Section>
@@ -62,26 +62,26 @@ const itemEvents = [
       a red "score this field" reads as destructive. The tone belongs on the
       toast, which is the thing reporting what happened.
     </p>
-    <Preview code={`<EsaButton id="toast-info" color="secondary" appearance="outline">Refresh SSURGO data</EsaButton>\n<EsaButton id="toast-success" color="secondary" appearance="outline">Save assessment</EsaButton>\n<EsaButton id="toast-warning" color="secondary" appearance="outline">Override soil values</EsaButton>\n<EsaButton id="toast-danger" color="secondary" appearance="outline">Score with no goals set</EsaButton>`}>
-      <EsaButton id="toast-info" color="secondary" appearance="outline">Refresh SSURGO data</EsaButton>
-      <EsaButton id="toast-success" color="secondary" appearance="outline">Save assessment</EsaButton>
-      <EsaButton id="toast-warning" color="secondary" appearance="outline">Override soil values</EsaButton>
-      <EsaButton id="toast-danger" color="secondary" appearance="outline">Score with no goals set</EsaButton>
+    <Preview code={`<EsaButton id="toast-info" variant="secondary" appearance="outline">Refresh SSURGO data</EsaButton>\n<EsaButton id="toast-success" variant="secondary" appearance="outline">Save assessment</EsaButton>\n<EsaButton id="toast-warning" variant="secondary" appearance="outline">Override soil values</EsaButton>\n<EsaButton id="toast-danger" variant="secondary" appearance="outline">Score with no goals set</EsaButton>`}>
+      <EsaButton id="toast-info" variant="secondary" appearance="outline">Refresh SSURGO data</EsaButton>
+      <EsaButton id="toast-success" variant="secondary" appearance="outline">Save assessment</EsaButton>
+      <EsaButton id="toast-warning" variant="secondary" appearance="outline">Override soil values</EsaButton>
+      <EsaButton id="toast-danger" variant="secondary" appearance="outline">Score with no goals set</EsaButton>
     </Preview>
   </Section>
 
   <Section id="action" title="With an action">
     <p>An <code>action</code> label renders a button on the toast. Pressing it fires <code>action</code> on the item — the container re-dispatches this as <code>snackbar-action</code> — and dismisses the toast.</p>
-    <Preview code={`<EsaButton id="toast-action" color="secondary" appearance="outline">Remove from comparison</EsaButton>`}>
-      <EsaButton id="toast-action" color="secondary" appearance="outline">Remove from comparison</EsaButton>
+    <Preview code={`<EsaButton id="toast-action" variant="secondary" appearance="outline">Remove from comparison</EsaButton>`}>
+      <EsaButton id="toast-action" variant="secondary" appearance="outline">Remove from comparison</EsaButton>
     </Preview>
   </Section>
 
   <Section id="duration" title="Duration and dedupe">
     <p>Set <code>duration: 0</code> to keep a toast on screen until it's dismissed manually. Set <code>uniqueKey</code> to dedupe — click "Note missing coverage" more than once and only one toast stays on screen, because the second call returns the existing toast's id instead of stacking a duplicate.</p>
-    <Preview code={`<EsaButton id="toast-sticky" color="warning" appearance="outline">Flag manual override</EsaButton>\n<EsaButton id="toast-dedupe" color="secondary" appearance="outline">Note missing coverage</EsaButton>`}>
-      <EsaButton id="toast-sticky" color="warning" appearance="outline">Flag manual override</EsaButton>
-      <EsaButton id="toast-dedupe" color="secondary" appearance="outline">Note missing coverage</EsaButton>
+    <Preview code={`<EsaButton id="toast-sticky" variant="warning" appearance="outline">Flag manual override</EsaButton>\n<EsaButton id="toast-dedupe" variant="secondary" appearance="outline">Note missing coverage</EsaButton>`}>
+      <EsaButton id="toast-sticky" variant="warning" appearance="outline">Flag manual override</EsaButton>
+      <EsaButton id="toast-dedupe" variant="secondary" appearance="outline">Note missing coverage</EsaButton>
     </Preview>
   </Section>
 

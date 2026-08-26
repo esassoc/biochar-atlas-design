@@ -246,7 +246,7 @@ const accents = [
     <p>
       One <code>[data-theme="biochar"]</code> block in <code>theme-biochar.css</code> overrides the
       semantic layer; primitives never move. Links are the exception to chaining off primary — the
-      brand guide puts them on Purple, so <code>--color-text-link</code> is set directly.
+      brand guide puts them on Purple, so <code>--color-content-link</code> is set directly.
     </p>
     <p class="note">
       <strong>Gold cannot carry a state.</strong> White on Gold is 1.60:1 and white on Gold Dark
@@ -283,13 +283,13 @@ const accents = [
 
 <style>
   .roles { display: flex; flex-direction: column; gap: var(--spacing-200, 0.5rem); }
-  .role { display: flex; gap: var(--spacing-400, 1rem); align-items: center; padding: var(--spacing-300, 0.75rem) 0; border-bottom: 1px solid var(--color-border-light, #ebe8e1); }
+  .role { display: flex; gap: var(--spacing-400, 1rem); align-items: center; padding: var(--spacing-300, 0.75rem) 0; border-bottom: 1px solid var(--color-border-default-subtle, #ebe8e1); }
   .role:last-child { border-bottom: 0; }
-  .role__sw { width: 40px; height: 40px; border-radius: 8px; flex: none; border: 1px solid color-mix(in srgb, var(--color-text-primary, #000) 10%, transparent); }
+  .role__sw { width: 40px; height: 40px; border-radius: 8px; flex: none; border: 1px solid color-mix(in srgb, var(--color-content-default, #000) 10%, transparent); }
   .role__body { display: grid; gap: 1px; }
-  .role__body code { font-family: var(--font-mono, monospace); font-size: 14px; color: var(--color-text-primary, #33312a); }
-  .role__val { font-family: var(--font-mono, monospace); font-size: 14px; color: var(--color-text-muted, #807c73); text-transform: uppercase; }
-  .role__note { font-size: 14px; color: var(--color-text-secondary, #54514a); }
+  .role__body code { font-family: var(--typography-font-family-mono, monospace); font-size: 14px; color: var(--color-content-default, #33312a); }
+  .role__val { font-family: var(--typography-font-family-mono, monospace); font-size: 14px; color: var(--color-content-default-secondary, #807c73); text-transform: uppercase; }
+  .role__note { font-size: 14px; color: var(--color-content-default-secondary, #54514a); }
 
-  .note { padding: var(--spacing-300, 0.75rem) var(--spacing-400, 1rem); background: var(--color-surface-sunken, #f3f1ea); border-radius: 8px; font-size: 15px; line-height: 1.55; }
+  .note { padding: var(--spacing-300, 0.75rem) var(--spacing-400, 1rem); background: var(--color-background-elevation-sunken, #f3f1ea); border-radius: 8px; font-size: 15px; line-height: 1.55; }
 </style>

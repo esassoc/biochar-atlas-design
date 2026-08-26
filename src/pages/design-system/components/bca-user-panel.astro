@@ -22,8 +22,8 @@ const hooks = [
   { name: '--_width', type: 'length', default: 'per size', description: 'The one to set. 520px here, and the edit panel that stacks over it matches — a stack needs equal widths, because the under card peeks by sliding rather than by being wider.' },
   { name: '--z-modal / --z-modal-backdrop', type: 'number', default: '400 / 300', description: 'Must be raised above the app shell. esa-side-dialog is a custom overlay, not a native <dialog>, so it has no top layer and DOM order will not save it. This shell’s topbar is 1100 and its nav flyout 1200, so the record panel runs at 1300 / 1250 and the edit panel above it at 1340 / 1310.' },
   { name: '--side-dialog-inset', type: 'length', default: '16px', description: 'The gap on all four sides, and the stacking knob: the under card re-points it to 40px while a second panel is open, which the lego animates. The peek is the difference between the two insets, capped at the lego\u2019s 24px body padding \u2014 past that the strip slices glyphs off the labels underneath.' },
-  { name: '--side-dialog-backdrop-bg', type: 'color', default: 'rgba(0,0,0,.5)', description: 'The scrim. The top card of a stack sets it to --bca-panel-stack-scrim (30% black), which dims the card underneath one step without taking the page to the 50% the record panel already applies. It must be this token and not --color-backdrop: the lego falls back to --color-backdrop only when this one is unset, and component-tokens.css sets it at :root \u2014 so the substitution has already happened and the concrete colour is what inherits down.' },
-  { name: '--shadow-400', type: 'shadow', default: '0 8px 32px -8px rgba(0,0,0,.08)', description: 'The panel\u2019s elevation, hardcoded in the lego with no --side-dialog-shadow hook. Both panels re-point it to --bca-panel-shadow: the shipped value throws straight DOWN at 8%, and a right-anchored panel only ever shows its left edge.' },
+  { name: '--side-dialog-backdrop-bg', type: 'color', default: 'rgba(0,0,0,.5)', description: 'The scrim. The top card of a stack sets it to --bca-panel-stack-scrim (30% black), which dims the card underneath one step without taking the page to the 50% the record panel already applies. It must be this token and not --color-background-overlay-backdrop: the lego falls back to --color-background-overlay-backdrop only when this one is unset, and component-tokens.css sets it at :root \u2014 so the substitution has already happened and the concrete colour is what inherits down.' },
+  { name: '--elevation-5', type: 'shadow', default: '0 8px 32px -8px rgba(0,0,0,.08)', description: 'The panel\u2019s elevation, hardcoded in the lego with no --side-dialog-shadow hook. Both panels re-point it to --bca-panel-shadow: the shipped value throws straight DOWN at 8%, and a right-anchored panel only ever shows its left edge.' },
   { name: '--record-*', type: 'length / weight', default: 'page scale', description: 'The density block. bca-record-header, bca-field-group and bca-field all read these, so a panel sets its scale once on the slot scopes rather than threading a prop through three components.' },
 ];
 ---
@@ -43,7 +43,7 @@ const hooks = [
     </p>
     <div class="cluster" data-gap="sm">
       {demo.map((u) => (
-        <EsaButton color="secondary" appearance="outline" data-ds-open-user={u.id}>{u.name}</EsaButton>
+        <EsaButton variant="secondary" appearance="outline" data-ds-open-user={u.id}>{u.name}</EsaButton>
       ))}
     </div>
   </Section>
@@ -118,11 +118,11 @@ const hooks = [
     <p>
       The shadow draws the line the scrim's value break implies.
       esa-side-dialog hardcodes <code>box-shadow</code> to
-      <code>--shadow-400</code> and ships no shadow hook of its own, and the
-      shipped <code>--shadow-400</code> is <code>0 8px 32px -8px rgba(0,0,0,.08)</code>
+      <code>--elevation-5</code> and ships no shadow hook of its own, and the
+      shipped <code>--elevation-5</code> is <code>0 8px 32px -8px rgba(0,0,0,.08)</code>
       — straight down, at 8%. On a panel pinned to the right edge, the only edge
       you see is the left one, and a downward shadow draws nothing there. Both
-      panels re-point <code>--shadow-400</code> to
+      panels re-point <code>--elevation-5</code> to
       <code>--bca-panel-shadow</code>, which throws left and keeps its density
       near the edge so the peek beside it stays legible.
     </p>
@@ -135,8 +135,8 @@ const hooks = [
     </p>
     <p>
       The backdrop has to be the component token and not
-      <code>--color-backdrop</code>. The lego reads
-      <code>var(--side-dialog-backdrop-bg, var(--color-backdrop, …))</code>, and
+      <code>--color-background-overlay-backdrop</code>. The lego reads
+      <code>var(--side-dialog-backdrop-bg, var(--color-background-overlay-backdrop, …))</code>, and
       <code>component-tokens.css</code> already sets the component token at
       <code>:root</code> from the generic one — so the substitution has happened
       by the time the value reaches a panel, and the generic token has nothing
@@ -168,7 +168,7 @@ const hooks = [
   <Section id="density" title="Density">
     <p>
       The panel runs at beacon-design's drawer scale — a
-      <code>--type-size-400</code> name, 15px values, 14px labels — set once as
+      <code>--font-size-400</code> name, 15px values, 14px labels — set once as
       a block of <code>--record-*</code> custom properties on the two slot
       scopes. Every record component inside reads them, so a component nested
       three deep picks up the scale without a <code>density</code> prop in three

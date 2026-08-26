@@ -49,13 +49,13 @@ const rows = users.map((u) => ({
     <div class="bca-user-grid__search">
       <esa-text-field id="users-search" placeholder="Search users…" size="sm"></esa-text-field>
     </div>
-    <EsaButton id="users-clear" color="ghost" appearance="outline" size="sm">Clear filters</EsaButton>
+    <EsaButton id="users-clear" variant="ghost" appearance="outline" size="sm">Clear filters</EsaButton>
   </div>
 
   <div id="users-grid" class="bca-user-grid__host"></div>
 
   <div class="bca-user-grid__foot">
-    <EsaButton id="users-download" color="ghost" appearance="outline" size="sm" icon="download">
+    <EsaButton id="users-download" variant="ghost" appearance="outline" size="sm" icon="download">
       Download as CSV
     </EsaButton>
     <p class="bca-user-grid__count">
@@ -243,8 +243,8 @@ const rows = users.map((u) => ({
     flex-wrap: wrap;
     padding: var(--spacing-300, 0.75rem) var(--spacing-400, 1rem);
     margin-bottom: var(--spacing-400, 1rem);
-    background: var(--color-surface, #fafaf7);
-    border: 1px solid var(--color-border, #d0cfcc);
+    background: var(--color-background-elevation-raised, #fafaf7);
+    border: 1px solid var(--color-border-default, #d0cfcc);
     border-radius: var(--radius-200, 0.5rem);
   }
   .bca-user-grid__search {
@@ -263,7 +263,7 @@ const rows = users.map((u) => ({
     font-size: 0.8125rem;
   }
   .bca-user-grid__controls :global(esa-text-field) {
-    --form-font-size-sm: 0.8125rem;
+    --typography-label-xs-font-size: 0.8125rem;
   }
 
   /* The grid owns the vertical space the shell's content region leaves after
@@ -284,15 +284,15 @@ const rows = users.map((u) => ({
     justify-content: space-between;
     gap: var(--spacing-400, 1rem);
     padding: var(--spacing-200, 0.5rem) var(--spacing-400, 1rem);
-    background: var(--color-background, #f4f3ee);
-    border: 1px solid var(--color-border, #d0cfcc);
+    background: var(--color-background-default, #f4f3ee);
+    border: 1px solid var(--color-border-default, #d0cfcc);
     border-top: 0;
     border-radius: 0 0 var(--radius-100, 0.25rem) var(--radius-100, 0.25rem);
   }
   .bca-user-grid__count {
     margin: 0;
     font-size: 0.8125rem;
-    color: var(--color-text-secondary, #474540);
+    color: var(--color-content-default-secondary, #474540);
     font-variant-numeric: tabular-nums;
   }
 
@@ -315,17 +315,17 @@ const rows = users.map((u) => ({
     border-radius: var(--radius-100, 0.25rem);
     font-size: 0.8125rem;
     line-height: 1.5;
-    font-weight: var(--font-weight-semibold, 600);
+    font-weight: var(--typography-font-weight-semibold, 600);
     white-space: nowrap;
     background: color-mix(in srgb, var(--_chip, #898780) 16%, transparent);
-    color: color-mix(in srgb, var(--_chip, #898780) 70%, var(--color-text-primary, #21201c));
+    color: color-mix(in srgb, var(--_chip, #898780) 70%, var(--color-content-default, #21201c));
   }
   /* The quiet case: the dot alone carries the hue. Used for the values that are
      the norm and the end state, so the tinted chip is the only one that pulls. */
   .bca-user-grid :global(.bca-grid-chip[data-quiet]) {
     background: transparent;
-    color: var(--color-text-secondary, #474540);
-    font-weight: var(--font-weight-regular, 400);
+    color: var(--color-content-default-secondary, #474540);
+    font-weight: var(--typography-font-weight-regular, 400);
     padding-inline: 0;
   }
   .bca-user-grid :global(.bca-grid-chip__dot) {
@@ -337,14 +337,14 @@ const rows = users.map((u) => ({
   }
 
   /* The name column. Purple links are the brand guide's own call for links on
-     a light surface — --color-text-link is purple-12 at 13.92:1 on the panel. */
+     a light surface — --color-content-link is purple-12 at 13.92:1 on the panel. */
   .bca-user-grid :global(.bca-grid-name) {
-    color: var(--color-text-link, #45173d);
+    color: var(--color-content-link, #45173d);
     text-decoration: underline;
     text-underline-offset: 2px;
   }
   .bca-user-grid :global(.bca-grid-name:hover) {
-    color: var(--color-text-link-hover, #36082f);
+    color: var(--color-content-link-hover, #36082f);
   }
   /* The whole row is a target, so say so. */
   .bca-user-grid :global(.ag-row) {

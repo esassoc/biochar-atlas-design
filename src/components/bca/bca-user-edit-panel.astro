@@ -75,8 +75,8 @@ const seed = {
        is a web component, so the slot attribute has to survive into the DOM and
        Astro unwraps a Fragment before it gets there. -->
   <div slot="footer" class="bca-user-edit-panel__foot">
-    <EsaButton id="users-edit-cancel" color="ghost" appearance="outline">Cancel</EsaButton>
-    <EsaButton id="users-edit-save" color="primary">Save changes</EsaButton>
+    <EsaButton id="users-edit-cancel" variant="ghost" appearance="outline">Cancel</EsaButton>
+    <EsaButton id="users-edit-save" variant="primary">Save changes</EsaButton>
   </div>
 </esa-side-dialog>
 
@@ -235,16 +235,16 @@ const seed = {
      The under card's own slide is set on the record panel, in
      bca-user-panel.astro, because a component styles its own element.
 
-     IT HAS TO BE --side-dialog-backdrop-bg, NOT --color-backdrop. The lego
-     reads `var(--side-dialog-backdrop-bg, var(--color-backdrop, …))`, so
-     --color-backdrop is only consulted when the component token is unset — and
+     IT HAS TO BE --side-dialog-backdrop-bg, NOT --color-background-overlay-backdrop. The lego
+     reads `var(--side-dialog-backdrop-bg, var(--color-background-overlay-backdrop, …))`, so
+     --color-background-overlay-backdrop is only consulted when the component token is unset — and
      component-tokens.css sets it at :root as
-     `--side-dialog-backdrop-bg: var(--color-backdrop, …)`. That substitution
+     `--side-dialog-backdrop-bg: var(--color-background-overlay-backdrop, …)`. That substitution
      happens once, at :root, and the CONCRETE colour is what inherits down. By
      the time it reaches this element there is no fallback chain left to
-     redirect, so re-pointing --color-backdrop here does nothing at all.
+     redirect, so re-pointing --color-background-overlay-backdrop here does nothing at all.
      Measured: the backdrop stayed rgba(0,0,0,.5) with the class applied.
-     beacon-design's permit-tracking sets --color-backdrop for this and loads
+     beacon-design's permit-tracking sets --color-background-overlay-backdrop for this and loads
      the same token file, so its stacked editor's backdrop is unreachable
      today. Filed in NEEDS.md.
 
@@ -270,7 +270,7 @@ const seed = {
      the second half of the job the scrim starts: the scrim makes the value
      break, this draws the line at the seam. */
   #users-edit-panel {
-    --shadow-400: var(--bca-panel-shadow);
+    --elevation-5: var(--bca-panel-shadow);
   }
 
   .bca-user-edit-panel__head {
@@ -283,22 +283,22 @@ const seed = {
      stack read as one product rather than two. */
   .bca-user-edit-panel__title {
     margin: 0;
-    font-size: var(--type-size-400, 1.25rem);
-    font-weight: var(--font-weight-semibold, 600);
+    font-size: var(--font-size-400, 1.25rem);
+    font-weight: var(--typography-font-weight-semibold, 600);
     line-height: 1.2;
-    color: var(--color-text-primary, #21201c);
+    color: var(--color-content-default, #21201c);
   }
   .bca-user-edit-panel__who {
     margin: 0;
     font-size: 0.875rem;
     line-height: 1.4;
-    color: var(--color-text-secondary, #474540);
+    color: var(--color-content-default-secondary, #474540);
   }
 
   /* The form runs at the panel's density, matching the record it edits. */
   #users-edit-form {
-    --form-font-size-sm: 0.9375rem;
-    --form-label-font-size: 0.875rem;
+    --typography-label-xs-font-size: 0.9375rem;
+    --typography-label-md-font-size: 0.875rem;
   }
 
   .bca-user-edit-panel__foot {

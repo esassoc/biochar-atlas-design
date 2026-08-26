@@ -5,7 +5,7 @@
 import '@esa/tokens/tokens.css';
 import '@esa/tokens/component-tokens.css';
 // The hub's composition layer — layout primitives (.stack/.cluster/.repel/.grid)
-// and type roles (.type-body/.type-label/…). Opt-in classes, so loading them
+// and type roles (.typography-body-md/.typography-label/…). Opt-in classes, so loading them
 // restyles nothing; they are what keeps a page a manifest instead of bespoke CSS.
 import '@esa/tokens/layouts.css';
 import '@esa/tokens/type-roles.css';
@@ -37,15 +37,15 @@ const { title = 'Biochar Atlas' } = Astro.props;
       *, *::before, *::after { box-sizing: border-box; }
       body {
         margin: 0;
-        font-family: var(--font-sans, system-ui, sans-serif);
-        font-weight: var(--font-weight-regular, 400);
-        color: var(--color-text-primary, #21201c);
+        font-family: var(--typography-font-family-sans, system-ui, sans-serif);
+        font-weight: var(--typography-font-weight-regular, 400);
+        color: var(--color-content-default, #21201c);
         /* Canvas, not card — the shell's content region has no background of
            its own, so the body IS the canvas the topbar and sidebar sit on. */
-        background: var(--color-background, #f6f5f4);
+        background: var(--color-background-default, #f6f5f4);
         -webkit-font-smoothing: antialiased;
       }
-      a { color: var(--color-text-link, #45173d); text-decoration: none; }
+      a { color: var(--color-content-link, #45173d); text-decoration: none; }
       img { display: block; max-width: 100%; }
       button { font-family: inherit; cursor: pointer; background: none; border: 0; }
     </style>

@@ -9,7 +9,7 @@ import BcaButton from '../../../components/bca/bca-button.astro';
 const brandTones = ['green', 'purple', 'gold'] as const;
 
 const props = [
-  { name: 'color', type: "'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'info' | 'ai' | 'ghost'", default: "'primary'", description: 'Semantic color role. Primary is ABI Green — the theme re-points --color-primary.' },
+  { name: 'color', type: "'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'info' | 'ai' | 'ghost'", default: "'primary'", description: 'Semantic color role. Primary is ABI Green — the theme re-points --color-background-brand.' },
   { name: 'appearance', type: "'fill' | 'outline' | 'dashed' | 'soft'", default: "'fill'", description: 'Solid, outlined, dashed-outline, or a neutral surface that fills with the accent on hover.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Control size (shared form scale).' },
   { name: 'icon', type: 'string', description: 'Lucide icon name, shown left of the label.' },
@@ -22,7 +22,7 @@ const props = [
 ];
 
 const bcaProps = [
-  { name: 'tone', type: "'green' | 'purple' | 'gold'", default: "'green'", description: 'ABI brand action color. Green is --color-primary; purple and gold come from --bca-tone-*.' },
+  { name: 'tone', type: "'green' | 'purple' | 'gold'", default: "'green'", description: 'ABI brand action color. Green is --color-background-brand; purple and gold come from --bca-tone-*.' },
   { name: '…', type: 'EsaButton props', description: 'Every other prop is forwarded to esa-button unchanged.' },
 ];
 ---
@@ -31,7 +31,7 @@ const bcaProps = [
   category="Core"
   slug="esa-button"
   type=".astro"
-  summary="The inherited Ecology button. Its primary is ABI Green, because the theme re-points <code>--color-primary</code>. Purple and Gold arrive through <code>bca-button</code>, which sets the same private knobs to brand values — the identity half of the set, beside the conventional one."
+  summary="The inherited Ecology button. Its primary is ABI Green, because the theme re-points <code>--color-background-brand</code>. Purple and Gold arrive through <code>bca-button</code>, which sets the same private knobs to brand values — the identity half of the set, beside the conventional one."
 >
   <Section id="brand" title="Brand tones">
     <p>
@@ -65,10 +65,10 @@ const bcaProps = [
       What a button carries when it is not a brand call to action. Secondary is
       the Sage neutral; ghost is transparent until hovered.
     </p>
-    <Preview code={`<EsaButton color="secondary">Reset scenario</EsaButton>\n<EsaButton color="ghost">Cancel</EsaButton>`}>
-      <EsaButton color="secondary">Reset scenario</EsaButton>
-      <EsaButton color="secondary" appearance="outline">Reset scenario</EsaButton>
-      <EsaButton color="ghost">Cancel</EsaButton>
+    <Preview code={`<EsaButton variant="secondary">Reset scenario</EsaButton>\n<EsaButton variant="ghost">Cancel</EsaButton>`}>
+      <EsaButton variant="secondary">Reset scenario</EsaButton>
+      <EsaButton variant="secondary" appearance="outline">Reset scenario</EsaButton>
+      <EsaButton variant="ghost">Cancel</EsaButton>
     </Preview>
   </Section>
 
@@ -78,10 +78,10 @@ const bcaProps = [
       as destructive to someone who has never seen this palette — which is also
       why the status families stay off the brand.
     </p>
-    <Preview code={`<EsaButton color="danger">Delete assessment</EsaButton>\n<EsaButton color="danger" appearance="soft">Delete assessment</EsaButton>`}>
-      <EsaButton color="danger">Delete assessment</EsaButton>
-      <EsaButton color="danger" appearance="outline">Delete assessment</EsaButton>
-      <EsaButton color="danger" appearance="soft">Delete assessment</EsaButton>
+    <Preview code={`<EsaButton variant="danger">Delete assessment</EsaButton>\n<EsaButton variant="danger" appearance="soft">Delete assessment</EsaButton>`}>
+      <EsaButton variant="danger">Delete assessment</EsaButton>
+      <EsaButton variant="danger" appearance="outline">Delete assessment</EsaButton>
+      <EsaButton variant="danger" appearance="soft">Delete assessment</EsaButton>
     </Preview>
   </Section>
 
@@ -93,10 +93,10 @@ const bcaProps = [
       before it has happened. Shown here so the set is documented, not to
       recommend it.
     </p>
-    <Preview code={`<EsaButton color="success">Saved</EsaButton>`}>
-      <EsaButton color="success">Saved</EsaButton>
-      <EsaButton color="warning">Check values</EsaButton>
-      <EsaButton color="info">Details</EsaButton>
+    <Preview code={`<EsaButton variant="success">Saved</EsaButton>`}>
+      <EsaButton variant="success">Saved</EsaButton>
+      <EsaButton variant="warning">Check values</EsaButton>
+      <EsaButton variant="info">Details</EsaButton>
     </Preview>
   </Section>
 
@@ -120,7 +120,7 @@ const bcaProps = [
     <p>Pass a Lucide icon name via <code>icon</code>; add <code>iconOnly</code> to drop the label.</p>
     <Preview code={`<BcaButton tone="gold" icon="download">Download report</BcaButton>\n<BcaButton icon="plus" iconOnly aria-label="Add biochar" />`}>
       <BcaButton tone="gold" icon="download">Download report</BcaButton>
-      <EsaButton color="secondary" icon="search">Find a field</EsaButton>
+      <EsaButton variant="secondary" icon="search">Find a field</EsaButton>
       <BcaButton tone="green" icon="plus" iconOnly aria-label="Add biochar" />
     </Preview>
   </Section>

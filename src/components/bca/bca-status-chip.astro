@@ -59,7 +59,7 @@ const resolved = tone === 'plain' ? 'plain' : (TONES[value.toLowerCase()] ?? 'pl
      rather than a flag. */
   .bca-status-chip[data-tone='quiet'] {
     --pill-bg: transparent;
-    --pill-text-color: var(--color-text-primary, #21201c);
+    --pill-text-color: var(--color-content-default, #21201c);
     --pill-border-color: var(--bca-status-green-11, #177c52);
   }
 
@@ -75,7 +75,7 @@ const resolved = tone === 'plain' ? 'plain' : (TONES[value.toLowerCase()] ?? 'pl
     --pill-text-color: color-mix(
       in srgb,
       var(--bca-status-amber-11, #a45e00) 70%,
-      var(--color-text-primary, #21201c)
+      var(--color-content-default, #21201c)
     );
     --pill-border-color: color-mix(in srgb, var(--bca-status-amber-11, #a45e00) 40%, transparent);
   }
@@ -83,6 +83,6 @@ const resolved = tone === 'plain' ? 'plain' : (TONES[value.toLowerCase()] ?? 'pl
   /* Muted: an inert account. 6.10:1 on the panel — quiet, comfortably over 4.5. */
   .bca-status-chip[data-tone='muted'] {
     --pill-bg: transparent;
-    --pill-text-color: var(--color-text-tertiary, #615f5a);
+    --pill-text-color: var(--color-content-default-tertiary, #615f5a);
   }
 </style>

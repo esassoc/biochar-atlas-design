@@ -60,7 +60,7 @@ const { workflow } = Astro.props;
     flex-direction: column;
     gap: var(--spacing-200, 0.5rem);
     padding-block-start: var(--spacing-300, 0.75rem);
-    border-block-start: 1px solid var(--color-border-light, #ebe8e1);
+    border-block-start: 1px solid var(--color-border-default-subtle, #ebe8e1);
   }
   /* the group after the intro is the first group; the intro hides exactly
      when any group shows, so this is always the top visible entry */
@@ -74,7 +74,7 @@ const { workflow } = Astro.props;
 
   .bca-summary__heading {
     margin: 0;
-    color: var(--color-text-primary, #33312a);
+    color: var(--color-content-default, #33312a);
   }
 
   .bca-summary__values {
@@ -92,12 +92,12 @@ const { workflow } = Astro.props;
   }
   .bca-summary__pair dt {
     margin: 0;
-    color: var(--color-text-tertiary, #615f5a);
+    color: var(--color-content-default-tertiary, #615f5a);
     flex-shrink: 0;
   }
   .bca-summary__pair dd {
     margin: 0;
-    color: var(--color-text-primary, #33312a);
+    color: var(--color-content-default, #33312a);
     text-align: right;
     min-width: 0;
   }

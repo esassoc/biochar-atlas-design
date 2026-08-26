@@ -133,7 +133,7 @@ import { users, usersById, formatDate } from '../../data/users';
        above the panel's bottom edge and drops the button into the body — which
        is exactly what it did on the first pass. -->
   <div slot="footer" class="bca-user-panel__foot">
-    <EsaButton id="users-record-panel-edit" color="primary" icon="pencil" data-opens-user-edit>
+    <EsaButton id="users-record-panel-edit" variant="primary" icon="pencil" data-opens-user-edit>
       Edit user
     </EsaButton>
   </div>
@@ -283,7 +283,7 @@ import { users, usersById, formatDate } from '../../data/users';
   /* ═══ Panel density ═══
      One block, set on both slot scopes, inherited by every record component
      inside. The numbers are beacon-design's drawer scale verbatim (its segment
-     dossier: --type-size-400 title, 0.875rem labels, 0.9375rem values), which
+     dossier: --font-size-400 title, 0.875rem labels, 0.9375rem values), which
      is the same source that settled the grid's 13px/44px — so the drawer and
      the table it opens over are one product rather than two.
 
@@ -299,9 +299,9 @@ import { users, usersById, formatDate } from '../../data/users';
      that page competes with it instead of sitting under it. */
   .bca-user-panel__heads,
   .bca-user-panel__body {
-    --record-name-family: var(--font-sans, Inter, system-ui, sans-serif);
-    --record-name-size: var(--type-size-400, 1.25rem);
-    --record-name-weight: var(--font-weight-semibold, 600);
+    --record-name-family: var(--typography-font-family-sans, Inter, system-ui, sans-serif);
+    --record-name-size: var(--font-size-400, 1.25rem);
+    --record-name-weight: var(--typography-font-weight-semibold, 600);
     --record-context-size: 0.875rem;
     --record-section-size: 0.9375rem;
     --record-label-size: 0.875rem;
@@ -332,13 +332,13 @@ import { users, usersById, formatDate } from '../../data/users';
     --side-dialog-inset: 40px;
   }
 
-  /* The leading edge. esa-side-dialog hardcodes box-shadow to --shadow-400 and
-     ships no --side-dialog-shadow hook, so re-pointing --shadow-400 on the host
+  /* The leading edge. esa-side-dialog hardcodes box-shadow to --elevation-5 and
+     ships no --side-dialog-shadow hook, so re-pointing --elevation-5 on the host
      is the only lever — see theme-biochar.css for why the shipped value (8%
      alpha, straight down) draws nothing on a right-anchored panel, and for the
      grep proving the re-point cannot reach anything else. */
   #users-record-panel {
-    --shadow-400: var(--bca-panel-shadow);
+    --elevation-5: var(--bca-panel-shadow);
   }
 
   /* The lego's header slot is a single row; the hidden siblings must not

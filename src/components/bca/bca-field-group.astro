@@ -50,7 +50,7 @@ const { title, flush = false } = Astro.props as Props;
   }
 
   /* Flush variant. The heading copies esa-card's own title rule verbatim —
-     --type-size-250 at 600 in the inherited ink — rather than inventing a
+     --font-size-250 at 600 in the inherited ink — rather than inventing a
      second heading scale, so a group reads identically whether or not it is
      carded. No uppercase, no letter-spacing: that treatment is the ornamental
      micro-label the design principles ban, and the word "Account" does not
@@ -62,9 +62,9 @@ const { title, flush = false } = Astro.props as Props;
   }
   .bca-field-group__title {
     margin: 0;
-    font-family: var(--font-sans, Inter, system-ui, sans-serif);
-    font-size: var(--record-section-size, var(--type-size-250, 1.0625rem));
+    font-family: var(--typography-font-family-sans, Inter, system-ui, sans-serif);
+    font-size: var(--record-section-size, var(--font-size-250, 1.0625rem));
     font-weight: 600;
-    color: var(--color-text-primary, #21201c);
+    color: var(--color-content-default, #21201c);
   }
 </style>

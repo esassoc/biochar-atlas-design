@@ -77,29 +77,29 @@ const { moduleName, status = 'Coming soon' } = Astro.props;
      module title below it. */
   .bca-coming-soon__product {
     margin: 0;
-    font-family: var(--font-display, 'Crimson Pro', Georgia, serif);
-    font-weight: var(--font-weight-light, 300);
+    font-family: var(--typography-font-family-display, 'Crimson Pro', Georgia, serif);
+    font-weight: var(--typography-font-weight-light, 300);
     font-size: 1.375rem; /* 22px */
     line-height: 1.1;
-    color: var(--color-primary, #364500);
+    color: var(--color-background-brand, #364500);
   }
 
   /* Same face as the wordmark above it — one lockup family. Scale and color
      carry the hierarchy instead of a second typeface. */
   .bca-coming-soon__module {
     margin: 0;
-    font-family: var(--font-display, 'Crimson Pro', Georgia, serif);
-    font-weight: var(--font-weight-light, 300);
+    font-family: var(--typography-font-family-display, 'Crimson Pro', Georgia, serif);
+    font-weight: var(--typography-font-weight-light, 300);
     font-size: clamp(2.25rem, 1.75rem + 1.75vw, 3rem);
     line-height: 1.08;
     letter-spacing: -0.01em;
-    color: var(--color-text-primary, #33312a);
+    color: var(--color-content-default, #33312a);
   }
 
   .bca-coming-soon__status {
     margin: var(--spacing-300, 0.75rem) 0 0;
     font-size: 1.0625rem; /* 17px */
     line-height: 1.5;
-    color: var(--color-text-tertiary, #6a665e);
+    color: var(--color-content-default-tertiary, #6a665e);
   }
 </style>

@@ -25,10 +25,10 @@ const props = [
     <Preview align="start" code={`<EsaCollapsible title="Soil properties" icon="database" open>\n  pH, texture, drainage class, and available water capacity.\n</EsaCollapsible>\n<EsaCollapsible title="Limitations" icon="info">\n  Scope notes and screening-level disclaimers.\n</EsaCollapsible>`}>
       <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px;">
         <EsaCollapsible title="Soil properties" icon="database" open>
-          <p style="margin: 0; color: var(--color-text-secondary);">pH, texture, drainage class, and available water capacity.</p>
+          <p style="margin: 0; color: var(--color-content-default-secondary);">pH, texture, drainage class, and available water capacity.</p>
         </EsaCollapsible>
         <EsaCollapsible title="Limitations" icon="info">
-          <p style="margin: 0; color: var(--color-text-secondary);">Scope notes and screening-level disclaimers.</p>
+          <p style="margin: 0; color: var(--color-content-default-secondary);">Scope notes and screening-level disclaimers.</p>
         </EsaCollapsible>
       </div>
     </Preview>
@@ -39,7 +39,7 @@ const props = [
     <Preview align="start" code={`<EsaCollapsible title="Methodology">\n  How the 0–100 score is derived.\n</EsaCollapsible>`}>
       <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px;">
         <EsaCollapsible title="Methodology">
-          <p style="margin: 0; color: var(--color-text-secondary);">How the 0–100 score is derived.</p>
+          <p style="margin: 0; color: var(--color-content-default-secondary);">How the 0–100 score is derived.</p>
         </EsaCollapsible>
       </div>
     </Preview>
@@ -50,10 +50,10 @@ const props = [
     <Preview align="start" code={`<EsaCollapsible title="Tracking" icon="history" flush open>\n  Ruleset version and dataset refresh dates.\n</EsaCollapsible>`}>
       <div class="flush-host">
         <EsaCollapsible title="Tracking" icon="history" flush open>
-          <p style="margin: 0; color: var(--color-text-secondary);">Ruleset version and dataset refresh dates.</p>
+          <p style="margin: 0; color: var(--color-content-default-secondary);">Ruleset version and dataset refresh dates.</p>
         </EsaCollapsible>
         <EsaCollapsible title="Details" icon="file-text" flush>
-          <p style="margin: 0; color: var(--color-text-secondary);">Read-only assessment metadata.</p>
+          <p style="margin: 0; color: var(--color-content-default-secondary);">Read-only assessment metadata.</p>
         </EsaCollapsible>
       </div>
     </Preview>
@@ -67,10 +67,10 @@ const props = [
 <style>
   .flush-host {
     width: 100%; max-width: 420px;
-    border: 1px solid var(--color-border, #ddd9d0);
+    border: 1px solid var(--color-border-default, #ddd9d0);
     border-radius: var(--radius-300, 8px);
-    background: var(--color-surface, #fff);
+    background: var(--color-background-elevation-raised, #fff);
     padding: 0 var(--spacing-400, 1rem);
   }
-  .flush-host > :global(* + *) { border-top: 1px solid var(--color-border-light, #ebe8e1); }
+  .flush-host > :global(* + *) { border-top: 1px solid var(--color-border-default-subtle, #ebe8e1); }
 </style>

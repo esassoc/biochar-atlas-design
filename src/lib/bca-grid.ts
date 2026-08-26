@@ -40,14 +40,14 @@ const atlasIconOverrides = iconOverrides({
 export const atlasTheme = themeQuartz.withPart(atlasIconOverrides).withParams({
   fontFamily: 'Inter, system-ui, sans-serif',
   headerFontFamily: 'Inter, system-ui, sans-serif',
-  accentColor: '#364500', // brand Green / --color-primary — sort, filter-active, checkbox
-  foregroundColor: '#21201c', // --bca-neutral-12 / --color-text-primary, 15.59:1 on the panel
+  accentColor: '#364500', // brand Green / --color-background-brand — sort, filter-active, checkbox
+  foregroundColor: '#21201c', // --bca-neutral-12 / --color-content-default, 15.59:1 on the panel
 
   // ── The brand slab ──────────────────────────────────────────────────────
-  headerBackgroundColor: '#364500', // brand Green / --color-primary
+  headerBackgroundColor: '#364500', // brand Green / --color-background-brand
   headerTextColor: '#ffffff', // 10.46:1 on the slab
   // Beacon's exact resize-handle treatment: white at 20%, which is legible on
-  // a dark slab where the light --color-border used by a light header is not.
+  // a dark slab where the light --color-border-default used by a light header is not.
   headerColumnResizeHandleColor: 'rgba(255, 255, 255, 0.2)',
 
   // ── Density: Beacon's numbers, verbatim ─────────────────────────────────
@@ -61,11 +61,11 @@ export const atlasTheme = themeQuartz.withPart(atlasIconOverrides).withParams({
   // the app has nowhere else. The rows sit on the panel; the zebra is the
   // shell's own hue rather than a grey, because --bca-sage-3 sits ΔE 0.0284
   // from the panel where --bca-neutral-2 measures 0.0139 and disappears.
-  backgroundColor: '#fafaf7', // --color-surface
+  backgroundColor: '#fafaf7', // --color-background-elevation-raised
   oddRowBackgroundColor: '#f2f1e9', // --bca-sage-3
   rowHoverColor: '#e6eae0', // --bca-green-3, ΔE 0.0540 from the panel
 
-  borderColor: '#d0cfcc', // --bca-neutral-6 / --color-border
+  borderColor: '#d0cfcc', // --bca-neutral-6 / --color-border-default
   wrapperBorder: '1px solid #d0cfcc',
   // Bottom corners square because the record-count strip is welded under the
   // grid. Beacon's 4px, not this spoke's 6px: the radius is part of what reads

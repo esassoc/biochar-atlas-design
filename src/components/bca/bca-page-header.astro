@@ -70,7 +70,7 @@ const hasActions = Astro.slots.has('actions');
     min-width: 0;
   }
 
-  /* esa-page-header's own rung (--type-size-600) and the weight left unpinned,
+  /* esa-page-header's own rung (--font-size-600) and the weight left unpinned,
      which is what lets [data-theme=biochar] h1's Crimson Pro Light land — see
      theme-biochar.css, where a rule that pins 600 is exactly how a heading
      ends up semibold in this spoke. */
@@ -79,10 +79,10 @@ const hasActions = Astro.slots.has('actions');
     align-items: center;
     gap: var(--spacing-300, 0.75rem);
     margin: 0;
-    font-family: var(--page-header-title-font, var(--font-display));
-    font-size: var(--page-header-title-size, var(--type-size-600, 1.75rem));
+    font-family: var(--page-header-title-font, var(--typography-font-family-display));
+    font-size: var(--page-header-title-size, var(--font-size-600, 1.75rem));
     line-height: 1.1;
-    color: var(--page-header-title-color, var(--color-text-primary, #21201c));
+    color: var(--page-header-title-color, var(--color-content-default, #21201c));
   }
 
   /* ABI Purple rather than the title's own ink: identity, not emphasis, and a
@@ -95,8 +95,8 @@ const hasActions = Astro.slots.has('actions');
 
   .bca-page-header__lede {
     margin: 0;
-    font-size: var(--page-header-lede-size, var(--type-size-300, 1.125rem));
-    color: var(--page-header-lede-color, var(--color-text-secondary, #474540));
+    font-size: var(--page-header-lede-size, var(--font-size-300, 1.125rem));
+    color: var(--page-header-lede-color, var(--color-content-default-secondary, #474540));
   }
 
   /* Top-aligned with the title rather than centred on the bar, so the actions
@@ -115,8 +115,8 @@ const hasActions = Astro.slots.has('actions');
      which is touched, so a caller who declares a size still gets it. No reach
      into .esa-button__native and no private --_btn-* tokens.
 
-     Why the type is a literal and not var(--form-font-size-sm): the theme
-     re-points --form-font-size-md to 1rem for Andy's 16px floor, which is
+     Why the type is a literal and not var(--typography-label-xs-font-size): the theme
+     re-points --typography-label-md-font-size to 1rem for Andy's 16px floor, which is
      about fields a person TYPES INTO. A page action is not that, and it
      inherited the 16px by accident. 0.8125rem is the same literal
      bca-user-grid uses for its control strip, so the CTA, the search field and
@@ -128,8 +128,8 @@ const hasActions = Astro.slots.has('actions');
   .bca-page-header__actions {
     padding-top: var(--spacing-150, 0.375rem);
     --form-height-md: var(--form-height-sm, 32px);
-    --form-radius-md: var(--form-radius-sm, 4px);
-    --form-font-size-md: 0.8125rem;
+    --radius-md: var(--radius-sm, 4px);
+    --typography-label-md-font-size: 0.8125rem;
     --icon-size-md: var(--icon-size-sm, 16px);
 
     /* The page's one primary action takes the brand ORANGE fill (Andy,

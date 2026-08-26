@@ -20,7 +20,7 @@ const props = [
   category="Display"
   slug="esa-card"
   type=".astro"
-  summary="The inherited Ecology card, wearing the Biochar Atlas skin. Header (icon + title + subtitle + actions), body, and optional footer; the primary header variant fills with forest green from <code>--color-primary</code>."
+  summary="The inherited Ecology card, wearing the Biochar Atlas skin. Header (icon + title + subtitle + actions), body, and optional footer; the primary header variant fills with forest green from <code>--color-background-brand</code>."
 >
   <Section id="variants" title="Variants">
     <Preview align="start" code={`<EsaCard title="Default">…</EsaCard>\n<EsaCard title="Elevated" variant="elevated">…</EsaCard>\n<EsaCard title="Filled" variant="filled">…</EsaCard>`}>
@@ -38,11 +38,11 @@ const props = [
       <code>actions</code> slot puts controls on its right. <code>headerVariant="primary"</code>
       fills the header with the brand green.
     </p>
-    <Preview align="start" code={`<EsaCard title="Soil context" subtitle="Auto-derived from SSURGO" headerVariant="muted">\n  Willamette silt loam, 0–3% slopes.\n  <EsaButton slot="actions" color="ghost" size="sm">Edit</EsaButton>\n</EsaCard>`}>
+    <Preview align="start" code={`<EsaCard title="Soil context" subtitle="Auto-derived from SSURGO" headerVariant="muted">\n  Willamette silt loam, 0–3% slopes.\n  <EsaButton slot="actions" variant="ghost" size="sm">Edit</EsaButton>\n</EsaCard>`}>
       <div class="stack">
         <EsaCard title="Soil context" subtitle="Auto-derived from SSURGO" headerVariant="muted">
           Willamette silt loam, 0–3% slopes. pH 6.2, moderate available water capacity.
-          <EsaButton slot="actions" color="ghost" size="sm">Edit</EsaButton>
+          <EsaButton slot="actions" variant="ghost" size="sm">Edit</EsaButton>
         </EsaCard>
         <EsaCard title="Suitability summary" subtitle="Ruleset v0.3" headerVariant="primary">
           Douglas-fir slash at 550°C scores 78 of 100 for the selected goals.
@@ -86,6 +86,6 @@ const props = [
 <style>
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--spacing-300, 0.75rem); width: 100%; }
   .stack { display: flex; flex-direction: column; gap: var(--spacing-300, 0.75rem); width: 100%; }
-  .foot-meta { font-size: 14px; color: var(--color-text-muted, #807c73); }
-  .slots { font-size: 15px; color: var(--color-text-secondary, #54514a); }
+  .foot-meta { font-size: 14px; color: var(--color-content-default-secondary, #807c73); }
+  .slots { font-size: 15px; color: var(--color-content-default-secondary, #54514a); }
 </style>

@@ -8,7 +8,7 @@
 // identity half beside them rather than replacing them: danger stays
 // conventional red, because a destructive action should not be brand-colored.
 //
-// `tone="green"` is `color="primary"` and nothing else — --color-primary IS
+// `tone="green"` is `color="primary"` and nothing else — --color-background-brand IS
 // brand Green, so there is no second green here. Purple and Gold each need
 // four values, and each breaks a rule Green does not; the numbers and the
 // reasoning live in theme-biochar.css § BRAND TONES, and the tokens do too.
@@ -39,7 +39,7 @@ const { tone = 'green', ...rest } = Astro.props as Props;
      NEEDS.md. -->
 
 <span class:list={['bca-button', `bca-button--${tone}`]}>
-  <EsaButton color="primary" {...rest}><slot /></EsaButton>
+  <EsaButton variant="primary" {...rest}><slot /></EsaButton>
 </span>
 
 <style>
@@ -53,10 +53,10 @@ const { tone = 'green', ...rest } = Astro.props as Props;
      in the docs, and so a future change to the brand's action green has one
      place to land. */
   .bca-button--green :global(.esa-button) {
-    --_accent: var(--color-primary);
-    --_accent-hover: var(--color-primary-hover);
-    --_on: var(--color-text-inverse);
-    --_accent-text: var(--color-primary-strong);
+    --_accent: var(--color-background-brand);
+    --_accent-hover: var(--color-background-brand-hover);
+    --_on: var(--color-content-default-knockout);
+    --_accent-text: var(--color-content-brand);
   }
 
   .bca-button--purple :global(.esa-button) {

@@ -41,7 +41,7 @@ const display = value === null || value === undefined || value === '' ? '—' : 
     margin: 0;
     font-size: var(--record-label-size, 1rem);
     line-height: 1.5;
-    color: var(--color-text-secondary, #474540);
+    color: var(--color-content-default-secondary, #474540);
   }
 
   .bca-field__value {
@@ -49,13 +49,13 @@ const display = value === null || value === undefined || value === '' ? '—' : 
     font-size: var(--record-value-size, 1rem);
     line-height: 1.5;
     font-weight: var(--record-value-weight, 400);
-    color: var(--color-text-primary, #21201c);
+    color: var(--color-content-default, #21201c);
     min-width: 0;
     overflow-wrap: anywhere;
   }
 
   .bca-field__value--mono {
-    font-family: var(--font-mono, ui-monospace, monospace);
+    font-family: var(--typography-font-family-mono, ui-monospace, monospace);
     font-size: 0.9375em;
   }
 </style>
