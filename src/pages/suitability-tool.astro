@@ -6,20 +6,18 @@
 import AppShell from '../layouts/AppShell.astro';
 import BcaToolFrame from '../components/bca/bca-tool-frame.astro';
 import BcaWorkflowWorkspace from '../components/bca/bca-workflow-workspace.astro';
-import { evaluateASite, exploreBiochars } from '../data/workflow';
+import { evaluateASite } from '../data/workflow';
 ---
 
 <!-- manifest:
   layout: AppShell                              # Atlas app shell + sidenav
   sections:
-    - tool frame          -> bca-tool-frame     # page header + workflow switch
+    - tool frame          -> bca-tool-frame     # page header band
     - evaluate workspace  -> bca-workflow-workspace  # soil-first stepper, split rails
-    - explore workspace   -> bca-workflow-workspace  # biochar-first stepper, split rails
 -->
 
-<AppShell title="Suitability Tool — Biochar Atlas" activeNavId="suitability-tool">
+<AppShell title="Biochar Atlas Suitability Tool" activeNavId="suitability-tool">
   <BcaToolFrame>
-    <BcaWorkflowWorkspace slot="evaluate" workflow={evaluateASite} variant="split" />
-    <BcaWorkflowWorkspace slot="explore" workflow={exploreBiochars} variant="split" />
+    <BcaWorkflowWorkspace workflow={evaluateASite} variant="split" />
   </BcaToolFrame>
 </AppShell>

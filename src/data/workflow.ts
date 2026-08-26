@@ -1,12 +1,7 @@
-// Suitability Tool workflows — the stepper prototype's data spine.
+// Suitability Tool workflow — the stepper prototype's data spine.
 //
-// The Evaluate a Site workflow maps the Developer Guide's eight modules
-// (08_12_2026) one step per module, in module order — no folding. Explore
-// Biochars follows the guide's own biochar-first stepper (§0.2: Goals →
-// Biochar Selection → Contribution Results → Export, no cost-benefit) plus
-// two flagged additions: the optional Module 4 amendment-entry step (§0.1
-// names manual entry as an Explore entry point) and the optional "Add a site"
-// step (this prototype's proposal — the client review needs to confirm it).
+// Evaluate a Site maps the Developer Guide's eight modules (08_12_2026) one
+// step per module, in module order — no folding.
 //
 // `values` is the canned data a step captures when completed in the demo.
 // Deterministic on purpose: the calibration anchors (Douglas-fir slash 550 °C
@@ -41,75 +36,6 @@ export interface WorkflowDef {
   label: string;
   steps: StepDef[];
 }
-
-// ── Steps shared by both workflows ──────────────────────────────────────────
-
-const goalsStep: Omit<StepDef, 'optional'> = {
-  id: 'goals',
-  label: 'Set goals',
-  title: 'Set goals and criteria',
-  modules: 'Guide module 3',
-  guidance:
-    'Select one or more application goals and any exclusion criteria. Goals drive the biochar scoring; exclusions remove biochars that fail them.',
-  planned: ['Goal cards with priority ranking', 'Exclusion criteria toggles'],
-  values: [
-    { label: 'Goals', value: 'Water retention, organic matter, carbon storage' },
-    { label: 'Exclusions', value: 'CPS 336 standard' },
-  ],
-};
-
-// Guide module 4 — used only when the material is not in the ABI catalog, so
-// it is optional in both workflows.
-const amendmentStep: StepDef = {
-  id: 'amendment',
-  label: 'Add amendment',
-  title: 'Add a custom amendment',
-  modules: 'Guide module 4',
-  optional: true,
-  guidance:
-    'Enter or upload a biochar, compost, or other amendment that is not in the catalog. Entries standardize into the same record the catalog uses.',
-  planned: [
-    'Amendment type selector',
-    'Manual property entry',
-    'Lab report upload',
-    'Standardized record preview',
-  ],
-  values: [
-    { label: 'Custom amendment', value: 'Hazelnut shell 500 °C' },
-    { label: 'Source', value: 'Lab report' },
-  ],
-};
-
-const resultsStep: StepDef = {
-  id: 'results',
-  label: 'Review results',
-  title: 'Review contribution results',
-  modules: 'Guide module 6',
-  guidance:
-    'Set the application rate and review the nutrient budget. Liming and soil carbon results update with the rate.',
-  planned: [
-    'Application rate input',
-    'Nutrient budget tables',
-    'Fertilizer replacement values',
-    'pH and liming calculator',
-    'Soil carbon calculator',
-  ],
-  values: [
-    { label: 'Application rate', value: '10 tons/acre' },
-    { label: 'Soil carbon', value: '+4.4 tons C/acre' },
-  ],
-};
-
-const exportStep: StepDef = {
-  id: 'export',
-  label: 'Export report',
-  title: 'Export the report',
-  modules: 'Guide module 8',
-  guidance:
-    'Download the assessment as a field-ready PDF or as the NRCS CPS 336 package.',
-  planned: ['PDF report builder', 'NRCS CPS 336 export'],
-  values: [{ label: 'Report', value: 'PDF assessment' }],
-};
 
 // ── Evaluate a site (soil-first) — modules 1 through 8, one step each ────────
 
@@ -157,8 +83,40 @@ export const evaluateASite: WorkflowDef = {
         { label: 'NRCS rating', value: 'Moderately well suited' },
       ],
     },
-    { ...goalsStep },
-    { ...amendmentStep },
+    {
+      id: 'goals',
+      label: 'Set goals',
+      title: 'Set goals and criteria',
+      modules: 'Guide module 3',
+      guidance:
+        'Select one or more application goals and any exclusion criteria. Goals drive the biochar scoring; exclusions remove biochars that fail them.',
+      planned: ['Goal cards with priority ranking', 'Exclusion criteria toggles'],
+      values: [
+        { label: 'Goals', value: 'Water retention, organic matter, carbon storage' },
+        { label: 'Exclusions', value: 'CPS 336 standard' },
+      ],
+    },
+    {
+      // Guide module 4 — used only when the material is not in the ABI
+      // catalog, so it is optional.
+      id: 'amendment',
+      label: 'Add amendment',
+      title: 'Add a custom amendment',
+      modules: 'Guide module 4',
+      optional: true,
+      guidance:
+        'Enter or upload a biochar, compost, or other amendment that is not in the catalog. Entries standardize into the same record the catalog uses.',
+      planned: [
+        'Amendment type selector',
+        'Manual property entry',
+        'Lab report upload',
+        'Standardized record preview',
+      ],
+      values: [
+        { label: 'Custom amendment', value: 'Hazelnut shell 500 °C' },
+        { label: 'Source', value: 'Lab report' },
+      ],
+    },
     {
       id: 'biochar',
       label: 'Choose biochar',
@@ -177,7 +135,25 @@ export const evaluateASite: WorkflowDef = {
         { label: 'Mode', value: 'Single' },
       ],
     },
-    { ...resultsStep },
+    {
+      id: 'results',
+      label: 'Review results',
+      title: 'Review contribution results',
+      modules: 'Guide module 6',
+      guidance:
+        'Set the application rate and review the nutrient budget. Liming and soil carbon results update with the rate.',
+      planned: [
+        'Application rate input',
+        'Nutrient budget tables',
+        'Fertilizer replacement values',
+        'pH and liming calculator',
+        'Soil carbon calculator',
+      ],
+      values: [
+        { label: 'Application rate', value: '10 tons/acre' },
+        { label: 'Soil carbon', value: '+4.4 tons C/acre' },
+      ],
+    },
     {
       id: 'costs',
       label: 'Weigh costs',
@@ -196,51 +172,15 @@ export const evaluateASite: WorkflowDef = {
         { label: 'Five-year net', value: '+$186/acre' },
       ],
     },
-    { ...exportStep },
-  ],
-};
-
-// ── Explore biochars (biochar-first) ─────────────────────────────────────────
-
-export const exploreBiochars: WorkflowDef = {
-  id: 'explore',
-  label: 'Explore biochars',
-  steps: [
-    { ...goalsStep, optional: true },
-    { ...amendmentStep },
     {
-      id: 'biochars',
-      label: 'Choose biochars',
-      title: 'Choose biochars',
-      modules: 'Guide module 5',
+      id: 'export',
+      label: 'Export report',
+      title: 'Export the report',
+      modules: 'Guide module 8',
       guidance:
-        'Browse the scored catalog and select up to three biochars to compare. Custom amendments you added appear in their own group.',
-      planned: [
-        'Scored biochar list',
-        'User-provided amendments group',
-        'Application mode selector',
-      ],
-      values: [
-        { label: 'Mode', value: 'Comparison' },
-        { label: 'Douglas-fir slash 550 °C', value: '78' },
-        { label: 'Mixed hardwood 650 °C', value: '64' },
-      ],
+        'Download the assessment as a field-ready PDF or as the NRCS CPS 336 package.',
+      planned: ['PDF report builder', 'NRCS CPS 336 export'],
+      values: [{ label: 'Report', value: 'PDF assessment' }],
     },
-    {
-      id: 'site',
-      label: 'Add a site',
-      title: 'Add a site',
-      modules: 'Guide modules 1–2',
-      optional: true,
-      guidance:
-        'Add a field to unlock the nutrient budget, liming, and soil carbon results.',
-      planned: ['Interactive map', 'SSURGO retrieval', 'Soil summary'],
-      values: [
-        { label: 'Soil', value: 'Willamette silt loam' },
-        { label: 'pH', value: '5.9' },
-      ],
-    },
-    { ...resultsStep },
-    { ...exportStep },
   ],
 };
