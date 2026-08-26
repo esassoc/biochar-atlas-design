@@ -40,7 +40,7 @@ const hasActions = Astro.slots.has('actions');
   <div class="bca-page-header__bar">
     <div class="bca-page-header__titles">
       <h1 class="bca-page-header__title">
-        <EsaIcon name={icon} size="lg" paths={iconPaths} />
+        <EsaIcon name={icon} size="md" paths={iconPaths} />
         <span>{title}</span>
       </h1>
       {lede && <p class="bca-page-header__lede">{lede}</p>}
@@ -70,29 +70,26 @@ const hasActions = Astro.slots.has('actions');
     min-width: 0;
   }
 
-  /* One step up the scale from esa-page-header's default (--type-size-600) and
-     the weight left unpinned, which is what lets [data-theme=biochar] h1's
-     Crimson Pro Light land — see theme-biochar.css, where a rule that pins 600
-     is exactly how a heading ends up semibold in this spoke. */
+  /* esa-page-header's own rung (--type-size-600) and the weight left unpinned,
+     which is what lets [data-theme=biochar] h1's Crimson Pro Light land — see
+     theme-biochar.css, where a rule that pins 600 is exactly how a heading
+     ends up semibold in this spoke. */
   .bca-page-header__title {
     display: flex;
     align-items: center;
     gap: var(--spacing-300, 0.75rem);
     margin: 0;
     font-family: var(--page-header-title-font, var(--font-display));
-    font-size: var(--page-header-title-size, var(--type-size-700, 2.25rem));
+    font-size: var(--page-header-title-size, var(--type-size-600, 1.75rem));
     line-height: 1.1;
     color: var(--page-header-title-color, var(--color-text-primary, #21201c));
   }
 
-  /* Brand Green rather than the title's own ink. A 2px-stroke Lucide glyph at
-     cap height carries far more mass than Crimson Pro Light does at the same
-     colour, so matching the ink makes the icon the loudest thing in the row.
-     Green measures L 0.364 against the ink's 0.243 — a real value step back —
-     while still holding 10.00:1 on the panel. It also reads as identity rather
-     than emphasis, which is what a page glyph is for. */
+  /* ABI Purple rather than the title's own ink: identity, not emphasis, and a
+     step of mass back from the 2px-stroke glyph that Crimson Pro Light can't
+     match at equal color. */
   .bca-page-header__title :global(.esa-icon) {
-    color: var(--color-primary, #364500);
+    color: var(--bca-brand-purple, #45173d);
     flex-shrink: 0;
   }
 
@@ -134,5 +131,12 @@ const hasActions = Astro.slots.has('actions');
     --form-radius-md: var(--form-radius-sm, 4px);
     --form-font-size-md: 0.8125rem;
     --icon-size-md: var(--icon-size-sm, 16px);
+
+    /* The page's one primary action takes the brand ORANGE fill (Andy,
+       2026-08-25) — a step hotter than the step footers' gold, same dark-olive
+       knockout. Scoped here so every admin page's slotted primary matches. */
+    --color-background-brand: var(--bca-brand-gold-dark, #ff9e00);
+    --color-background-brand-hover: var(--bca-gold-10, #ca8c02);
+    --color-content-default-knockout: var(--bca-green-10, #262903);
   }
 </style>

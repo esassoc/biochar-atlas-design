@@ -1,0 +1,25 @@
+---
+// Suitability Tool — stepper direction B, "fused rail": one left rail carries
+// the checklist AND each step's captured values, so the to-do list grows into
+// the summary as the workflow progresses; the step stack takes the remaining
+// width. The chosen direction ("split rails") lives at /suitability-tool.
+import AppShell from '../../layouts/AppShell.astro';
+import BcaToolFrame from '../../components/bca/bca-tool-frame.astro';
+import BcaWorkflowWorkspace from '../../components/bca/bca-workflow-workspace.astro';
+import { evaluateASite, exploreBiochars } from '../../data/workflow';
+---
+
+<!-- manifest:
+  layout: AppShell                              # Atlas app shell + sidenav
+  sections:
+    - tool frame          -> bca-tool-frame     # page header, global controls, workflow tabs
+    - evaluate workspace  -> bca-workflow-workspace  # soil-first stepper, fused rail
+    - explore workspace   -> bca-workflow-workspace  # biochar-first stepper, fused rail
+-->
+
+<AppShell title="Stepper B — Biochar Atlas" activeNavId="suitability-tool">
+  <BcaToolFrame>
+    <BcaWorkflowWorkspace slot="evaluate" workflow={evaluateASite} variant="fused" />
+    <BcaWorkflowWorkspace slot="explore" workflow={exploreBiochars} variant="fused" />
+  </BcaToolFrame>
+</AppShell>

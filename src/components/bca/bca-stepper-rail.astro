@@ -1,0 +1,144 @@
+---
+// bca-stepper-rail — the workflow checklist rail (the Cowork-style to-do
+// list). One row per step: an unnumbered dot indicator, concise label, and an
+// Optional marker. The 'summary' variant additionally carries each step's
+// captured key values beneath its row, so the checklist grows into the
+// summary as steps complete (stepper direction B). The workspace controller
+// drives [data-status] and reveals [data-values]; this component only renders.
+//
+// bcn-lego-checked: esa-sidebar-nav is a page-nav tree (hrefs, collapse), not
+// a stateful checklist; nothing else in Ecology or Beacon renders a stepper.
+// The rows are native buttons because each is a same-page navigation control
+// the controller owns — esa-button is an action button with its own chrome,
+// wrong shape for a rail row. Filed alongside the esa-stepper need.
+import type { WorkflowDef } from '../../data/workflow';
+import BcaStepDot from './bca-step-dot.astro';
+
+interface Props {
+  workflow: WorkflowDef;
+  /** 'checklist' — labels only. 'summary' — captured values accumulate under each row. */
+  variant?: 'checklist' | 'summary';
+}
+const { workflow, variant = 'checklist' } = Astro.props;
+---
+
+<nav class="bca-stepper" data-variant={variant} aria-label={`${workflow.label} steps`}>
+  <ol class="bca-stepper__list" role="list">
+    {
+      workflow.steps.map((step, i) => (
+        <li
+          class="bca-stepper__item"
+          data-step-ref={step.id}
+          data-status={i === 0 ? 'active' : 'upcoming'}
+        >
+          <button type="button" class="bca-stepper__row" data-nav={step.id}>
+            <BcaStepDot index={i + 1} numbered={false} />
+            <span class="bca-stepper__label">{step.label}</span>
+          </button>
+          {variant === 'summary' && step.values.length > 0 && (
+            <dl class="bca-stepper__values" data-values hidden>
+              {step.values.map((v) => (
+                <div class="bca-stepper__pair">
+                  <dt class="typography-microcopy-xs">{v.label}</dt>
+                  <dd class="typography-microcopy-sm">{v.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .bca-stepper__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-050, 0.125rem);
+  }
+
+  .bca-stepper__row {
+    --bca-step-dot-size: 14px;
+
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-200, 0.5rem);
+    width: 100%;
+    padding: var(--spacing-150, 0.375rem) var(--spacing-200, 0.5rem);
+    border-radius: var(--radius-200, 0.5rem);
+    text-align: left;
+    color: var(--color-text-secondary, #54514a);
+    font-size: 0.875rem; /* 14px dense-rail floor */
+    font-weight: var(--font-weight-medium, 500);
+    transition: background 150ms ease, color 150ms ease;
+  }
+  .bca-stepper__row:hover {
+    background: var(--color-active-overlay, rgba(0, 0, 0, 0.04));
+    color: var(--color-text-primary, #33312a);
+  }
+  .bca-stepper__row:focus-visible {
+    outline: 2px solid var(--color-primary, #364500);
+    outline-offset: 2px;
+  }
+
+  .bca-stepper__label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Active row — same fill + ink + weight trio as the app sidenav's active
+     treatment, so "where am I" reads identically in both rails. */
+  .bca-stepper__item[data-status='active'] .bca-stepper__row {
+    background: var(--bca-green-4, #d6dccc);
+    color: var(--color-primary, #364500);
+    font-weight: var(--font-weight-semibold, 600);
+  }
+
+  .bca-stepper__item[data-status='complete'] .bca-stepper__row {
+    color: var(--color-text-primary, #33312a);
+  }
+
+  .bca-stepper__item[data-status='skipped'] .bca-stepper__row {
+    color: var(--color-text-muted, #807c73);
+  }
+
+  /* ── 'summary' variant: captured values beneath the row ── */
+  .bca-stepper__values[hidden] {
+    display: none;
+  }
+  .bca-stepper__values {
+    margin: 0;
+    /* indent under the label column: row padding + dot + gap */
+    padding: var(--spacing-100, 0.25rem) var(--spacing-200, 0.5rem)
+      var(--spacing-300, 0.75rem)
+      calc(var(--spacing-200, 0.5rem) + 14px + var(--spacing-200, 0.5rem));
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-100, 0.25rem);
+  }
+
+  .bca-stepper__pair {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-300, 0.75rem);
+  }
+  .bca-stepper__pair dt {
+    margin: 0;
+    color: var(--color-text-tertiary, #615f5a);
+    flex-shrink: 0;
+  }
+  .bca-stepper__pair dd {
+    margin: 0;
+    color: var(--color-text-primary, #33312a);
+    text-align: right;
+    min-width: 0;
+  }
+</style>

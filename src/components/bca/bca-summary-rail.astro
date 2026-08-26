@@ -1,0 +1,104 @@
+---
+// bca-summary-rail — the right-hand Summary card (stepper direction A). It
+// accumulates each step's top-tier key values as the workflow progresses:
+// glanceable state mid-run, and the reminder of a saved assessment on return.
+// The workspace controller reveals each [data-step-ref] group on completion.
+import type { WorkflowDef } from '../../data/workflow';
+import EsaCard from '@esa/ecology/esa-card.astro';
+import EsaEmptyState from '@esa/ecology/esa-empty-state.astro';
+
+interface Props {
+  workflow: WorkflowDef;
+}
+const { workflow } = Astro.props;
+---
+
+<EsaCard title="Summary" variant="outlined" padding="compact">
+  <div class="bca-summary">
+    <div class="bca-summary__intro" data-summary-empty>
+      <EsaEmptyState
+        size="xs"
+        title="No details yet"
+        description="Complete a step to collect its key details here."
+      />
+    </div>
+    {
+      workflow.steps.map(
+        (step) =>
+          step.values.length > 0 && (
+            <section class="bca-summary__group" data-step-ref={step.id} hidden>
+              <h3 class="bca-summary__heading typography-label-sm-strong">{step.label}</h3>
+              <dl class="bca-summary__values">
+                {step.values.map((v) => (
+                  <div class="bca-summary__pair">
+                    <dt class="typography-microcopy-xs">{v.label}</dt>
+                    <dd class="typography-microcopy-xs">{v.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )
+      )
+    }
+  </div>
+</EsaCard>
+
+<style>
+  .bca-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-400, 1rem);
+  }
+
+  /* wrapper only hosts the esa-empty-state lego and its hidden toggle */
+  .bca-summary__intro[hidden] {
+    display: none;
+  }
+
+  .bca-summary__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-200, 0.5rem);
+    padding-block-start: var(--spacing-300, 0.75rem);
+    border-block-start: 1px solid var(--color-border-light, #ebe8e1);
+  }
+  /* the group after the intro is the first group; the intro hides exactly
+     when any group shows, so this is always the top visible entry */
+  .bca-summary__intro + .bca-summary__group {
+    padding-block-start: 0;
+    border-block-start: 0;
+  }
+  .bca-summary__group[hidden] {
+    display: none;
+  }
+
+  .bca-summary__heading {
+    margin: 0;
+    color: var(--color-text-primary, #33312a);
+  }
+
+  .bca-summary__values {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-100, 0.25rem);
+  }
+
+  .bca-summary__pair {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-300, 0.75rem);
+  }
+  .bca-summary__pair dt {
+    margin: 0;
+    color: var(--color-text-tertiary, #615f5a);
+    flex-shrink: 0;
+  }
+  .bca-summary__pair dd {
+    margin: 0;
+    color: var(--color-text-primary, #33312a);
+    text-align: right;
+    min-width: 0;
+  }
+</style>

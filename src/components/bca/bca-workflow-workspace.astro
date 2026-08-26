@@ -1,0 +1,291 @@
+---
+// bca-workflow-workspace — one workflow's whole working surface: stepper rail
+// with the workflow controls stacked beneath it, the step stack, and
+// (direction A) the Summary rail. The two stepper directions differ only here:
+//   'split' — checklist rail left, steps center, Summary rail right.
+//   'fused' — one left rail that carries the checklist AND the captured
+//             values, steps get the remaining width.
+// The controller script at the bottom owns all workflow state: step statuses,
+// open/closed sections, rail + summary reveals, and the expand / collapse /
+// reset controls.
+import type { WorkflowDef } from '../../data/workflow';
+import BcaStepperRail from './bca-stepper-rail.astro';
+import BcaStepSection from './bca-step-section.astro';
+import BcaSummaryRail from './bca-summary-rail.astro';
+import EsaButton from '@esa/ecology/esa-button.astro';
+import EsaIcon from '@esa/ecology/esa-icon.astro';
+
+interface Props {
+  workflow: WorkflowDef;
+  variant: 'split' | 'fused';
+}
+const { workflow, variant } = Astro.props;
+
+// Lucide glyphs not in esa-icon's registry — slotted into the button labels
+// (esa-button's `icon` prop resolves registry names only).
+const CHEVRONS_UP_DOWN = '<path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>';
+const CHEVRONS_DOWN_UP = '<path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/>';
+const ROTATE_CCW =
+  '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>';
+---
+
+<div class="bca-workspace" data-workflow={workflow.id} data-variant={variant}>
+  <div class="bca-workspace__rail">
+    <div class="bca-workspace__rail-stack">
+      <BcaStepperRail workflow={workflow} variant={variant === 'fused' ? 'summary' : 'checklist'} />
+      <div class="bca-workspace__controls" role="group" aria-label="Workflow controls">
+        <EsaButton variant="ghost" size="sm" data-workspace-action="expand">
+          <EsaIcon name="chevrons-up-down" size="xs" paths={CHEVRONS_UP_DOWN} />
+          Expand all
+        </EsaButton>
+        <EsaButton variant="ghost" size="sm" data-workspace-action="collapse">
+          <EsaIcon name="chevrons-down-up" size="xs" paths={CHEVRONS_DOWN_UP} />
+          Collapse all
+        </EsaButton>
+        <EsaButton variant="ghost" size="sm" data-workspace-action="reset">
+          <EsaIcon name="rotate-ccw" size="xs" paths={ROTATE_CCW} />
+          Start over
+        </EsaButton>
+      </div>
+    </div>
+  </div>
+
+  <div class="bca-workspace__main">
+    {
+      workflow.steps.map((step, i) => (
+        <BcaStepSection
+          step={step}
+          index={i + 1}
+          total={workflow.steps.length}
+          workflowId={workflow.id}
+        />
+      ))
+    }
+  </div>
+
+  {
+    variant === 'split' && (
+      <div class="bca-workspace__summary">
+        <BcaSummaryRail workflow={workflow} />
+      </div>
+    )
+  }
+</div>
+
+<script>
+  type Status = 'upcoming' | 'active' | 'complete' | 'skipped';
+
+  function initWorkspace(root: HTMLElement) {
+    const sections = Array.from(root.querySelectorAll<HTMLElement>('.bca-step'));
+    const railItems = Array.from(root.querySelectorAll<HTMLElement>('.bca-stepper__item'));
+    const summaryGroups = Array.from(root.querySelectorAll<HTMLElement>('.bca-summary__group'));
+    const summaryIntro = root.querySelector<HTMLElement>('[data-summary-empty]');
+    const ids = sections.map((s) => s.dataset.step as string);
+
+    let statuses: Status[] = [];
+    const open = new Set<string>();
+
+    function resetState() {
+      statuses = ids.map((_, i) => (i === 0 ? 'active' : 'upcoming'));
+      open.clear();
+      open.add(ids[0]);
+    }
+    resetState();
+
+    function render() {
+      sections.forEach((section, i) => {
+        const status = statuses[i];
+        const isOpen = open.has(ids[i]);
+        section.dataset.status = status;
+        if (isOpen) section.setAttribute('data-open', '');
+        else section.removeAttribute('data-open');
+        section.querySelector('[data-toggle]')?.setAttribute('aria-expanded', String(isOpen));
+
+        section.querySelectorAll<HTMLButtonElement>('.bca-step__footer button').forEach((b) => {
+          b.disabled = status === 'upcoming';
+        });
+      });
+
+      railItems.forEach((item) => {
+        const i = ids.indexOf(item.dataset.stepRef as string);
+        if (i < 0) return;
+        item.dataset.status = statuses[i];
+        const values = item.querySelector<HTMLElement>('[data-values]');
+        if (values) values.hidden = statuses[i] !== 'complete';
+      });
+
+      summaryGroups.forEach((group) => {
+        const i = ids.indexOf(group.dataset.stepRef as string);
+        if (i >= 0) group.hidden = statuses[i] !== 'complete';
+      });
+
+      if (summaryIntro) {
+        summaryIntro.hidden = statuses.some((s) => s === 'complete');
+      }
+    }
+
+    function goTo(i: number) {
+      open.clear();
+      open.add(ids[i]);
+      render();
+      sections[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function advance(from: number, outcome: 'complete' | 'skipped') {
+      statuses[from] = outcome;
+      let next = -1;
+      for (let j = from + 1; j < ids.length; j++) {
+        if (statuses[j] === 'upcoming' || statuses[j] === 'active') {
+          next = j;
+          break;
+        }
+      }
+      if (next === -1) {
+        for (let j = 0; j < ids.length; j++) {
+          if (statuses[j] === 'upcoming' || statuses[j] === 'active') {
+            next = j;
+            break;
+          }
+        }
+      }
+      if (next !== -1) {
+        if (statuses[next] === 'upcoming') statuses[next] = 'active';
+        goTo(next);
+      } else {
+        // every step resolved — collapse the stack, the rails carry the record
+        open.clear();
+        render();
+      }
+    }
+
+    root.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+
+      const wsAction = target.closest<HTMLElement>('[data-workspace-action]');
+      if (wsAction) {
+        const kind = wsAction.dataset.workspaceAction;
+        if (kind === 'expand') ids.forEach((id) => open.add(id));
+        else if (kind === 'collapse') open.clear();
+        else if (kind === 'reset') resetState();
+        render();
+        if (kind === 'reset') {
+          sections[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return;
+      }
+
+      const nav = target.closest<HTMLElement>('[data-nav]');
+      if (nav) {
+        const i = ids.indexOf(nav.dataset.nav as string);
+        if (i >= 0) goTo(i);
+        return;
+      }
+
+      const action = target.closest<HTMLElement>('[data-action]');
+      if (action) {
+        const section = action.closest<HTMLElement>('.bca-step');
+        if (!section) return;
+        const i = ids.indexOf(section.dataset.step as string);
+        if (i < 0) return;
+        if (action.dataset.action === 'continue') advance(i, 'complete');
+        else if (action.dataset.action === 'skip') advance(i, 'skipped');
+        else if (action.dataset.action === 'back' && i > 0) goTo(i - 1);
+        return;
+      }
+
+      const toggle = target.closest<HTMLElement>('[data-toggle]');
+      if (toggle) {
+        const section = toggle.closest<HTMLElement>('.bca-step');
+        if (!section) return;
+        const id = section.dataset.step as string;
+        if (open.has(id)) open.delete(id);
+        else open.add(id);
+        render();
+      }
+    });
+
+    render();
+  }
+
+  document.querySelectorAll<HTMLElement>('.bca-workspace').forEach(initWorkspace);
+</script>
+
+<style>
+  /* Cells stretch to the row's full height (no align-items: start) so the
+     sticky rail children have the whole column to travel within. Rails run
+     narrow and dense on purpose — the main column takes everything else. */
+  .bca-workspace {
+    display: grid;
+    gap: var(--spacing-600, 2rem);
+  }
+  .bca-workspace[data-variant='split'] {
+    grid-template-columns: 216px minmax(0, 1fr) 256px;
+  }
+  .bca-workspace[data-variant='fused'] {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+
+  /* A light rule closes the rail column. It lives on the grid CELL, not the
+     sticky stack inside it, so it runs the workspace's full height instead of
+     traveling with the stuck content. The inline padding keeps the rows off
+     the rule; the column is 16px wider to hold their width. */
+  .bca-workspace__rail {
+    border-inline-end: 1px solid var(--color-border-light, #ebe8e1);
+    padding-inline-end: var(--spacing-400, 1rem);
+  }
+
+  .bca-workspace__rail-stack,
+  .bca-workspace__summary > :global(*) {
+    position: sticky;
+    top: var(--spacing-400, 1rem);
+  }
+
+  .bca-workspace__controls {
+    /* Brand-ink the ghost trio's labels to ABI Green; their hover wash is the
+       same overlay the stepper rows use, so the whole rail hovers as one. */
+    --color-content-default: var(--color-primary, #364500);
+    --color-background-elevation-sunken: var(--color-active-overlay, rgba(0, 0, 0, 0.04));
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-050, 0.125rem);
+    margin-block-start: var(--spacing-400, 1rem);
+    padding-block-start: var(--spacing-300, 0.75rem);
+    border-block-start: 1px solid var(--color-border-light, #ebe8e1);
+  }
+  /* the slotted icon sits inside the label span — give the pair its gap */
+  .bca-workspace__controls :global(.esa-button__label) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-150, 0.375rem);
+  }
+
+  .bca-workspace__main {
+    display: flex;
+    flex-direction: column;
+  }
+  /* the light rules between free-standing steps — one whisper above the
+     border-light rung, so the rules recede behind the step headers */
+  .bca-workspace__main > :global(.bca-step + .bca-step) {
+    border-block-start: 1px solid var(--bca-sage-5, #e3e2d9);
+  }
+  .bca-workspace__main > :global(.bca-step:first-child) {
+    padding-block-start: var(--spacing-300, 0.75rem);
+  }
+
+  @media (max-width: 1080px) {
+    .bca-workspace[data-variant='split'],
+    .bca-workspace[data-variant='fused'] {
+      grid-template-columns: 1fr;
+    }
+    .bca-workspace__rail-stack,
+    .bca-workspace__summary > :global(*) {
+      position: static;
+    }
+    .bca-workspace__rail {
+      border-inline-end: 0;
+      padding-inline-end: 0;
+    }
+  }
+</style>

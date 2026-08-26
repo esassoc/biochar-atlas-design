@@ -1,17 +1,25 @@
 ---
-// Suitability Tool — the module's page inside the Atlas app shell. The shell is
-// what this spoke demonstrates right now, so the canvas holds the module's
-// identity and its status and nothing else.
+// Suitability Tool — the stepper chrome, "split rails" arrangement (chosen
+// direction, 2026-08-25): the checklist rail on the left, the step stack in
+// the center, the accumulating Summary card on the right. The alternate
+// "fused rail" direction remains at suitability-tool/option-b.astro.
 import AppShell from '../layouts/AppShell.astro';
-import BcaComingSoon from '../components/bca/bca-coming-soon.astro';
+import BcaToolFrame from '../components/bca/bca-tool-frame.astro';
+import BcaWorkflowWorkspace from '../components/bca/bca-workflow-workspace.astro';
+import { evaluateASite, exploreBiochars } from '../data/workflow';
 ---
 
 <!-- manifest:
-  layout: AppShell                          # page spine — Atlas app shell + sidenav
+  layout: AppShell                              # Atlas app shell + sidenav
   sections:
-    - canvas -> bca-coming-soon             # institute mark, product wordmark, module, status
+    - tool frame          -> bca-tool-frame     # page header + workflow switch
+    - evaluate workspace  -> bca-workflow-workspace  # soil-first stepper, split rails
+    - explore workspace   -> bca-workflow-workspace  # biochar-first stepper, split rails
 -->
 
 <AppShell title="Suitability Tool — Biochar Atlas" activeNavId="suitability-tool">
-  <BcaComingSoon moduleName="Suitability Tool" />
+  <BcaToolFrame>
+    <BcaWorkflowWorkspace slot="evaluate" workflow={evaluateASite} variant="split" />
+    <BcaWorkflowWorkspace slot="explore" workflow={exploreBiochars} variant="split" />
+  </BcaToolFrame>
 </AppShell>

@@ -1,0 +1,106 @@
+---
+// bca-step-dot — the circular step indicator shared by the stepper rail and
+// the step headers. Stateless markup: the nearest ancestor's [data-status]
+// (upcoming | active | complete | skipped) decides which face shows — the
+// numeral, the check, or the skip dash.
+//
+// bcn-lego-checked: no esa-* renders a stepper indicator. esa-badge is a text
+// lozenge with no state faces, esa-progress-bar is a linear meter, and
+// esa-icon has no stateful circled variant. Checked Ecology and Beacon
+// (Beacon ships no wizard/stepper UI). The eventual home is a hub-level
+// esa-stepper once the pattern settles; until then this stays a bca- piece.
+interface Props {
+  /** 1-based step number shown in the resting and active faces. */
+  index: number;
+  /** Off renders the resting faces as empty circles (the rail treatment). */
+  numbered?: boolean;
+}
+const { index, numbered = true } = Astro.props;
+---
+
+<span class="bca-step-dot">
+  {numbered && <span class="bca-step-dot__num">{index}</span>}
+  <svg
+    class="bca-step-dot__glyph bca-step-dot__glyph--check"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M20 6 9 17l-5-5"></path>
+  </svg>
+  <svg
+    class="bca-step-dot__glyph bca-step-dot__glyph--skip"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="3"
+    stroke-linecap="round"
+    aria-hidden="true"
+  >
+    <path d="M5 12h14"></path>
+  </svg>
+</span>
+
+<style>
+  .bca-step-dot {
+    --_size: var(--bca-step-dot-size, 26px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    flex-shrink: 0;
+    border-radius: var(--radius-full, 9999px);
+    border: 1.5px solid var(--color-border-default, #c6c5c1);
+    background: var(--color-surface, #fdfdfc);
+    color: var(--color-text-tertiary, #615f5a);
+    font-size: var(--bca-step-dot-num-size, 0.8125rem); /* numeral tracks the dot's context */
+    font-weight: var(--font-weight-semibold, 600);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    transition:
+      background 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .bca-step-dot__glyph {
+    display: none;
+    inline-size: calc(var(--_size) * 0.55);
+    block-size: calc(var(--_size) * 0.55);
+  }
+
+  /* active — brand-green ring, numeral darkens to match */
+  :global([data-status='active']) .bca-step-dot {
+    border-color: var(--color-primary, #364500);
+    color: var(--color-primary, #364500);
+  }
+
+  /* complete — filled green, the check replaces the numeral */
+  :global([data-status='complete']) .bca-step-dot {
+    background: var(--color-primary, #364500);
+    border-color: var(--color-primary, #364500);
+    color: var(--color-text-inverse, #fdfdfc);
+  }
+  :global([data-status='complete']) .bca-step-dot .bca-step-dot__num {
+    display: none;
+  }
+  :global([data-status='complete']) .bca-step-dot .bca-step-dot__glyph--check {
+    display: block;
+  }
+
+  /* skipped — dashed ring, dash glyph */
+  :global([data-status='skipped']) .bca-step-dot {
+    border-style: dashed;
+  }
+  :global([data-status='skipped']) .bca-step-dot .bca-step-dot__num {
+    display: none;
+  }
+  :global([data-status='skipped']) .bca-step-dot .bca-step-dot__glyph--skip {
+    display: block;
+  }
+</style>

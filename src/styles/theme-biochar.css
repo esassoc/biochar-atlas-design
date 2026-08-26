@@ -611,6 +611,14 @@
   --font-weight-medium:   500;
   --font-weight-semibold: 600;
   --font-weight-bold:     700;
+  /* Inter floors at 400 in this spoke (Andy, 2026-08-25: "nothing should be
+     less than 400"). The hub's composites resolve DM Sans's 350 "regular" and
+     300 "light", both too thin on the parchment canvas, so both rungs land on
+     Inter 400 here. The floor is for UI text: Crimson Pro Light display
+     headings keep the brand's identity weight via the spoke's own
+     --font-weight-light. */
+  --typography-font-weight-regular: var(--font-weight-regular, 400);
+  --typography-font-weight-light: var(--font-weight-regular, 400);
 
   /* ═══ SOH-BC SUITABILITY — the map's classed ramp ═════════════════════
      Five discrete classes (Not suited → Well suited), the national map's
@@ -860,6 +868,19 @@
 [data-theme="biochar"] .esa-pill.esa-pill--md,
 [data-theme="biochar"] .esa-badge.esa-badge--md {
   font-size: 1rem;
+}
+
+/* sm esa-buttons step label and glyph to 12px (Andy, 2026-08-25): the microcopy
+   composite's default reads one notch too large inside the compact sm box. Two
+   token re-points scoped to the size class — the label span reads
+   --typography-microcopy-xs-font-size, the icon reads --icon-size-sm — so
+   neither value moves anywhere else. */
+[data-theme="biochar"] .esa-button.esa-button--sm {
+  --typography-microcopy-xs-font-size: 0.75rem;
+  --icon-size-sm: 12px;
+  /* slotted icons declare their own size (often xs); inside an sm button they
+     ride the same 12px so glyph never outweighs label */
+  --icon-size-xs: 12px;
 }
 
 /* esa-snackbar-item sizes its message from --type-size-200 and its action label

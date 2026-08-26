@@ -1,0 +1,65 @@
+---
+// bca-tool-frame — the Suitability Tool's page top: the page header and the
+// two-workflow switch (Evaluate a site / Explore biochars) as an
+// esa-button-toggle segmented control. Each panel holds one
+// bca-workflow-workspace, passed through the named slots; the panels persist
+// in the DOM, so switching preserves each workflow's progress. The workflow
+// controls (expand / collapse / start over) live in the workspace rail.
+import BcaPageHeader from './bca-page-header.astro';
+
+// Lucide map-pinned — same glyph the sidenav uses for the Suitability Tool.
+const MAP_PINNED =
+  '<path d="M18 8c0 3.613-3.869 7.429-5.393 8.795a1 1 0 0 1-1.214 0C9.87 15.429 6 11.613 6 8a6 6 0 0 1 12 0"/><circle cx="12" cy="8" r="2"/><path d="M8.714 14h-3.71a1 1 0 0 0-.948.683l-2.004 6A1 1 0 0 0 3 22h18a1 1 0 0 0 .948-1.316l-2-6a1 1 0 0 0-.949-.684h-3.712"/>';
+---
+
+<div class="bca-tool stack" data-gap="lg">
+  <BcaPageHeader title="Suitability Tool" icon="map-pinned" iconPaths={MAP_PINNED}>
+    <esa-button-toggle slot="actions" class="bca-tool__switch" size="sm"></esa-button-toggle>
+  </BcaPageHeader>
+
+  <div data-workflow-panel="evaluate"><slot name="evaluate" /></div>
+  <div data-workflow-panel="explore" hidden><slot name="explore" /></div>
+</div>
+
+<script>
+  import '@esa/ecology/esa-button-toggle';
+
+  document.querySelectorAll('esa-button-toggle.bca-tool__switch').forEach((el) => {
+    const toggle = el as HTMLElement & {
+      options: Array<{ label: string; value: string }>;
+      value: string;
+    };
+    toggle.options = [
+      { label: 'Evaluate a site', value: 'evaluate' },
+      { label: 'Explore biochars', value: 'explore' },
+    ];
+    toggle.value = 'evaluate';
+    toggle.addEventListener('change', () => {
+      document.querySelectorAll<HTMLElement>('[data-workflow-panel]').forEach((panel) => {
+        panel.hidden = panel.dataset.workflowPanel !== toggle.value;
+      });
+    });
+  });
+</script>
+
+<style>
+  /* The shell's content region is edge-to-edge; a document-shaped page
+     supplies its own gutter (same move as the admin pages). */
+  .bca-tool {
+    padding: var(--spacing-600, 2rem);
+  }
+
+  /* The header band closes with a light rule; the switch lives in its action
+     slot, so the rule underlines both the h1 and the workflow choice. */
+  .bca-tool > :global(.bca-page-header) {
+    padding-block-end: var(--spacing-400, 1rem);
+    border-block-end: 1px solid var(--color-border-light, #ebe8e1);
+  }
+
+  /* Brand-ink the switch's parchment track and selected label (the lego reads
+     these two). */
+  .bca-tool__switch {
+    --color-background-elevation-sunken: var(--bca-sage-4, #eae9e1);
+    --color-content-brand: var(--color-primary, #364500);
+  }
+</style>
