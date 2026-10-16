@@ -1,7 +1,7 @@
 // MOCK FIXTURE — Biochar Atlas user accounts.
 //
 // Not real account data. The people are the real ESA / ABI / USDA ARS project
-// team (andy-work: projects/biochar-atlas/project.md); their org and job title
+// team (esa: projects/biochar-atlas/project.md); their org and job title
 // are real, and everything that belongs to an *account* rather than a person —
 // email address, application role, status, dates — is invented for the
 // prototype. Emails follow a plausible pattern; none of them are live.
